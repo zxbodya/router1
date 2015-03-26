@@ -1,5 +1,5 @@
 let matcherFromExpression = (info)=> {
-  let [matcher,,paramNames]  = info;
+  let matcher = info[0], paramNames = info[2];
   let matcherExp = new RegExp('^' + matcher + '$');
 
   return (path)=> {
@@ -7,8 +7,8 @@ let matcherFromExpression = (info)=> {
     if (matches = path.match(matcherExp)) {
       //todo: verify matches count
       res = {};
-      for (let i = 0, l = matches.length; i < l; i++) {
-        res[paramNames[i]] = matches[i];
+      for (let i = 0, l = paramNames.length; i < l; i++) {
+        res[paramNames[i]] = matches[i + 1];
       }
     }
     return res;
