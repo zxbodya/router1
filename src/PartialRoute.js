@@ -9,7 +9,7 @@ class PartialRoute {
     this._route = route;
     this._resolveRoute = (path)=> {
       if (path[0] === '/') {
-        return path;
+        return path.slice(1);
       }
       let result = rawRoute.slice(0, index).map(route=>route.name).join('/');
       if (path === '') {

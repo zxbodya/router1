@@ -18,6 +18,8 @@ class Router extends Rx.AnonymousSubject {
     this._state = {};
     this.addRoutes(routeDefs);
 
+    this._location = location;
+
     let state = state;
     const routingResult = location
       .map((location)=> {
@@ -69,8 +71,8 @@ class Router extends Rx.AnonymousSubject {
         return res[1];
       });
 
-    let navigate = Rx.Observer.create(function (route) {
-      location.onNext(routes[route[0]].generate(route[1]));
+    let navigate = Rx.Observer.create(function (args) {
+      this.navigate(...args);
     });
 
     super(navigate, routingResult)
@@ -78,19 +80,24 @@ class Router extends Rx.AnonymousSubject {
 
   isActive(route, params, parents) {
     //todo:
+    return false;
   }
 
   url(route, params) {
-    // var route = this._routesByName[route];
-    //todo:
+    route = this._routesByName[route];
+    //todo: throw for not existing route
+    //todo: throw for abstract routes
+    return route.generatePath(params);
   }
 
   absUrl(route, params) {
     //todo:
+    return this.url(route, params);
   }
 
   navigate(route, params, replace) {
-    //todo:
+    let url = this.url(route, params);
+    this._location.onNext(url);
   }
 }
 

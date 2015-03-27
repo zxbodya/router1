@@ -2,6 +2,7 @@ const Rx = require('rx');
 
 const generatorFromExpression = require('./generatorFromExpression');
 const matcherFromExpression = require('./matcherFromExpression');
+const PartialRoute = require('./PartialRoute');
 
 let contactExpressions = (expressions)=> {
   let exp = '';
@@ -62,21 +63,22 @@ class Route {
       Object.keys(paramStreams).forEach(key=> {
         publicParamStreams[key] = paramStreams[key][1];
       });
-      elementStreams = part.handler(this, publicParamStreams, elementStreams)
+      var route = new PartialRoute(this, this._rawRoute, i);
+      elementStreams = part.handler(route, publicParamStreams, elementStreams)
     }
     return [newState, elementStreams];
   }
 
   isActive(route, params, parents) {
-    this._router.isActive(route, params, parents);
+    return this._router.isActive(route, params, parents);
   }
 
   url(route, params) {
-    this._router.url(route, params);
+    return this._router.url(route, params);
   }
 
   absUrl(route, params) {
-    this._router.absUrl(route, params);
+    return this._router.absUrl(route, params);
   }
 
   navigate(route, params, replace) {
