@@ -1,10 +1,14 @@
-//todo: tests for expression language
 const compileExpression = (expression)=> {
   //todo: for non-production verify expression syntax
+  if (process.env.NODE_ENV !== 'production') {
+    if (!/^(?:(?:[^<>:])*(?:<([^>:]+?)(?::([^>]+))?>)*(?:[^<>:])*)*$/.test(expression)) {
+      throw `syntax error in expression "${expression}"`;
+    }
+  }
   //todo: if syntax is not valid show messages about typical errors
 
   // http://stackoverflow.com/questions/8844256/split-string-including-regular-expression-match
-  let textParts = expression.split(/<([^>]+?)(?::([^>]+))?>/);
+  let textParts = expression.split(/<([^>:]+?)(?::([^>]+))?>/);
   let matcher = [];
   let generateParts = [];
   let paramNames = [];
@@ -21,7 +25,17 @@ const compileExpression = (expression)=> {
     }
     if (i % 3 === 2) {
       //todo: verify expression if it has captures - throw an error
-      matcher.push('(', part ? part : '.*', ')');
+      if (part) {
+        if (process.env.NODE_ENV !== 'production') {
+          if (/\([^?]/.test(part)) {
+            throw `syntax error in expression "${expression}", param regexp ${part} contain capture groups`;
+          }
+        }
+
+        matcher.push('(', part, ')');
+      } else {
+        matcher.push('(.*)');
+      }
     }
   }
   return [matcher.join(''), generateParts, paramNames]
