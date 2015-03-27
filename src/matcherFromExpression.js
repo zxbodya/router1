@@ -5,7 +5,6 @@ let matcherFromExpression = (info)=> {
   return (path)=> {
     let matches, res = false;
     if (matches = path.match(matcherExp)) {
-      //todo: verify matches count
       res = {};
       for (let i = 0, l = paramNames.length; i < l; i++) {
         res[paramNames[i]] = matches[i + 1];
