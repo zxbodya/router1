@@ -1,8 +1,15 @@
 let generatorFromExpression = (info)=> {
-  let [, generateParts, paramNames]  = info;
+  let generateParts = info[1], paramNames = info[2];
 
-  return (params) => {
-    //todo: check for missing parameters
+  return (params = {}) => {
+    if (process.env.NODE_ENV !== 'production') {
+      var missingParams = paramNames.filter(paramName=>!(paramName in params));
+
+      if (missingParams.length) {
+        throw `missing parameters [${missingParams.join(',')}]`;
+      }
+    }
+
     let res = [];
     for (let i = 0, l = generateParts.length, pn = 0, pl = paramNames.length; i < l; i++) {
       let g = generateParts[i];
@@ -15,6 +22,7 @@ let generatorFromExpression = (info)=> {
         }
       }
     }
+    //todo: test if matcher can match the result, and throw if it can not
     return res.join('');
   }
 };
