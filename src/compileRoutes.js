@@ -1,45 +1,38 @@
 const compileExpression = require('./compileExpression');
 
-let passHandler = (route, paramStreams, elementStreams)=>elementStreams;
-
-//todo: write spec
-
-//  let routes = [
-//    {
-//      name: 'routeName',
-//      // part of patch matched by route
-//      // search params to pull
-//      // expression for hash generation
-//      url: 'path-expression?param1&param2&param3#hash-expression',
-//      //resolve: {name:(params)=>{/*Promise||value*/}},
-//      //hash handler: scroll, animated scroll, none
-//      handler(route, paramStreams, elementStreams) {
-//        /* element streams */
-//      },
-//      // nested routes
-//      routes: []
-//    }
-//  ];
+let passHandler = (route, paramStreams, elementStreams) => elementStreams;
 
 let compileRoutes = (routeDefs)=> {
-  //todo: verify route definitions in dev
+  if (process.env.NODE_ENV !== 'production') {
+    let usedNames = new Set();
+    for (let i = 0, l = routeDefs.length; i < l; i++) {
+      let routeDef = routeDefs[i];
+      if (!routeDef.name) {
+        throw 'routes should have name property'
+      }
+      if (/[\/.]/.test(routeDef.name)) {
+        throw 'route name should not contain slashes and dots'
+      }
+      if (usedNames.has(routeDef.name)) {
+        throw 'route names should be uniq'
+      }
+      usedNames.add(routeDef.name);
+    }
+  }
 
   let rawRoutes = [];
 
   for (let i = 0, l = routeDefs.length; i < l; i++) {
     let routeDef = routeDefs[i];
 
+    let urlParts = (routeDef.url || '').match(/^([^?#]*)(?:\?([^#]*))?#?(.*)$/);
     let part = {
       name: routeDef.name,
-      handler: routeDef.handler || passHandler
+      handler: routeDef.handler || passHandler,
+      path: compileExpression(urlParts[1]),
+      searchParams: urlParts[2] ? urlParts[2].split('&') : [],
+      hash: compileExpression(urlParts[3])
     };
-    let urlParts = routeDef.url.match(/^([^?#]*)(?:\?([^#]*))?#?(.*)$/);
-    if (!urlParts) {
-      // todo: throw in development
-    }
-    part.path = compileExpression(urlParts[1]);
-    part.searchParams = urlParts[2] ? urlParts[2].split('&') : [];
-    part.hash = compileExpression(urlParts[3]);
 
     if (routeDef.routes && routeDef.routes.length > 0) {
       let nested = compileRoutes(routeDef.routes);
