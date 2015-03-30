@@ -9,7 +9,9 @@ Next to implement
   (url generation)
   (active class)
 4. Lazy route loading
-5. params data mappers
+5. params resolve
 6. search params
 7. hashes
+8. tests 
+9. optimisations
 
