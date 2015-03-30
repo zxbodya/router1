@@ -103,7 +103,8 @@ class Router extends Rx.AnonymousSubject {
     route = this._routesByName[route];
     //todo: throw for not existing route
     //todo: throw for abstract routes
-    return route.generatePath(params);
+    let paramsWithDefaults = Object.assign({}, this._activeRoute[1], params);
+    return route.generatePath(paramsWithDefaults);
   }
 
   absUrl(route, params) {
