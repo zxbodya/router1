@@ -19,7 +19,7 @@ class Router extends Rx.AnonymousSubject {
     this.addRoutes(routeDefs);
 
     this._location = location;
-
+    this._activeRoute = [null, {}];
     let state = state;
     const routingResult = location
       .map((location)=> {
@@ -64,8 +64,9 @@ class Router extends Rx.AnonymousSubject {
       .map(match=> {
         let route = match[0][0];
         let params = match[0][1];
+        this._activeRoute = [route.name, params];
         let location = match[1];
-        // todo: save active route, and update only
+
         let res = route.handle(state, params, location.search, location.hash);
         state = res[0];
         return res[1];
@@ -79,7 +80,22 @@ class Router extends Rx.AnonymousSubject {
   }
 
   isActive(route, params, parents) {
-    //todo:
+    // todo: move to lower levels
+    if (
+      this._activeRoute[0]
+      && (
+      (parents && route === this._activeRoute[0].substring(0, route.length))
+      || route === this._activeRoute[0]
+      )
+    ) {
+      let active = true;
+
+      for (let paramName in params)
+        if (params.hasOwnProperty(paramName)) {
+          active = active && params[paramName].toString() === this._activeRoute[1][paramName].toString()
+        }
+      return active;
+    }
     return false;
   }
 

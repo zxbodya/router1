@@ -50,7 +50,6 @@ class Route {
       if (prevStreams = state && state.paramStreams && state.paramStreams[paramName]) {
         paramStreams[paramName] = prevStreams;
         prevStreams[0].onNext(params[paramName] || search[paramName] || '');
-        console.log('param reused ', paramName);
       } else {
         let paramValue = new Rx.BehaviorSubject(params[paramName] || search[paramName] || '');
         paramStreams[paramName] = [paramValue, paramValue.distinctUntilChanged()];
