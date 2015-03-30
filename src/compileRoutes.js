@@ -31,7 +31,8 @@ let compileRoutes = (routeDefs)=> {
       handler: routeDef.handler || passHandler,
       path: compileExpression(urlParts[1]),
       searchParams: urlParts[2] ? urlParts[2].split('&') : [],
-      hash: compileExpression(urlParts[3])
+      hash: compileExpression(urlParts[3]),
+      slots: routeDef.slots || []
     };
 
     if (routeDef.routes && routeDef.routes.length > 0) {

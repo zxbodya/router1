@@ -62,6 +62,7 @@ describe('Router, compiling route collection', function () {
       {
         name: 'route1',
         url: 'aaa<param1>bbb',
+        slots: ['view0'],
         routes: [
           {
             name: 'route2',
@@ -70,6 +71,7 @@ describe('Router, compiling route collection', function () {
           {
             name: 'route3',
             url: 'ccc<param2>ddd?a',
+            slots: ['view1'],
             routes: [
               {
                 name: 'route4',
@@ -89,22 +91,24 @@ describe('Router, compiling route collection', function () {
     expect(compiled[0][0].path).toEqual(compileExpression('aaa<param1>bbb'));
     expect(compiled[0][0].searchParams).toEqual([]);
     expect(compiled[0][0].hash).toEqual(compileExpression(''));
+    expect(compiled[0][0].slots).toEqual(['view0']);
 
     expect(compiled[0][1].name).toEqual('route2');
     expect(compiled[0][1].path).toEqual(compileExpression('ccc<param2>ddd'));
     expect(compiled[0][1].searchParams).toEqual([]);
     expect(compiled[0][1].hash).toEqual(compileExpression(''));
 
-
     expect(compiled[1][0].name).toEqual('route1');
     expect(compiled[1][0].path).toEqual(compileExpression('aaa<param1>bbb'));
     expect(compiled[1][0].searchParams).toEqual([]);
     expect(compiled[1][0].hash).toEqual(compileExpression(''));
+    expect(compiled[1][0].slots).toEqual(['view0']);
 
     expect(compiled[1][1].name).toEqual('route3');
     expect(compiled[1][1].path).toEqual(compileExpression('ccc<param2>ddd'));
     expect(compiled[1][1].searchParams).toEqual(['a']);
     expect(compiled[1][1].hash).toEqual(compileExpression(''));
+    expect(compiled[1][1].slots).toEqual(['view1']);
 
     expect(compiled[1][2].name).toEqual('route4');
     expect(compiled[1][2].path).toEqual(compileExpression('ccc<param2>ddd'));
@@ -116,11 +120,13 @@ describe('Router, compiling route collection', function () {
     expect(compiled[2][0].path).toEqual(compileExpression('aaa<param1>bbb'));
     expect(compiled[2][0].searchParams).toEqual([]);
     expect(compiled[2][0].hash).toEqual(compileExpression(''));
+    expect(compiled[2][0].slots).toEqual(['view0']);
 
     expect(compiled[2][1].name).toEqual('route3');
     expect(compiled[2][1].path).toEqual(compileExpression('ccc<param2>ddd'));
     expect(compiled[2][1].searchParams).toEqual(['a']);
     expect(compiled[2][1].hash).toEqual(compileExpression(''));
+    expect(compiled[2][1].slots).toEqual(['view1']);
 
     expect(compiled[2][2].name).toEqual('route5');
     expect(compiled[2][2].path).toEqual(compileExpression('ccc<param2>ddd'));
