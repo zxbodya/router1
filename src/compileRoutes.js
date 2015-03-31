@@ -1,3 +1,5 @@
+'use strict';
+
 const compileExpression = require('./compileExpression');
 
 let passHandler = (route, paramStreams, elementStreams) => elementStreams;

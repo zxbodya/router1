@@ -1,3 +1,5 @@
+'use strict';
+
 let matcherFromExpression = (info)=> {
   let matcher = info[0], paramNames = info[2];
   let matcherExp = new RegExp('^' + matcher + '$');

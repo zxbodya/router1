@@ -1,3 +1,4 @@
+'use strict';
 class PartialRoute {
   /**
    *
@@ -11,7 +12,7 @@ class PartialRoute {
       if (path[0] === '/') {
         return path.slice(1);
       }
-      let result = rawRoute.slice(0, index+1).map(route=>route.name).join('/');
+      let result = rawRoute.slice(0, index + 1).map(route=>route.name).join('/');
       if (path === '') {
         return result;
       } else {

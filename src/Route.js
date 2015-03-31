@@ -1,3 +1,5 @@
+'use strict';
+
 const Rx = require('rx');
 
 const generatorFromExpression = require('./generatorFromExpression');

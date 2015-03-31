@@ -1,3 +1,5 @@
+'use strict';
+
 const compileExpression = (expression)=> {
   //todo: for non-production verify expression syntax
   if (process.env.NODE_ENV !== 'production') {

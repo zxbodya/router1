@@ -1,3 +1,5 @@
+'use strict';
+
 const Rx = require('rx');
 const compileRoutes = require('./compileRoutes');
 const Route = require('./Route');

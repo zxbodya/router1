@@ -1,3 +1,5 @@
+'use strict';
+
 let generatorFromExpression = (info)=> {
   let generateParts = info[1], paramNames = info[2];
 
