@@ -68,7 +68,7 @@ class Route {
 
       let partState;
 
-      if (state && state.parts && state.parts.length >= i) {
+      if (state && state.parts && state.parts.length > i) {
         let prev = state.parts[i];
 
         if (prev.part === part) {

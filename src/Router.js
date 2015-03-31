@@ -25,9 +25,11 @@ class Router extends Rx.AnonymousSubject {
     let state = state;
     const routingResult = location
       .map((location)=> {
-        let path = location;
+        let urlParts = (location || '').match(/^([^?#]*)(?:\?([^#]*))?#?(.*)$/);
+
+        let path = urlParts[1];
         let search = {};
-        let hash = '';
+        let hash = urlParts[3];
 
         location = {path, search, hash};
 
@@ -106,7 +108,12 @@ class Router extends Rx.AnonymousSubject {
     //todo: throw for not existing route
     //todo: throw for abstract routes
     let paramsWithDefaults = Object.assign({}, this._activeRoute[1], params);
-    return route.generatePath(paramsWithDefaults);
+    if (route) {
+      var generatePath = route.generatePath(paramsWithDefaults);
+    } else {
+      generatePath = '#route-not-found';
+    }
+    return generatePath;
   }
 
   absUrl(route, params) {
