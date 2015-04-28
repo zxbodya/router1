@@ -65,6 +65,15 @@ class Route {
     let elementStreams = {};
     let prevChanged = false;
     let partStates = new Array(this.rawRoute.length);
+    const viewByKey = slotKey => results=> {
+      if (!results[slotKey]) {
+        //todo :
+        console.log('warning missing view ' + slotKey);
+        return Observable.return(null);
+      }
+      return results[slotKey];
+    };
+
     for (let i = this.rawRoute.length - 1; i >= 0; i--) {
       let part = this.rawRoute[i];
 
@@ -90,23 +99,19 @@ class Route {
       partState = {part};
 
       let publicParamStreams = {};
-      Object.keys(paramStreams).forEach(key=> {
-        publicParamStreams[key] = paramStreams[key][1];
-      });
+      for (let key in paramStreams) {
+        if (paramStreams.hasOwnProperty(key)) {
+          publicParamStreams[key] = paramStreams[key][1];
+        }
+      }
       var route = new PartialRoute(this, this.rawRoute, i);
 
       let ess = new BehaviorSubject(elementStreams);
       let es = {};
-      part.slots.forEach(slotKey=> {
-        es[slotKey] = ess.switchMap(results=> {
-          if (!results[slotKey]) {
-            //todo :
-            console.log('warning missing view ' + slotKey);
-            return Observable.return(null);
-          }
-          return results[slotKey];
-        });
-      });
+      for (let slotIndex = 0, l = part.slots.length; slotIndex < l; slotIndex++) {
+        let slotKey = part.slots[slotIndex];
+        es[slotKey] = ess.switchMap(viewByKey(slotKey));
+      }
       partState.ess = ess;
       elementStreams = part.handler(route, publicParamStreams, es);
 
