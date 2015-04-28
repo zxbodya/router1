@@ -5,15 +5,15 @@ let matcherFromExpression = (info)=> {
   let matcherExp = new RegExp('^' + matcher + '$');
 
   return (path)=> {
-    let matches, res = false;
-    if (matches = path.match(matcherExp)) {
+    let matches = path.match(matcherExp), res = false;
+    if (matches) {
       res = {};
       for (let i = 0, l = paramNames.length; i < l; i++) {
         res[paramNames[i]] = matches[i + 1];
       }
     }
     return res;
-  }
+  };
 };
 
 module.exports = matcherFromExpression;

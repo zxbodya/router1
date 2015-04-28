@@ -9,15 +9,15 @@ class Router extends Rx.AnonymousSubject {
     compileRoutes(routeDefs).map(
         compiledRoute=>new Route(this, compiledRoute)
     ).forEach(route=> {
-        this._routes.push(route);
-        this._routesByName[route.name] = route;
-      })
+        this.routes.push(route);
+        this.routesByName[route.name] = route;
+      });
   }
 
-  constructor(location, routeDefs) {
+  constructor(locationObservable, routeDefs) {
     let state = state;
-    const routingResult = location
-      .map((location)=> {
+    const routingResult = locationObservable
+      .map(location=> {
         let urlParts = (location || '').match(/^([^?#]*)(?:\?([^#]*))?#?(.*)$/);
 
         let path = urlParts[1];
@@ -39,7 +39,7 @@ class Router extends Rx.AnonymousSubject {
         return [matched, location];
       })
       .map(data=> {
-        let [matched,location] = data;
+        let [matched, location] = data;
         let res;
         if (matched.length === 0) {
           //todo: route not found clause
@@ -61,7 +61,7 @@ class Router extends Rx.AnonymousSubject {
       .map(match=> {
         let route = match[0][0];
         let params = match[0][1];
-        this._activeRoute = [route.name, params];
+        this.activeRoute = [route.name, params];
         let location = match[1];
 
         let res = route.handle(state, params, location.search, location.hash);
@@ -77,30 +77,30 @@ class Router extends Rx.AnonymousSubject {
 
     //var that = this;
 
-    var routes = this._routes = [];
-    this._routesByName = {};
-    this._state = {};
+    var routes = this.routes = [];
+    this.routesByName = {};
+    this.state = {};
     this.addRoutes(routeDefs);
 
-    this._location = location;
-    this._activeRoute = [null, {}];
+    this.location = locationObservable;
+    this.activeRoute = [null, {}];
 
   }
 
   isActive(route, params, parents) {
     // todo: move to lower levels
     if (
-      this._activeRoute[0]
+      this.activeRoute[0]
       && (
-      (parents && route === this._activeRoute[0].substring(0, route.length))
-      || route === this._activeRoute[0]
+        (parents && route === this.activeRoute[0].substring(0, route.length))
+        || route === this.activeRoute[0]
       )
     ) {
       let active = true;
 
       for (let paramName in params)
         if (params.hasOwnProperty(paramName)) {
-          active = active && params[paramName].toString() === this._activeRoute[1][paramName].toString()
+          active = active && params[paramName].toString() === this.activeRoute[1][paramName].toString();
         }
       return active;
     }
@@ -108,10 +108,10 @@ class Router extends Rx.AnonymousSubject {
   }
 
   url(route, params) {
-    route = this._routesByName[route];
+    route = this.routesByName[route];
     //todo: throw for not existing route
     //todo: throw for abstract routes
-    let paramsWithDefaults = Object.assign({}, this._activeRoute[1], params);
+    let paramsWithDefaults = Object.assign({}, this.activeRoute[1], params);
     if (route) {
       var generatePath = route.generatePath(paramsWithDefaults);
     } else {
@@ -125,9 +125,9 @@ class Router extends Rx.AnonymousSubject {
     return this.url(route, params);
   }
 
-  navigate(route, params, replace) {
+  navigate(route, params/*, replace*/) {
     let url = this.url(route, params);
-    this._location.onNext(url);
+    this.location.onNext(url);
   }
 }
 

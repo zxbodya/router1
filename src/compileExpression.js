@@ -18,7 +18,7 @@ const compileExpression = (expression)=> {
     let part = textParts[i];
     if (i % 3 === 0) {
       //  http://stackoverflow.com/questions/3446170/escape-string-for-use-in-javascript-regex#answer-6969486
-      matcher.push(part.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&"));
+      matcher.push(part.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, '\\$&'));
       generateParts.push(part);
     }
     if (i % 3 === 1) {
@@ -40,7 +40,7 @@ const compileExpression = (expression)=> {
       }
     }
   }
-  return [matcher.join(''), generateParts, paramNames]
+  return [matcher.join(''), generateParts, paramNames];
 };
 
 module.exports = compileExpression;

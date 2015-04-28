@@ -1,6 +1,9 @@
 'use strict';
 
-const Rx = require('rx');
+const {
+  BehaviorSubject,
+  Observable
+  } = require('rx');
 
 const generatorFromExpression = require('./generatorFromExpression');
 const matcherFromExpression = require('./matcherFromExpression');
@@ -17,14 +20,14 @@ let contactExpressions = (expressions)=> {
     parts = parts.concat(partPath[1]);
     params = params.concat(partPath[2]);
   }
-  return [exp, parts, params]
+  return [exp, parts, params];
 };
 
 
 class Route {
   constructor(router, rawRoute) {
-    this._router = router;
-    this._rawRoute = rawRoute;
+    this.router = router;
+    this.rawRoute = rawRoute;
 
     let pathExp = contactExpressions(rawRoute.map(part=>part.path));
 
@@ -35,25 +38,24 @@ class Route {
 
     let allParams = new Set([...pathExp[2], ...searchParams]);
 
-    this._allParams = [...allParams.values()];
+    this.allParams = [...allParams.values()];
     this.name = rawRoute.map(part=>part.name).join('/');
 
     this.matchPath = matcherFromExpression(pathExp);
     this.generatePath = generatorFromExpression(pathExp);
   }
 
-
-  handle(state, params, search, hash) {
+  handle(state, params, search/*, hash*/) {
     let newState = {};
 
     let paramStreams = {};
-    this._allParams.forEach(paramName=> {
-      let prevStreams;
-      if (prevStreams = state && state.paramStreams && state.paramStreams[paramName]) {
+    this.allParams.forEach(paramName=> {
+      let prevStreams = state && state.paramStreams && state.paramStreams[paramName];
+      if (prevStreams) {
         paramStreams[paramName] = prevStreams;
         prevStreams[0].onNext(params[paramName] || search[paramName] || '');
       } else {
-        let paramValue = new Rx.BehaviorSubject(params[paramName] || search[paramName] || '');
+        let paramValue = new BehaviorSubject(params[paramName] || search[paramName] || '');
         paramStreams[paramName] = [paramValue, paramValue.distinctUntilChanged()];
       }
     });
@@ -62,9 +64,9 @@ class Route {
 
     let elementStreams = {};
     let prevChanged = false;
-    let partStates = new Array(this._rawRoute.length);
-    for (let i = this._rawRoute.length - 1; i >= 0; i--) {
-      let part = this._rawRoute[i];
+    let partStates = new Array(this.rawRoute.length);
+    for (let i = this.rawRoute.length - 1; i >= 0; i--) {
+      let part = this.rawRoute[i];
 
       let partState;
 
@@ -91,18 +93,18 @@ class Route {
       Object.keys(paramStreams).forEach(key=> {
         publicParamStreams[key] = paramStreams[key][1];
       });
-      var route = new PartialRoute(this, this._rawRoute, i);
+      var route = new PartialRoute(this, this.rawRoute, i);
 
-      let ess = new Rx.BehaviorSubject(elementStreams);
+      let ess = new BehaviorSubject(elementStreams);
       let es = {};
       part.slots.forEach(slotKey=> {
-        es[slotKey] = ess.switchMap(es=> {
-          if (!es[slotKey]) {
+        es[slotKey] = ess.switchMap(results=> {
+          if (!results[slotKey]) {
             //todo :
             console.log('warning missing view ' + slotKey);
-            return Rx.Observable.return(null);
+            return Observable.return(null);
           }
-          return es[slotKey];
+          return results[slotKey];
         });
       });
       partState.ess = ess;
@@ -115,19 +117,19 @@ class Route {
   }
 
   isActive(route, params, parents) {
-    return this._router.isActive(route, params, parents);
+    return this.router.isActive(route, params, parents);
   }
 
   url(route, params) {
-    return this._router.url(route, params);
+    return this.router.url(route, params);
   }
 
   absUrl(route, params) {
-    return this._router.absUrl(route, params);
+    return this.router.absUrl(route, params);
   }
 
   navigate(route, params, replace) {
-    this._router.navigate(route, params, replace);
+    this.router.navigate(route, params, replace);
   }
 }
 

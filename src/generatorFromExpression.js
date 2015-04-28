@@ -26,7 +26,7 @@ let generatorFromExpression = (info)=> {
     }
     //todo: test if matcher can match the result, and throw if it can not
     return res.join('');
-  }
+  };
 };
 
 module.exports = generatorFromExpression;
