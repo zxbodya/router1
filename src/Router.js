@@ -3,6 +3,7 @@
 const Rx = require('rx');
 const compileRoutes = require('./compileRoutes');
 const Route = require('./Route');
+const splitUrl = require('./splitUrl');
 
 class Router extends Rx.AnonymousSubject {
   addRoutes(routeDefs) {
@@ -18,11 +19,11 @@ class Router extends Rx.AnonymousSubject {
     let state = state;
     const routingResult = locationObservable
       .map(location=> {
-        let urlParts = (location || '').match(/^([^?#]*)(?:\?([^#]*))?#?(.*)$/);
+        let urlParts = splitUrl(location || '');
 
-        let path = urlParts[1];
+        let path = urlParts[0];
         let search = {};
-        let hash = urlParts[3];
+        let hash = urlParts[2];
 
         location = {path, search, hash};
 
