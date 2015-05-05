@@ -15,7 +15,7 @@ class Router extends Rx.AnonymousSubject {
       });
   }
 
-  constructor(locationObservable, routeDefs) {
+  constructor(locationObservable, routeDefs, getHandler) {
     let state = state;
     const routingResult = locationObservable
       .map(locationChange=> {
@@ -70,6 +70,7 @@ class Router extends Rx.AnonymousSubject {
 
     super(navigate, routingResult);
 
+    this.getHandler = getHandler;
     //var that = this;
 
     var routes = this.routes = [];

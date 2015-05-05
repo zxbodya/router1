@@ -102,7 +102,7 @@ class Route {
         es[slotKey] = ess.switchMap(viewByKey(slotKey));
       }
       partState.ess = ess;
-      elementStreams = part.handler(route, publicParamStreams, es);
+      elementStreams = this.router.getHandler(part.handler)(route, publicParamStreams, es);
       partState.es = elementStreams;
       partStates[i] = partState;
     }
@@ -125,6 +125,7 @@ class Route {
   navigate(route, params, replace) {
     this.router.navigate(route, params, replace);
   }
+
   navigateToUrl(url) {
     this.router.navigateToUrl(url);
   }
