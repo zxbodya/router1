@@ -7,9 +7,9 @@ const splitUrl = require('./splitUrl');
 
 class Router extends Rx.AnonymousSubject {
   addRoutes(routeDefs) {
-    compileRoutes(routeDefs).map(
-        compiledRoute=>new Route(this, compiledRoute)
-    ).forEach(route=> {
+    compileRoutes(routeDefs)
+      .forEach(compiledRoute=> {
+        let route = new Route(this, compiledRoute);
         this.routes.push(route);
         this.routesByName[route.name] = route;
       });
