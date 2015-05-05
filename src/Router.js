@@ -18,7 +18,8 @@ class Router extends Rx.AnonymousSubject {
   constructor(locationObservable, routeDefs) {
     let state = state;
     const routingResult = locationObservable
-      .map(location=> {
+      .map(locationChange=> {
+        let [location, scroll] = locationChange;
         let urlParts = splitUrl(location || '');
 
         let path = urlParts[0];
@@ -37,10 +38,6 @@ class Router extends Rx.AnonymousSubject {
           }
         }
 
-        return [matched, location];
-      })
-      .map(data=> {
-        let [matched, location] = data;
         let res;
         if (matched.length === 0) {
           //todo: route not found clause
@@ -57,17 +54,14 @@ class Router extends Rx.AnonymousSubject {
           // 2.1 select from conflicting
           // 2.2 resource not found clause
         }
-        return [res, location];
-      })
-      .map(match=> {
-        let route = match[0][0];
-        let params = match[0][1];
-        this.activeRoute = [route.name, params];
-        let location = match[1];
 
-        let res = route.handle(state, params, location.search, location.hash);
-        state = res[0];
-        return res[1];
+        let route = res[0];
+        let params = res[1];
+        this.activeRoute = [route.name, params];
+
+        let handleResult = route.handle(state, params, location.search, location.hash);
+        state = handleResult[0];
+        return [handleResult[1], scroll, location.hash];
       });
 
     let navigate = Rx.Observer.create(function (args) {
@@ -128,6 +122,10 @@ class Router extends Rx.AnonymousSubject {
 
   navigate(route, params/*, replace*/) {
     let url = this.url(route, params);
+    this.location.onNext(url);
+  }
+
+  navigateToUrl(url) {
     this.location.onNext(url);
   }
 }

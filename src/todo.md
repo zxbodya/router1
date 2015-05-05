@@ -8,10 +8,10 @@ Next to implement
 3. Link component 
   (url generation)
   (active class)
-4. Lazy route loading
-5. params resolve
+[-] 4. Lazy route loading
+[-] 5. params resolve
 6. search params
-7. hashes
+[+] 7. hashes
 8. tests 
-9. optimisations
+[+] 9. optimisations
 

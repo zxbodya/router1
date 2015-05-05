@@ -125,6 +125,9 @@ class Route {
   navigate(route, params, replace) {
     this.router.navigate(route, params, replace);
   }
+  navigateToUrl(url) {
+    this.router.navigateToUrl(url);
+  }
 }
 
 module.exports = Route;

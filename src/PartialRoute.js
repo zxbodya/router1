@@ -38,6 +38,10 @@ class PartialRoute {
   navigate(route, params = {}, replace = false) {
     return this.route.navigate(this.resolveRoute(route), params, replace);
   }
+
+  navigateToUrl(url) {
+    this.route.navigateToUrl(url);
+  }
 }
 
 
