@@ -79,6 +79,7 @@ class Route {
           }
           prevChanged = false;
           partStates[i] = partState;
+          elementStreams = partState.es;
           continue;
         }
       }
@@ -102,7 +103,7 @@ class Route {
       }
       partState.ess = ess;
       elementStreams = part.handler(route, publicParamStreams, es);
-
+      partState.es = elementStreams;
       partStates[i] = partState;
     }
     newState.parts = partStates;
