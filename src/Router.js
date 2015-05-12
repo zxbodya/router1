@@ -71,7 +71,6 @@ class Router extends Rx.AnonymousSubject {
     super(navigate, routingResult);
 
     this.getHandler = getHandler;
-    //var that = this;
 
     var routes = this.routes = [];
     this.routesByName = {};
@@ -103,26 +102,22 @@ class Router extends Rx.AnonymousSubject {
     return false;
   }
 
-  url(route, params) {
-    route = this.routesByName[route];
-    //todo: throw for not existing route
-    //todo: throw for abstract routes
-    let paramsWithDefaults = Object.assign({}, this.activeRoute[1], params);
+  url(name, params, hash) {
+    let route = this.routesByName[name];
     if (route) {
-      var generatePath = route.generatePath(paramsWithDefaults);
+      var generatePath = route.generatePath(params);
     } else {
-      generatePath = '#route-not-found';
+      throw `Route "${name}" not found`;
     }
-    return generatePath;
+    let url = generatePath;
+    if (hash) {
+      url += '#' + hash;
+    }
+    return url;
   }
 
-  absUrl(route, params) {
-    //todo:
-    return this.url(route, params);
-  }
-
-  navigate(route, params/*, replace*/) {
-    let url = this.url(route, params);
+  navigate(route, params, hash) {
+    let url = this.url(route, params, hash);
     this.location.onNext(url);
   }
 

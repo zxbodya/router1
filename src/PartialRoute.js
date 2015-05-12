@@ -31,10 +31,6 @@ class PartialRoute {
     return this.route.url(this.resolveRoute(route), params);
   }
 
-  absUrl(route, params = {}) {
-    return this.route.absUrl(this.resolveRoute(route), params);
-  }
-
   navigate(route, params = {}, replace = false) {
     return this.route.navigate(this.resolveRoute(route), params, replace);
   }

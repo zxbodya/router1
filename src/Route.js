@@ -118,10 +118,6 @@ class Route {
     return this.router.url(route, params);
   }
 
-  absUrl(route, params) {
-    return this.router.absUrl(route, params);
-  }
-
   navigate(route, params, replace) {
     this.router.navigate(route, params, replace);
   }
