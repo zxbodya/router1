@@ -6,8 +6,9 @@ Next to implement
 [+] 2. do not reload not replaced handlers
 [+] 2. default params
 3. Link component 
-  (url generation)
-  (active class)
+  [+](url generation)
+  [+](active class)
+     (active class auto update)
 [-] 4. Lazy route loading
 [-] 5. params resolve
 6. search params
