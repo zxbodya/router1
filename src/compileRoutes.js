@@ -10,13 +10,13 @@ let compileRoutes = (routeDefs)=> {
     for (let i = 0, l = routeDefs.length; i < l; i++) {
       let routeDef = routeDefs[i];
       if (!routeDef.name) {
-        throw 'routes should have name property';
+        throw new Error('routes should have name property');
       }
       if (/[\/.]/.test(routeDef.name)) {
-        throw 'route name should not contain slashes and dots';
+        throw new Error('route name should not contain slashes and dots');
       }
       if (usedNames.has(routeDef.name)) {
-        throw 'route names should be uniq';
+        throw new Error('route names should be uniq');
       }
       usedNames.add(routeDef.name);
     }

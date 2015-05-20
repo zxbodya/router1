@@ -8,7 +8,7 @@ let generatorFromExpression = (info)=> {
       var missingParams = paramNames.filter(paramName=>!(paramName in params));
 
       if (missingParams.length) {
-        throw `missing parameters [${missingParams.join(',')}]`;
+        throw new Error(`missing parameters [${missingParams.join(',')}]`);
       }
     }
 

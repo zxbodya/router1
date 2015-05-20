@@ -108,7 +108,7 @@ class Router extends Rx.AnonymousSubject {
     if (route) {
       var generatePath = route.generatePath(params);
     } else {
-      throw `Route "${name}" not found`;
+      throw new Error(`Route "${name}" not found`);
     }
     let url = generatePath;
     if (hash) {

@@ -4,7 +4,7 @@ const compileExpression = (expression)=> {
   //todo: for non-production verify expression syntax
   if (process.env.NODE_ENV !== 'production') {
     if (!/^(?:(?:[^<>:])*(?:<([^>:]+?)(?::([^>]+))?>)*(?:[^<>:])*)*$/.test(expression)) {
-      throw `syntax error in expression "${expression}"`;
+      throw new Error(`syntax error in expression "${expression}"`);
     }
   }
   //todo: if syntax is not valid show messages about typical errors
@@ -30,7 +30,7 @@ const compileExpression = (expression)=> {
       if (part) {
         if (process.env.NODE_ENV !== 'production') {
           if (/\([^?]/.test(part)) {
-            throw `syntax error in expression "${expression}", param regexp ${part} contain capture groups`;
+            throw new Error(`syntax error in expression "${expression}", param regexp ${part} contain capture groups`);
           }
         }
 
