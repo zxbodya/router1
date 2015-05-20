@@ -3,11 +3,11 @@
 const React = require('react');
 const {PropTypes, Component} = React;
 
-function withRouterContext(ComponentToEnhance, router, route) {
+function withRouterContext(ComponentToEnhance, router) {
 
   class RouterContext extends Component {
     getChildContext() {
-      return {router, route};
+      return {router};
     }
 
     render() {
@@ -19,10 +19,8 @@ function withRouterContext(ComponentToEnhance, router, route) {
 
 
   RouterContext.childContextTypes = {
-    router: PropTypes.object.isRequired,
-    route: PropTypes.object.isRequired
+    router: PropTypes.object.isRequired
   };
-
 
   return RouterContext;
 }
