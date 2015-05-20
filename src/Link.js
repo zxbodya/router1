@@ -8,7 +8,7 @@ class Link extends Component {
     let {href, route, params, hash} = this.props;
     let {router} = this.context;
 
-    if(!router) {
+    if (!router) {
       //todo:
       return <span>No router in context</span>;
     }
@@ -28,8 +28,10 @@ class Link extends Component {
         router.navigate(route, params, hash);
       };
     }
-    return (
-      <a href={url} {...this.props} onClick={onClick}/>
+    return React.createElement(
+      'a',
+      Object.assign({href: url, onClick}, this.props),
+      this.props.children
     );
   }
 }
