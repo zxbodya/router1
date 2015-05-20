@@ -106,7 +106,7 @@ class Router extends Rx.AnonymousSubject {
   url(name, params, hash) {
     let route = this.routesByName[name];
     if (route) {
-      var generatePath = route.generatePath(params);
+      var generatePath = route.generatePath(Object.assign({}, this.activeRoute[1], params));
     } else {
       throw new Error(`Route "${name}" not found`);
     }
