@@ -8,6 +8,11 @@ class Link extends Component {
     let {href, route, params, hash} = this.props;
     let {router} = this.context;
 
+    if(!router) {
+      //todo:
+      return <span>No router in context</span>;
+    }
+
     let url;
     let onClick;
     if (href) {
