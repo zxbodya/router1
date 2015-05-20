@@ -20,25 +20,6 @@ class PartialRoute {
       }
     };
   }
-
-  //------- User api --------//
-
-  isActive(route, params = {}, parents = true) {
-    return this.route.isActive(this.resolveRoute(route), params, parents);
-  }
-
-  url(route, params = {}) {
-    return this.route.url(this.resolveRoute(route), params);
-  }
-
-  navigate(route, params = {}, replace = false) {
-    return this.route.navigate(this.resolveRoute(route), params, replace);
-  }
-
-  navigateToUrl(url) {
-    this.route.navigateToUrl(url);
-  }
 }
-
 
 module.exports = PartialRoute;

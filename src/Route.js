@@ -10,6 +10,7 @@ const matcherFromExpression = require('./matcherFromExpression');
 const PartialRoute = require('./PartialRoute');
 
 let contactExpressions = require('./concatExpressions');
+let withRouterContext = require('./withRouterContext');
 
 
 class Route {
@@ -62,6 +63,10 @@ class Route {
       return results[slotKey];
     };
 
+    const withContext = (route, Component)=> {
+      return withRouterContext(Component, this.router, route);
+    };
+
     for (let i = this.rawRoute.length - 1; i >= 0; i--) {
       let part = this.rawRoute[i];
 
@@ -102,28 +107,12 @@ class Route {
         es[slotKey] = ess.switchMap(viewByKey(slotKey));
       }
       partState.ess = ess;
-      elementStreams = this.router.getHandler(part.handler)(route, publicParamStreams, es);
+      elementStreams = this.router.getHandler(part.handler)(withContext.bind(null, route), publicParamStreams, es);
       partState.es = elementStreams;
       partStates[i] = partState;
     }
     newState.parts = partStates;
     return [newState, elementStreams];
-  }
-
-  isActive(route, params, parents) {
-    return this.router.isActive(route, params, parents);
-  }
-
-  url(route, params) {
-    return this.router.url(route, params);
-  }
-
-  navigate(route, params, replace) {
-    this.router.navigate(route, params, replace);
-  }
-
-  navigateToUrl(url) {
-    this.router.navigateToUrl(url);
   }
 }
 
