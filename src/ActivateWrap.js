@@ -11,7 +11,7 @@ class ActivateWrap extends Component {
 
     let {router} = this.context;
 
-    if(!router) {
+    if (!router) {
       //todo:
       return <span>No router in context</span>;
     }
