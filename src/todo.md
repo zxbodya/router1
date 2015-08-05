@@ -15,4 +15,4 @@ Next to implement
 [+] 7. hashes
 8. tests 
 [+] 9. optimisations
-
+10. 404

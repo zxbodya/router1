@@ -29,6 +29,7 @@ class ActivateWrap extends Component {
 ActivateWrap.propTypes = {
   component: PropTypes.any.isRequired,
   activeClass: PropTypes.string,
+  className: PropTypes.string,
   route: PropTypes.string,
   href: PropTypes.string,
   params: PropTypes.object
