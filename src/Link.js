@@ -1,7 +1,4 @@
-'use strict';
-
-const React = require('react');
-const {PropTypes, Component} = React;
+import React, {PropTypes, Component} from 'react';
 
 class Link extends Component {
   render() {
@@ -47,4 +44,4 @@ Link.contextTypes = {
   router: PropTypes.object
 };
 
-module.exports = Link;
+export default Link;

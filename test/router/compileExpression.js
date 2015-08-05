@@ -1,5 +1,5 @@
 'use strict';
-const compileExpression = require('../../src/router/compileExpression');
+import compileExpression from '../../src/router/compileExpression';
 
 describe('Router, expression parsing', function () {
   let tests = [

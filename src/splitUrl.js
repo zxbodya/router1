@@ -1,6 +1,4 @@
-'use strict';
-
-module.exports = function (url) {
+export default function (url) {
   let urlParts = url.match(/^([^?#]*)(?:\?([^#]*))?#?(.*)$/);
 
   let path = urlParts[1];

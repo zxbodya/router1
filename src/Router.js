@@ -1,9 +1,7 @@
-'use strict';
-
-const Rx = require('rx');
-const compileRoutes = require('./compileRoutes');
-const Route = require('./Route');
-const splitUrl = require('./splitUrl');
+import Rx from 'rx';
+import compileRoutes from './compileRoutes';
+import Route from './Route';
+import splitUrl from './splitUrl';
 
 class Router extends Rx.AnonymousSubject {
   addRoutes(routeDefs) {
@@ -126,4 +124,4 @@ class Router extends Rx.AnonymousSubject {
   }
 }
 
-module.exports = Router;
+export default Router;

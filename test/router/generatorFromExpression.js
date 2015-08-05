@@ -1,6 +1,6 @@
 'use strict';
-const compileExpression = require('../../src/router/compileExpression');
-const generatorFromExpression = require('../../src/router/generatorFromExpression');
+import compileExpression from '../../src/router/compileExpression';
+import generatorFromExpression from '../../src/router/generatorFromExpression';
 
 describe('Router, generator from expression', function () {
   it('it generates strings without params', ()=> {

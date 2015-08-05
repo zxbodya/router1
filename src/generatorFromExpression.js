@@ -1,5 +1,3 @@
-'use strict';
-
 let generatorFromExpression = (info)=> {
   let generateParts = info[1], paramNames = info[2];
 
@@ -29,4 +27,4 @@ let generatorFromExpression = (info)=> {
   };
 };
 
-module.exports = generatorFromExpression;
+export default generatorFromExpression;

@@ -1,4 +1,3 @@
-'use strict';
 class PartialRoute {
   /**
    *
@@ -22,4 +21,4 @@ class PartialRoute {
   }
 }
 
-module.exports = PartialRoute;
+export default PartialRoute;

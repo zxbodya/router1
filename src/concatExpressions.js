@@ -1,6 +1,4 @@
-'use strict';
-
-module.exports = function contactExpressions(expressions) {
+export default function contactExpressions(expressions) {
   let exp = '';
   let params = [];
   let parts = [];

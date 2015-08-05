@@ -1,8 +1,5 @@
-'use strict';
-
-const React = require('react');
-const {PropTypes, Component} = React;
-const classnames = require('classnames');
+import React, {PropTypes, Component} from 'react';
+import classnames from 'classnames';
 
 //todo: subscribe for route changes
 class ActivateWrap extends Component {
@@ -39,4 +36,4 @@ ActivateWrap.contextTypes = {
   router: PropTypes.object
 };
 
-module.exports = ActivateWrap;
+export default ActivateWrap;

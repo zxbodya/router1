@@ -1,6 +1,6 @@
 'use strict';
-const compileExpression = require('../../src/router/compileExpression');
-const matcherFromExpression = require('../../src/router/matcherFromExpression');
+import compileExpression from '../../src/router/compileExpression';
+import matcherFromExpression from '../../src/router/matcherFromExpression';
 
 describe('Router, matcher from expression', function () {
   it('it matches strings without params', ()=> {

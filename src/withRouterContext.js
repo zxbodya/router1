@@ -1,7 +1,4 @@
-'use strict';
-
-const React = require('react');
-const {PropTypes, Component} = React;
+import React, {PropTypes, Component} from 'react';
 
 function withRouterContext(ComponentToEnhance, router) {
 
@@ -17,7 +14,6 @@ function withRouterContext(ComponentToEnhance, router) {
     }
   }
 
-
   RouterContext.childContextTypes = {
     router: PropTypes.object.isRequired
   };
@@ -25,4 +21,4 @@ function withRouterContext(ComponentToEnhance, router) {
   return RouterContext;
 }
 
-module.exports = withRouterContext;
+export default withRouterContext;

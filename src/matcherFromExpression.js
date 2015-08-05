@@ -1,5 +1,3 @@
-'use strict';
-
 let matcherFromExpression = (info)=> {
   let matcher = info[0], paramNames = info[2];
   let matcherExp = new RegExp('^' + matcher + '$');
@@ -16,4 +14,4 @@ let matcherFromExpression = (info)=> {
   };
 };
 
-module.exports = matcherFromExpression;
+export default matcherFromExpression;

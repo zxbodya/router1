@@ -1,5 +1,3 @@
-'use strict';
-
 const compileExpression = (expression)=> {
   //todo: for non-production verify expression syntax
   if (process.env.NODE_ENV !== 'production') {
@@ -43,4 +41,4 @@ const compileExpression = (expression)=> {
   return [matcher.join(''), generateParts, paramNames];
 };
 
-module.exports = compileExpression;
+export default compileExpression;

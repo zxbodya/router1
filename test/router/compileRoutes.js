@@ -1,6 +1,6 @@
 'use strict';
-const compileRoutes = require('../../src/router/compileRoutes');
-const compileExpression = require('../../src/router/compileExpression');
+import compileRoutes from '../../src/router/compileRoutes';
+import compileExpression from '../../src/router/compileExpression';
 
 describe('Router, compiling route collection', function () {
   it('compiles empty collection', ()=> {

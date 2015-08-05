@@ -1,13 +1,8 @@
-'use strict';
+import {BehaviorSubject, Observable} from 'rx';
 
-const {
-  BehaviorSubject,
-  Observable
-  } = require('rx');
-
-const generatorFromExpression = require('./generatorFromExpression');
-const matcherFromExpression = require('./matcherFromExpression');
-const PartialRoute = require('./PartialRoute');
+import generatorFromExpression from './generatorFromExpression';
+import matcherFromExpression from './matcherFromExpression';
+import PartialRoute from './PartialRoute';
 
 let contactExpressions = require('./concatExpressions');
 
@@ -111,4 +106,4 @@ class Route {
   }
 }
 
-module.exports = Route;
+export default Route;

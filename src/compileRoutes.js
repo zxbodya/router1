@@ -1,6 +1,4 @@
-'use strict';
-
-const compileExpression = require('./compileExpression');
+import compileExpression from './compileExpression';
 
 let passHandler = (route, paramStreams, elementStreams) => elementStreams;
 
@@ -50,4 +48,4 @@ let compileRoutes = (routeDefs)=> {
   return rawRoutes;
 };
 
-module.exports = compileRoutes;
+export default compileRoutes;
