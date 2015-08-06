@@ -94,7 +94,7 @@ class Route {
       let es = {};
       for (let slotIndex = 0, l = part.slots.length; slotIndex < l; slotIndex++) {
         let slotKey = part.slots[slotIndex];
-        es[slotKey] = ess.switchMap(viewByKey(slotKey));
+        es[slotKey] = ess.flatMapLatest(viewByKey(slotKey));
       }
       partState.ess = ess;
       elementStreams = this.router.getHandler(part.handler)(route, publicParamStreams, es);
