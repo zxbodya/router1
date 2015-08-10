@@ -1,4 +1,4 @@
-import compileExpression from './compileExpression';
+import compileExpression from './expressions/compile';
 
 let passHandler = (route, paramStreams, elementStreams) => elementStreams;
 

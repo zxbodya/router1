@@ -1,6 +1,6 @@
 'use strict';
 import compileRoutes from '../../src/router/compileRoutes';
-import compileExpression from '../../src/router/compileExpression';
+import compileExpression from '../../src/router/expressions/compile';
 
 describe('Router, compiling route collection', function () {
   it('compiles empty collection', ()=> {

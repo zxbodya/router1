@@ -1,7 +1,7 @@
 import Rx from 'rx';
 import compileRoutes from './compileRoutes';
 import Route from './Route';
-import splitUrl from './splitUrl';
+import splitUrl from './utils/splitUrl';
 
 class Router extends Rx.AnonymousSubject {
   addRoutes(routeDefs) {

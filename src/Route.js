@@ -1,10 +1,9 @@
 import {BehaviorSubject, Observable} from 'rx';
 
-import generatorFromExpression from './generatorFromExpression';
-import matcherFromExpression from './matcherFromExpression';
-import PartialRoute from './PartialRoute';
+import generatorFromExpression from './expressions/createGenerator';
+import matcherFromExpression from './expressions/createMatcher';
 
-let contactExpressions = require('./concatExpressions');
+let contactExpressions = require('./expressions/concat');
 
 
 class Route {
@@ -88,7 +87,6 @@ class Route {
           publicParamStreams[key] = paramStreams[key][1];
         }
       }
-      var route = new PartialRoute(this, this.rawRoute, i);
 
       let ess = new BehaviorSubject(elementStreams);
       let es = {};
@@ -97,7 +95,7 @@ class Route {
         es[slotKey] = ess.flatMapLatest(viewByKey(slotKey));
       }
       partState.ess = ess;
-      elementStreams = this.router.getHandler(part.handler)(route, publicParamStreams, es);
+      elementStreams = this.router.getHandler(part.handler)(publicParamStreams, es);
       partState.es = elementStreams;
       partStates[i] = partState;
     }
