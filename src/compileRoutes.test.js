@@ -36,25 +36,21 @@ describe('Router, compiling route collection', function () {
       }
     ]);
 
-    expect(compiled[0][0].name).toEqual('route1');
-    expect(compiled[0][0].path).toEqual(compileExpression('aaa<param1>bbb'));
-    expect(compiled[0][0].searchParams).toEqual([]);
+    expect(compiled[0].name).toEqual('route1');
+    expect(compiled[0].searchParams).toEqual([]);
+    expect(compiled[0].allParams).toEqual(['param1']);
 
-    expect(compiled[1][0].name).toEqual('route2');
-    expect(compiled[1][0].path).toEqual(compileExpression('ccc<param2>ddd'));
-    expect(compiled[1][0].searchParams).toEqual([]);
+    expect(compiled[1].name).toEqual('route2');
+    expect(compiled[1].searchParams).toEqual([]);
 
-    expect(compiled[2][0].name).toEqual('route3');
-    expect(compiled[2][0].path).toEqual(compileExpression('ccc<param2>ddd'));
-    expect(compiled[2][0].searchParams).toEqual(['a']);
+    expect(compiled[2].name).toEqual('route3');
+    expect(compiled[2].searchParams).toEqual(['a']);
 
-    expect(compiled[3][0].name).toEqual('route4');
-    expect(compiled[3][0].path).toEqual(compileExpression('ccc<param2>ddd'));
-    expect(compiled[3][0].searchParams).toEqual([]);
+    expect(compiled[3].name).toEqual('route4');
+    expect(compiled[3].searchParams).toEqual([]);
 
-    expect(compiled[4][0].name).toEqual('route5');
-    expect(compiled[4][0].path).toEqual(compileExpression('ccc<param2>ddd'));
-    expect(compiled[4][0].searchParams).toEqual(['a', 'b']);
+    expect(compiled[4].name).toEqual('route5');
+    expect(compiled[4].searchParams).toEqual(['a', 'b']);
   });
 
   it('compiles route collection with nested routes', ()=> {
@@ -90,38 +86,16 @@ describe('Router, compiling route collection', function () {
       }
     ]);
 
-    expect(compiled[0][0].name).toEqual('route1');
-    expect(compiled[0][0].path).toEqual(compileExpression('aaa<param1>bbb'));
-    expect(compiled[0][0].searchParams).toEqual([]);
+    expect(compiled[0].name).toEqual('route1/route2');
+    expect(compiled[0].searchParams).toEqual([]);
 
-    expect(compiled[0][1].name).toEqual('route2');
-    expect(compiled[0][1].path).toEqual(compileExpression('ccc<param2>ddd'));
-    expect(compiled[0][1].searchParams).toEqual([]);
+    expect(compiled[1].name).toEqual('route1/route3/route4');
+    expect(compiled[1].searchParams).toEqual(['a']);
 
-    expect(compiled[1][0].name).toEqual('route1');
-    expect(compiled[1][0].path).toEqual(compileExpression('aaa<param1>bbb'));
-    expect(compiled[1][0].searchParams).toEqual([]);
+    expect(compiled[2].name).toEqual('route1/route3/route5');
+    expect(compiled[2].searchParams).toEqual(['a', 'b']);
+    //todo: warning tests
 
-    expect(compiled[1][1].name).toEqual('route3');
-    expect(compiled[1][1].path).toEqual(compileExpression('ccc<param2>ddd'));
-    expect(compiled[1][1].searchParams).toEqual(['a']);
-
-    expect(compiled[1][2].name).toEqual('route4');
-    expect(compiled[1][2].path).toEqual(compileExpression('ccc<param2>ddd'));
-    expect(compiled[1][2].searchParams).toEqual([]);
-
-
-    expect(compiled[2][0].name).toEqual('route1');
-    expect(compiled[2][0].path).toEqual(compileExpression('aaa<param1>bbb'));
-    expect(compiled[2][0].searchParams).toEqual([]);
-
-    expect(compiled[2][1].name).toEqual('route3');
-    expect(compiled[2][1].path).toEqual(compileExpression('ccc<param2>ddd'));
-    expect(compiled[2][1].searchParams).toEqual(['a']);
-
-    expect(compiled[2][2].name).toEqual('route5');
-    expect(compiled[2][2].path).toEqual(compileExpression('ccc<param2>ddd'));
-    expect(compiled[2][2].searchParams).toEqual(['a', 'b']);
   });
 
   it('throws when route name is missing', ()=> {
