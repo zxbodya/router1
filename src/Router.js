@@ -13,10 +13,10 @@ class Router extends Rx.AnonymousSubject {
       });
   }
 
-  constructor(locationObservable, routeDefs, getHandler) {
+  constructor(locationSubject, routeDefs, getHandler) {
     let state = state;
     let router;
-    const routingResult = locationObservable
+    const routingResult = locationSubject
       .map(locationChange=> {
         let [location, scroll] = locationChange;
         let urlParts = splitUrl(location || '');
@@ -74,7 +74,7 @@ class Router extends Rx.AnonymousSubject {
     var routes = this.routes = [];
     this.routesByName = {};
     this.state = {};
-    this.location = locationObservable;
+    this.location = locationSubject;
     this.activeRoute = [null, {}];
 
     this.addRoutes(routeDefs);

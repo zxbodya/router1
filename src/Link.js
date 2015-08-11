@@ -37,7 +37,8 @@ Link.propTypes = {
   route: PropTypes.string,
   href: PropTypes.string,
   params: PropTypes.object,
-  hash: PropTypes.string
+  hash: PropTypes.string,
+  children: PropTypes.any
 };
 
 Link.contextTypes = {

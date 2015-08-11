@@ -44,7 +44,7 @@ class Route {
 
     newState.paramStreams = paramStreams;
 
-    let elementStreams = {};
+    let view = null;
     let prevChanged = false;
     let partStates = new Array(this.rawRoute.length);
     const viewByKey = slotKey => results=> {
@@ -69,11 +69,11 @@ class Route {
           // not changed
           partState = prev;
           if (prevChanged) {
-            partState.ess.onNext(elementStreams);
+            partState.ess.onNext(view);
           }
           prevChanged = false;
           partStates[i] = partState;
-          elementStreams = partState.es;
+          view = partState.es;
           continue;
         }
       }
@@ -88,19 +88,21 @@ class Route {
         }
       }
 
-      let ess = new BehaviorSubject(elementStreams);
-      let es = {};
-      for (let slotIndex = 0, l = part.slots.length; slotIndex < l; slotIndex++) {
-        let slotKey = part.slots[slotIndex];
-        es[slotKey] = ess.flatMapLatest(viewByKey(slotKey));
+      let ess;
+      let es;
+
+      if (view) {
+        ess = new BehaviorSubject(view);
+        es = ess.flatMapLatest(s=>s);
       }
+
       partState.ess = ess;
-      elementStreams = this.router.getHandler(part.handler)(publicParamStreams, es);
-      partState.es = elementStreams;
+      view = this.router.getHandler(part.handler)(publicParamStreams, es);
+      partState.es = view;
       partStates[i] = partState;
     }
     newState.parts = partStates;
-    return [newState, elementStreams];
+    return [newState, view];
   }
 }
 
