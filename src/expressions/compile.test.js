@@ -1,5 +1,4 @@
-'use strict';
-import compileExpression from '../../src/router/expressions/compile';
+import compileExpression from './compile.js';
 
 describe('Router, expression parsing', function () {
   let tests = [

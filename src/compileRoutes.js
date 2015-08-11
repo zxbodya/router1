@@ -28,13 +28,12 @@ let compileRoutes = (routeDefs)=> {
   for (let i = 0, l = routeDefs.length; i < l; i++) {
     let routeDef = routeDefs[i];
 
-    let urlParts = (routeDef.url || '').match(/^([^?#]*)(?:\?([^#]*))?#?(.*)$/);
+    let urlParts = (routeDef.url || '').match(/^([^?]*)(?:\?(.*))?$/);
     let part = {
       name: routeDef.name,
       handler: routeDef.handler,
       path: compileExpression(urlParts[1]),
-      searchParams: urlParts[2] ? urlParts[2].split('&') : [],
-      hash: compileExpression(urlParts[3])
+      searchParams: urlParts[2] ? urlParts[2].split('&') : []
     };
 
     if (routeDef.routes && routeDef.routes.length > 0) {
