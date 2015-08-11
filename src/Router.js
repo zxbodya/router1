@@ -11,8 +11,8 @@ class Router extends Rx.AnonymousSubject {
       });
   }
 
-  constructor(locationSubject, routeDefs, getHandler) {
-    let state = state;
+  constructor(locationSubject, routeDefs, handler) {
+    let state;
     let router;
     const routingResult = locationSubject
       .map(locationChange=> {
@@ -56,9 +56,8 @@ class Router extends Rx.AnonymousSubject {
         let params = res[1];
         router.activeRoute = [route.name, params];
 
-        let handleResult = this.handle(route, state, params, location.search, location.hash);
-        state = handleResult[0];
-        return [handleResult[1], scroll, location.hash];
+        let handleResult = this.handler.handle(route, params, location.search, location.hash);
+        return [handleResult, scroll, location.hash];
       });
 
     let navigate = Rx.Observer.create(function (args) {
@@ -67,86 +66,14 @@ class Router extends Rx.AnonymousSubject {
 
     super(navigate, routingResult);
     router = this;
-    this.getHandler = getHandler;
+    this.handler = handler;
 
     var routes = this.routes = [];
     this.routesByName = {};
-    this.state = {};
     this.location = locationSubject;
     this.activeRoute = [null, {}];
 
     this.addRoutes(routeDefs);
-  }
-
-  handle(route, state, params, search/*, hash*/) {
-
-    let newState = {};
-
-    let paramStreams = {};
-    route.allParams.forEach(paramName=> {
-      let prevStreams = state && state.paramStreams && state.paramStreams[paramName];
-      if (prevStreams) {
-        paramStreams[paramName] = prevStreams;
-        prevStreams[0].onNext(params[paramName] || search[paramName] || '');
-      } else {
-        let paramValue = new BehaviorSubject(params[paramName] || search[paramName] || '');
-        paramStreams[paramName] = [paramValue, paramValue.distinctUntilChanged()];
-      }
-    });
-
-    newState.paramStreams = paramStreams;
-
-    let view = null;
-    let prevChanged = false;
-    let partStates = new Array(route.handler.length);
-
-    for (let i = route.handler.length - 1; i >= 0; i--) {
-      let part = route.handler[i];
-
-      let partState;
-
-      if (state && state.parts && state.parts.length > i) {
-        let prev = state.parts[i];
-
-        if (prev.part === part) {
-          // changed previous (need to update element streams stream)
-          // not changed
-          partState = prev;
-          if (prevChanged) {
-            partState.ess.onNext(view);
-          }
-          prevChanged = false;
-          partStates[i] = partState;
-          view = partState.es;
-          continue;
-        }
-      }
-      // changed
-      prevChanged = true;
-      partState = {part};
-
-      let publicParamStreams = {};
-      for (let key in paramStreams) {
-        if (paramStreams.hasOwnProperty(key)) {
-          publicParamStreams[key] = paramStreams[key][1];
-        }
-      }
-
-      let ess;
-      let es;
-
-      if (view) {
-        ess = new BehaviorSubject(view);
-        es = ess.flatMapLatest(s=>s);
-      }
-
-      partState.ess = ess;
-      view = this.getHandler(part)(publicParamStreams, es);
-      partState.es = view;
-      partStates[i] = partState;
-    }
-    newState.parts = partStates;
-    return [newState, view];
   }
 
   isActive(route, params, parents) {
