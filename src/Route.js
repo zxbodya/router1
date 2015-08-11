@@ -47,14 +47,6 @@ class Route {
     let view = null;
     let prevChanged = false;
     let partStates = new Array(this.rawRoute.length);
-    const viewByKey = slotKey => results=> {
-      if (!results[slotKey]) {
-        //todo :
-        console.log('warning missing view ' + slotKey);
-        return Observable.return(null);
-      }
-      return results[slotKey];
-    };
 
     for (let i = this.rawRoute.length - 1; i >= 0; i--) {
       let part = this.rawRoute[i];

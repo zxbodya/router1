@@ -1,6 +1,6 @@
 import compileExpression from './expressions/compile';
 
-let passHandler = (route, paramStreams, elementStreams) => elementStreams;
+let passHandler = (paramStreams, childView) => childView;
 
 let compileRoutes = (routeDefs)=> {
   if (process.env.NODE_ENV !== 'production') {
@@ -9,6 +9,9 @@ let compileRoutes = (routeDefs)=> {
       let routeDef = routeDefs[i];
       if (!routeDef.name) {
         throw new Error('routes should have name property');
+      }
+      if (!routeDef.handler) {
+        throw new Error('routes should have handler property');
       }
       if (/[\/.]/.test(routeDef.name)) {
         throw new Error('route name should not contain slashes and dots');
@@ -28,11 +31,10 @@ let compileRoutes = (routeDefs)=> {
     let urlParts = (routeDef.url || '').match(/^([^?#]*)(?:\?([^#]*))?#?(.*)$/);
     let part = {
       name: routeDef.name,
-      handler: routeDef.handler || passHandler,
+      handler: routeDef.handler,
       path: compileExpression(urlParts[1]),
       searchParams: urlParts[2] ? urlParts[2].split('&') : [],
-      hash: compileExpression(urlParts[3]),
-      slots: routeDef.slots || []
+      hash: compileExpression(urlParts[3])
     };
 
     if (routeDef.routes && routeDef.routes.length > 0) {
