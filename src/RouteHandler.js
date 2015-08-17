@@ -1,4 +1,6 @@
 import Rx, {BehaviorSubject, Observable} from 'rx';
+import NotFound from './../views/NotFound.js';
+import RxComponent from '../utils/RxComponent.js';
 
 class RouteHandler {
   constructor(getHandler) {
@@ -26,7 +28,7 @@ class RouteHandler {
 
     newState.paramStreams = paramStreams;
 
-    let view = null;
+    let view = null, meta = null, status = null;
     let prevChanged = false;
     let partStates = new Array(route.handler.length);
 
@@ -43,11 +45,13 @@ class RouteHandler {
           // not changed
           partState = prev;
           if (prevChanged) {
-            partState.ess.onNext(view);
+            partState.view$$.onNext(view);
+            partState.meta$$.onNext(meta);
           }
           prevChanged = false;
           partStates[i] = partState;
-          view = partState.es;
+          view = partState.view$;
+          meta = partState.meta$;
           continue;
         }
       }
@@ -62,22 +66,55 @@ class RouteHandler {
         }
       }
 
-      let ess;
-      let es;
+      let view$$;
+      let view$;
 
       if (view) {
-        ess = new BehaviorSubject(view);
-        es = ess.flatMapLatest(s=>s);
+        view$$ = new BehaviorSubject(view);
+        view$ = view$$.flatMapLatest(s=>s);
       }
 
-      partState.ess = ess;
-      view = this.getHandler(part)(publicParamStreams, es);
-      partState.es = view;
+      let meta$$;
+      let meta$;
+
+      if (meta) {
+        meta$$ = new BehaviorSubject(meta);
+        meta$ = meta$$.flatMapLatest(s=>s);
+      }
+
+      partState.view$$ = view$$;
+      partState.meta$$ = meta$$;
+      let handleResult = this.getHandler(part)(publicParamStreams, view$);
+      if (handleResult.subscribe) {
+        view = handleResult;
+        meta = meta$;
+      } else {
+        view = handleResult.view;
+        meta = handleResult.meta;
+        status = handleResult.status;
+      }
+      partState.view$ = view;
+      partState.meta$ = meta;
       partStates[i] = partState;
     }
     newState.parts = partStates;
     this.state = newState;
-    return view;
+    if (!meta) {
+      meta = Observable.just({});
+    }
+    if (!status) {
+      status = Observable.just({code: 200});
+    }
+    return {view, meta, status};
+  }
+
+  notFound() {
+    this.state = {};
+    return {
+      view: new RxComponent(NotFound),
+      status: Observable.just({code: 404}),
+      meta: Observable.just({title: 'Страница не найдена'})
+    };
   }
 }
 

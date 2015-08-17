@@ -12,18 +12,17 @@ class Router extends Rx.AnonymousSubject {
   }
 
   constructor(locationSubject, routeDefs, handler) {
-    let state;
     let router;
     const routingResult = locationSubject
       .map(locationChange=> {
-        let [location, scroll] = locationChange;
-        let urlParts = splitUrl(location || '');
+        let [locationUrl, scroll] = locationChange;
+        let urlParts = splitUrl(locationUrl || '');
 
         let path = urlParts[0];
         let search = {};
         let hash = urlParts[2];
 
-        location = {path, search, hash};
+        let location = {path, search, hash};
 
         let matched = [];
 
@@ -52,12 +51,19 @@ class Router extends Rx.AnonymousSubject {
           // 2.2 resource not found clause
         }
 
-        let route = res[0];
-        let params = res[1];
-        router.activeRoute = [route.name, params];
+        if (res) {
+          let route = res[0];
+          let params = res[1];
+          router.activeRoute = [route.name, params];
 
-        let handleResult = this.handler.handle(route, params, location.search, location.hash);
-        return [handleResult, scroll, location.hash];
+          let handleResult = this.handler.handle(route, params, location.search, location.hash);
+          return [handleResult, scroll, location.hash];
+        } else {
+          router.activeRoute = [null, {}];
+
+          let handleResult = this.handler.notFound(locationUrl);
+          return [handleResult, scroll, location.hash];
+        }
       });
 
     let navigate = Rx.Observer.create(function (args) {
