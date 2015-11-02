@@ -14,7 +14,7 @@ import NotFound from '../NotFound';
 
 import routes from '../routes';
 import Router from '../router/Router';
-import withRouterContext from '../router/withRouterContext';
+import RouterContext from '../router/RouterContext';
 
 const router = new Router(
   history,
@@ -26,8 +26,6 @@ router.routingResult().forEach(routingResult=> {
     Handler = NotFound;
   }
 
-  Handler = withRouterContext(Handler, router);
-
   React.withContext({
     metaData: {
       setTitle(title) {
@@ -38,7 +36,7 @@ router.routingResult().forEach(routingResult=> {
       }
     }
   }, ()=> {
-    React.render(<Handler/>, document.getElementById('app'), ()=> {
+    React.render(<RouterContext router={router} component={Handler}/>, document.getElementById('app'), ()=> {
       const hash = window.location.hash;
       if (hash) {
         let target = $(hash);

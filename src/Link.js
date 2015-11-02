@@ -3,7 +3,7 @@ import classnames from 'classnames';
 
 class Link extends Component {
   render() {
-    let {href, route, params, hash, className, activeClassName} = this.props;
+    let {href, route, params, hash, className, activeClassName, onClick:onClickOriginal} = this.props;
     let {router} = this.context;
 
     if (!router) {
@@ -22,6 +22,7 @@ class Link extends Component {
     if (href) {
       url = href;
       onClick = (e)=> {
+        onClickOriginal && onClickOriginal(e);
         e.preventDefault();
         router.navigateToUrl(href);
       };
@@ -29,18 +30,20 @@ class Link extends Component {
     } else {
       url = router.createUrl(route, params, hash);
       onClick = (e)=> {
+        onClickOriginal && onClickOriginal(e);
         e.preventDefault();
         router.navigate(route, params, hash);
       };
 
       isActive = router.isActive(route, params);
     }
-    let props = Object.assign({
+    let props = Object.assign(
+      {},
+      this.props, {
         href: url,
         onClick
       },
-      this.props,
-      {className: classnames(className || '', {[activeClassName || 'active']: isActive})}
+      {className: classnames(className || '', {[activeClassName || 'active']: isActive && activeClassName})}
     );
     return React.createElement(
       'a',
@@ -51,6 +54,7 @@ class Link extends Component {
 }
 
 Link.propTypes = {
+  onClick: PropTypes.func,
   route: PropTypes.string,
   href: PropTypes.string,
   params: PropTypes.object,
