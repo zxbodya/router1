@@ -1,29 +1,39 @@
 import React from 'react';
-import Router from 'react-router';
+import createServerHistory from './../router/createServerHistory';
+
+import notFoundHandler from '../notFoundPage/notFoundHandler';
+
 import routes from '../routes';
+import Router from '../router/Router';
+import RouterContext from '../router/RouterContext';
 
-export default function prerender(requestPath, cb, metaData) {
+export default function prerender(requestPath, cb) {
 
-  const router = Router.create({
-    routes: routes,
-    location: requestPath,
-    onAbort: function (redirect) {
-      cb({redirect: redirect.to});
-    },
-    onError: function (err) {
-      cb(err);
-    }
+
+  let history = createServerHistory(requestPath);
+
+  const router = new Router(
+    history,
+    routes);
+
+  router.routingResult().first().subscribe(routingResult=> {
+    let handler = routingResult.handler || notFoundHandler;
+
+    const {meta, view} = handler();
+
+    const html = React.renderToString(<RouterContext router={router} component={view}/>);
+    cb(null, {html, meta});
   });
 
-  router.run(function (Handler) {
+  //const router = Router.create({
+  //  routes: routes,
+  //  location: requestPath,
+  //  onAbort: function (redirect) {
+  //    cb({redirect: redirect.to});
+  //  },
+  //  onError: function (err) {
+  //    cb(err);
+  //  }
+  //});
 
-    React.withContext({
-      metaData: metaData
-    }, ()=> {
-      const virtualDom = React.createFactory(Handler)({});
-      const html = React.renderToString(virtualDom);
-      cb(null, html);
-    });
-
-  });
 }
