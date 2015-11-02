@@ -1,41 +1,41 @@
-import Home from './homePage/Home';
-import Cases from './casesPage/Cases';
-import Case from './casePage/Case';
-import Team from './teamPage/Team';
-import Services from './servicesPage/Services';
-import Contact from './contactPage/Contact';
+import homeHandler from './homePage/homeHandler';
+import casesHandler from './casesPage/casesHandler';
+import caseHandler from './casePage/caseHandler';
+import teamHandler from './teamPage/teamHandler';
+import servicesHandler from './servicesPage/servicesHandler';
+import contactHandler from './contactPage/contactHandler';
 
 export default [
   {
     name: 'home',
     url: '/',
-    handler: Home
+    handler: homeHandler
   },
 
   {
     name: 'contact',
     url: '/contact',
-    handler: Contact
+    handler: contactHandler
   },
   {
     name: 'services',
     url: '/services',
-    handler: Services
+    handler: servicesHandler
   },
   {
     name: 'team',
     url: '/team',
-    handler: Team
+    handler: teamHandler
   },
   {
     name: 'case',
     url: '/case/<slug>',
-    handler: Case
+    handler: caseHandler
   },
   //<Redirect from="/case/" to="/case"/>
   {
     name: 'cases',
     url: '/case',
-    handler: Cases
+    handler: casesHandler
   }
 ];

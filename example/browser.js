@@ -10,7 +10,7 @@ import createBrowserHistory from './../router/createBrowserHistory';
 
 let history = createBrowserHistory();
 
-import NotFound from '../notFoundPage/NotFound';
+import notFoundHandler from '../notFoundPage/notFoundHandler';
 
 import routes from '../routes';
 import Router from '../router/Router';
@@ -21,34 +21,27 @@ const router = new Router(
   routes);
 
 router.routingResult().forEach(routingResult=> {
-  let Handler = routingResult.handler;
-  if (Handler === null) {
-    Handler = NotFound;
-  }
+  let handler = routingResult.handler || notFoundHandler;
 
-  React.withContext({
-    metaData: {
-      setTitle(title) {
-        document.title = title;
-      },
-      setDescription(description) {
-        $('meta[name=description]').text(description);
+  const {meta, view} = handler();
+
+
+  document.title = meta.title || '';
+
+  $('meta[name=description]').text(meta.description || '');
+
+  React.render(<RouterContext router={router} component={view}/>, document.getElementById('app'), ()=> {
+    const hash = window.location.hash;
+    if (hash) {
+      let target = $(hash);
+      target = target.length ? target : $('[name=' + hash.slice(1) + ']');
+      if (target.length) {
+        $('html,body').animate({
+          scrollTop: target.offset().top
+        }, 0);
       }
     }
-  }, ()=> {
-    React.render(<RouterContext router={router} component={Handler}/>, document.getElementById('app'), ()=> {
-      const hash = window.location.hash;
-      if (hash) {
-        let target = $(hash);
-        target = target.length ? target : $('[name=' + hash.slice(1) + ']');
-        if (target.length) {
-          $('html,body').animate({
-            scrollTop: target.offset().top
-          }, 0);
-        }
-      }
-      window.ga('send', 'pageview', window.location.pathname);
-    });
+    window.ga('send', 'pageview', window.location.pathname);
   });
 });
 
