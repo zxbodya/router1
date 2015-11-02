@@ -1,4 +1,6 @@
 import React from 'react';
+import ReactDOM from 'react-dom/server';
+
 import createServerHistory from './../router/createServerHistory';
 
 import notFoundHandler from '../notFoundPage/notFoundHandler';
@@ -21,7 +23,7 @@ export default function prerender(requestPath, cb) {
 
     const {meta, view} = handler();
 
-    const html = React.renderToString(<RouterContext router={router} component={view}/>);
+    const html = ReactDOM.renderToString(<RouterContext router={router} component={view}/>);
     cb(null, {html, meta});
   });
 

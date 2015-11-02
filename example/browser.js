@@ -1,4 +1,7 @@
 import React from 'react';
+
+import ReactDOM from 'react-dom';
+
 import $ from 'jquery';
 
 import '../styles/main.sass';
@@ -30,7 +33,7 @@ router.routingResult().forEach(routingResult=> {
 
   $('meta[name=description]').text(meta.description || '');
 
-  React.render(<RouterContext router={router} component={view}/>, document.getElementById('app'), ()=> {
+  ReactDOM.render(<RouterContext router={router} component={view}/>, document.getElementById('app'), ()=> {
     const hash = window.location.hash;
     if (hash) {
       let target = $(hash);
