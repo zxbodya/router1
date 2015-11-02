@@ -1,3 +1,12 @@
+/***
+ * Concatenates compiled expressions
+ *
+ * NOT USED
+ * maybe would be useful in future, if there would be need to do nested states
+ *
+ * @param expressions
+ * @return {*[]}
+ */
 export default function contactExpressions(expressions) {
   let exp = '';
   let params = [];

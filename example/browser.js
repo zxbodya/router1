@@ -1,17 +1,33 @@
 import React from 'react';
-import Router from 'react-router';
-
-import routes from '../routes';
 import $ from 'jquery';
 
 import '../styles/main.sass';
 import '../styles/icons.scss';
 
-import 'ga';
+import './ga';
 
+import createBrowserHistory from './../router/createBrowserHistory';
 
+let history = createBrowserHistory();
 
-Router.run(routes, Router.HistoryLocation, (Handler) => {
+import NotFound from '../NotFound';
+
+import routes from '../routes';
+import Router from '../router/Router';
+import withRouterContext from '../router/withRouterContext';
+
+const router = new Router(
+  history,
+  routes);
+
+router.routingResult().forEach(routingResult=> {
+  let Handler = routingResult.handler;
+  if (Handler === null) {
+    Handler = NotFound;
+  }
+
+  Handler = withRouterContext(Handler, router);
+
   React.withContext({
     metaData: {
       setTitle(title) {

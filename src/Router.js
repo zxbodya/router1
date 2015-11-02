@@ -1,8 +1,18 @@
-import Rx, {BehaviorSubject, Observable} from 'rx';
 import compileRoutes from './compileRoutes';
 import splitUrl from './utils/splitUrl';
 
-class Router extends Rx.AnonymousSubject {
+
+class Router {
+  constructor(history, routes) {
+    this.history = history;
+
+    this.routes = [];
+    this.routesByName = {};
+
+    this.activeRoute = [null, {}];
+    this.addRoutes(routes);
+  }
+
   addRoutes(routeDefs) {
     compileRoutes(routeDefs)
       .forEach(route=> {
@@ -11,24 +21,17 @@ class Router extends Rx.AnonymousSubject {
       });
   }
 
-  constructor(locationSubject, routeDefs, handler) {
-    let router;
-    const routingResult = locationSubject
-      .map(locationChange=> {
-        let [locationUrl, scroll] = locationChange;
-        let urlParts = splitUrl(locationUrl || '');
+  routingResult() {
+    return this.history
+      .location
+      .map((location)=> {
 
-        let path = urlParts[0];
-        let search = {};
-        let hash = urlParts[2];
+        const {pathname, search, hash} = location;
+        const matched = [];
 
-        let location = {path, search, hash};
-
-        let matched = [];
-
-        for (let i = 0, l = routes.length; i < l; i++) {
-          let route = routes[i];
-          let params = route.matchPath(path);
+        for (let i = 0, l = this.routes.length; i < l; i++) {
+          const route = this.routes[i];
+          const params = route.matchPath(pathname);
           if (params) {
             matched.push([route, params]);
           }
@@ -52,78 +55,56 @@ class Router extends Rx.AnonymousSubject {
         }
 
         if (res) {
-          let route = res[0];
-          let params = res[1];
-          router.activeRoute = [route.name, params];
+          const route = res[0];
+          const params = res[1];
 
-          let handleResult = this.handler.handle(route, params, location.search, location.hash);
-          return [handleResult, scroll, location.hash];
+          return {route: route.name, handler: route.handler, params, location};
         } else {
-          router.activeRoute = [null, {}];
-
-          let handleResult = this.handler.notFound(locationUrl);
-          return [handleResult, scroll, location.hash];
+          return {route: null, handler: null, params: {}, location};
         }
-      });
-
-    let navigate = Rx.Observer.create(function (args) {
-      this.navigate(...args);
-    });
-
-    super(navigate, routingResult);
-    router = this;
-    this.handler = handler;
-
-    var routes = this.routes = [];
-    this.routesByName = {};
-    this.location = locationSubject;
-    this.activeRoute = [null, {}];
-
-    this.addRoutes(routeDefs);
+      })
+      .do(({route, params})=> {
+        this.activeRoute = [route, params];
+      })
+      .shareReplay();
   }
-
-  isActive(route, params, parents) {
-    // todo: move to lower levels
-    if (
-      this.activeRoute[0]
-      && (
-        (parents && route === this.activeRoute[0].substring(0, route.length))
-        || route === this.activeRoute[0]
-      )
-    ) {
+  isActive(route, params) {
+    if (this.activeRoute[0] && route === this.activeRoute[0]) {
       let active = true;
 
-      for (let paramName in params)
+      for (let paramName in params) {
         if (params.hasOwnProperty(paramName)) {
           active = active && params[paramName].toString() === this.activeRoute[1][paramName].toString();
         }
+      }
       return active;
     }
     return false;
   }
 
-  url(name, params = {}, hash = '') {
+  createUrl(name, params = {}, hash = '') {
     let route = this.routesByName[name];
     if (route) {
-      var generatePath = route.generatePath(Object.assign({}, this.activeRoute[1], params));
+      const pathname = route.generatePath(Object.assign({}, this.activeRoute[1], params));
+      if (hash) {
+        return hash = '#' + hash;
+      }
+      return `${pathname}${hash}`;
     } else {
-      throw new Error(`Route "${name}" not found`);
+      console.error(`Route "${name}" not found`);
+      return `#route-${name}-not-found`;
     }
-    let url = generatePath;
-    if (hash) {
-      url += '#' + hash;
-    }
-    return url;
   }
 
   navigate(route, params = {}, hash = '') {
-    let url = this.url(route, params, hash);
-    this.location.onNext(url);
+    let url = this.createUrl(route, params, hash);
+    this.history.push(url);
   }
 
   navigateToUrl(url) {
-    this.location.onNext(url);
+    this.history.push(url);
   }
+
 }
 
 export default Router;

@@ -9,10 +9,16 @@ class ActivateWrap extends Component {
     let {router} = this.context;
 
     if (!router) {
-      //todo:
-      return <span>No router in context</span>;
+      console.error('No router in context');
+
+      return React.createElement(
+        component,
+        this.props,
+        props.children
+      );
     }
 
+    //todo: by href
     let isActive = router.isActive(route, params);
     let props = Object.assign({}, this.props, {className: classnames(className || '', {[activeClass || 'active']: isActive})});
     return React.createElement(
