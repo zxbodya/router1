@@ -10,7 +10,7 @@ import createBrowserHistory from './../router/createBrowserHistory';
 
 let history = createBrowserHistory();
 
-import NotFound from '../NotFound';
+import NotFound from '../notFoundPage/NotFound';
 
 import routes from '../routes';
 import Router from '../router/Router';

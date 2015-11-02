@@ -1,9 +1,9 @@
-import Home from './Home/Home';
-import Cases from './Cases';
-import Case from './Case';
-import Team from './Team';
-import Services from './Services';
-import Contact from './Contact';
+import Home from './homePage/Home';
+import Cases from './casesPage/Cases';
+import Case from './casePage/Case';
+import Team from './teamPage/Team';
+import Services from './servicesPage/Services';
+import Contact from './contactPage/Contact';
 
 export default [
   {
