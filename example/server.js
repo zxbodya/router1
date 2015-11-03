@@ -18,14 +18,24 @@ export default function prerender(requestPath, cb) {
     history,
     routes);
 
-  router.routingResult().first().subscribe(routingResult=> {
-    let handler = routingResult.handler || notFoundHandler;
+  let resultMeta;
+  router.routingResult()
+    .map(routingResult=> {
+      let handler = routingResult.handler || notFoundHandler;
 
-    const {meta, view} = handler();
-
-    const html = ReactDOM.renderToString(<RouterContext router={router} component={view}/>);
-    cb(null, {html, meta});
-  });
+      return handler();
+    })
+    .do(({meta})=> {
+      resultMeta = meta;
+    })
+    .flatMapLatest(({view})=>view)
+    .first()
+    .forEach(({component, props})=> {
+      const html = ReactDOM.renderToString(
+        <RouterContext router={router} component={component} props={props}/>
+      );
+      cb(null, {html, meta: resultMeta});
+    });
 
   //const router = Router.create({
   //  routes: routes,

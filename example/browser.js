@@ -23,30 +23,39 @@ const router = new Router(
   history,
   routes);
 
-router.routingResult().forEach(routingResult=> {
-  let handler = routingResult.handler || notFoundHandler;
+const appElement = document.getElementById('app');
+router
+  .routingResult()
+  .map(routingResult=> {
+    let handler = routingResult.handler || notFoundHandler;
 
-  const {meta, view} = handler();
+    return handler();
+  })
+  .do(({meta})=> {
+    document.title = meta.title || '';
 
-
-  document.title = meta.title || '';
-
-  $('meta[name=description]').text(meta.description || '');
-
-  ReactDOM.render(<RouterContext router={router} component={view}/>, document.getElementById('app'), ()=> {
-    const hash = window.location.hash;
-    if (hash) {
-      let target = $(hash);
-      target = target.length ? target : $('[name=' + hash.slice(1) + ']');
-      if (target.length) {
-        $('html,body').animate({
-          scrollTop: target.offset().top
-        }, 0);
-      }
-    }
-    window.ga('send', 'pageview', window.location.pathname);
+    $('meta[name=description]').text(meta.description || '');
+  })
+  .flatMapLatest(({view})=>view)
+  .distinctUntilChanged()
+  .forEach(({component, props})=> {
+    ReactDOM.render(
+      <RouterContext router={router} component={component} props={props}/>,
+      appElement,
+      ()=> {
+        const hash = window.location.hash;
+        if (hash) {
+          let target = $(hash);
+          target = target.length ? target : $('[name=' + hash.slice(1) + ']');
+          if (target.length) {
+            $('html,body').animate({
+              scrollTop: target.offset().top
+            }, 0);
+          }
+        }
+        window.ga('send', 'pageview', window.location.pathname);
+      });
   });
-});
 
 
 //////////// Performs a smooth page scroll to an anchor on the same page. ////////////
