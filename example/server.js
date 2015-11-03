@@ -23,7 +23,7 @@ export default function prerender(requestPath, cb) {
     .map(routingResult=> {
       let handler = routingResult.handler || notFoundHandler;
 
-      return handler();
+      return handler(routingResult.params);
     })
     .do(({meta})=> {
       resultMeta = meta;

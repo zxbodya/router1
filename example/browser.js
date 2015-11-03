@@ -29,7 +29,7 @@ router
   .map(routingResult=> {
     let handler = routingResult.handler || notFoundHandler;
 
-    return handler();
+    return handler(routingResult.params);
   })
   .do(({meta})=> {
     document.title = meta.title || '';
