@@ -9,6 +9,8 @@ import routes from '../routes';
 import Router from '../router/Router';
 import RouterContext from '../router/RouterContext';
 
+import toObservable from '../utils/toObservable';
+
 export default function prerender(requestPath, cb) {
 
 
@@ -20,10 +22,10 @@ export default function prerender(requestPath, cb) {
 
   let resultMeta;
   router.routingResult()
-    .map(routingResult=> {
+    .flatMap(routingResult=> {
       let handler = routingResult.handler || notFoundHandler;
 
-      return handler(routingResult.params);
+      return toObservable(handler(routingResult.params));
     })
     .do(({meta})=> {
       resultMeta = meta;

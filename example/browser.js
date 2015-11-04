@@ -19,6 +19,7 @@ import routes from '../routes';
 import Router from '../router/Router';
 import RouterContext from '../router/RouterContext';
 
+import toObservable from '../utils/toObservable';
 const router = new Router(
   history,
   routes);
@@ -26,10 +27,10 @@ const router = new Router(
 const appElement = document.getElementById('app');
 router
   .routingResult()
-  .map(routingResult=> {
+  .flatMap(routingResult=> {
     let handler = routingResult.handler || notFoundHandler;
 
-    return handler(routingResult.params);
+    return toObservable(handler(routingResult.params));
   })
   .do(({meta})=> {
     document.title = meta.title || '';
