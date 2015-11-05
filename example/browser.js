@@ -32,11 +32,16 @@ router
 
     return toObservable(handler(routingResult.params));
   })
-  .do(({meta})=> {
-    document.title = meta.title || '';
+  .do(({meta, redirect})=> {
+    if (redirect) {
+      history.replace(redirect);
+    } else {
+      document.title = meta.title || '';
 
-    $('meta[name=description]').text(meta.description || '');
+      $('meta[name=description]').text(meta.description || '');
+    }
   })
+  .filter(({redirect})=>!redirect)
   .flatMapLatest(({view})=>view)
   .distinctUntilChanged()
   .forEach(({component, props})=> {

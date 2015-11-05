@@ -29,10 +29,20 @@ export default [
   },
   {
     name: 'case',
-    url: '/case/<slug>',
+    url: '/case/<slug:\w+>',
     handler: caseHandler
   },
   //<Redirect from="/case/" to="/case"/>
+  {
+    name: 'cases-redirect',
+    url: '/case/',
+    handler: function () {
+      return {
+        redirect: '/case',
+        status: 301
+      }
+    }
+  },
   {
     name: 'cases',
     url: '/case',

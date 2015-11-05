@@ -10,6 +10,7 @@ import Router from '../router/Router';
 import RouterContext from '../router/RouterContext';
 
 import toObservable from '../utils/toObservable';
+import {Observable} from 'rx';
 
 export default function prerender(requestPath, cb) {
 
@@ -27,27 +28,26 @@ export default function prerender(requestPath, cb) {
 
       return toObservable(handler(routingResult.params));
     })
-    .do(({meta})=> {
-      resultMeta = meta;
-    })
-    .flatMapLatest(({view})=>view)
-    .first()
-    .forEach(({component, props})=> {
-      const html = ReactDOM.renderToString(
-        <RouterContext router={router} component={component} props={props}/>
-      );
-      cb(null, {html, meta: resultMeta});
-    });
+    .flatMapLatest(({view, redirect, status, meta})=> {
+      if (redirect) {
+        return Observable.return({redirect, status})
+      } else {
+        return view.first().map(({component, props})=> {
+          const html = ReactDOM.renderToString(
+            <RouterContext router={router} component={component} props={props}/>
+          );
+          return {
+            view: html,
+            meta,
+            status
+          }
+        });
+      }
 
-  //const router = Router.create({
-  //  routes: routes,
-  //  location: requestPath,
-  //  onAbort: function (redirect) {
-  //    cb({redirect: redirect.to});
-  //  },
-  //  onError: function (err) {
-  //    cb(err);
-  //  }
-  //});
+    })
+    .first()
+    .forEach((data)=> {
+      cb(null, data);
+    }, error=>cb(error));
 
 }
