@@ -66,8 +66,8 @@ router
 
 //////////// Performs a smooth page scroll to an anchor on the same page. ////////////
 
-$(function () {
-  $(document.body).on('click', 'a[href*=#]:not([href=#])', function () {
+$(function() {
+  $(document.body).on('click', 'a[href*=#]:not([href=#])', function() {
     if (location.pathname.replace(/^\//, '') === this.pathname.replace(/^\//, '') && location.hostname === this.hostname) {
       let target = $(this.hash);
       target = target.length ? target : $('[name=' + this.hash.slice(1) + ']');

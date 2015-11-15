@@ -10,7 +10,7 @@ function historyFactory() {
   }
 
   const changes = new Subject();
-  const next = ()=>{
+  const next = ()=> {
     changes.onNext(currentLocation());
   };
   if ('onpopstate' in window) {

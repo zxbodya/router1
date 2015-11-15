@@ -1,6 +1,6 @@
 import compileExpression from './compile.js';
 
-describe('Router, expression parsing', function () {
+describe('Router, expression parsing', function() {
   let tests = [
     {
       expression: 'aaaaaaa',

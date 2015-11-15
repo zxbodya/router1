@@ -68,6 +68,7 @@ class Router {
       })
       .shareReplay();
   }
+
   isActive(route, params) {
     if (this.activeRoute[0] && route === this.activeRoute[0]) {
       let active = true;

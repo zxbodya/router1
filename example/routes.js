@@ -36,7 +36,7 @@ export default [
   {
     name: 'cases-redirect',
     url: '/case/',
-    handler: function () {
+    handler: function() {
       return {
         redirect: '/case',
         status: 301

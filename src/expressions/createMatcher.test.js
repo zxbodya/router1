@@ -1,7 +1,7 @@
 import compileExpression from './compile.js';
 import matcherFromExpression from './createMatcher.js';
 
-describe('Router, matcher from expression', function () {
+describe('Router, matcher from expression', function() {
   it('it matches strings without params', ()=> {
     let expression = compileExpression('aaaaa');
     let matcher = matcherFromExpression(expression);

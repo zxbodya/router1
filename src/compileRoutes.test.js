@@ -1,7 +1,7 @@
 import compileRoutes from './compileRoutes.js';
 import compileExpression from './expressions/compile.js';
 
-describe('Router, compiling route collection', function () {
+describe('Router, compiling route collection', function() {
   it('compiles empty collection', ()=> {
     expect(compileRoutes([])).toEqual([]);
   });

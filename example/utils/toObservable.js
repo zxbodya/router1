@@ -5,7 +5,7 @@ const observableFromPromise = Observable.fromPromise;
 const isObservable = Observable.isObservable;
 const isPromise = helpers.isPromise;
 
-export default function (data) {
+export default function(data) {
   return isObservable(data)
     ? data
     : (
