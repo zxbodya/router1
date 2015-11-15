@@ -1,6 +1,6 @@
 import compileRoutes from './compileRoutes.js';
 
-describe('Router, compiling route collection', function() {
+describe('Router, compiling route collection', () => {
   it('compiles empty collection', ()=> {
     expect(compileRoutes([])).toEqual([]);
   });

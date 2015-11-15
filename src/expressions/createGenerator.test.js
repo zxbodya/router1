@@ -1,7 +1,7 @@
 import compileExpression from './compile.js';
 import generatorFromExpression from './createGenerator.js';
 
-describe('Router, generator from expression', function() {
+describe('Router, generator from expression', () => {
   it('it generates strings without params', ()=> {
     const expression = compileExpression('aaaaa');
     const generator = generatorFromExpression(expression);
