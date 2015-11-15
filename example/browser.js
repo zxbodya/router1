@@ -11,7 +11,7 @@ import './ga';
 
 import createBrowserHistory from './../router/createBrowserHistory';
 
-let history = createBrowserHistory();
+const history = createBrowserHistory();
 
 import notFoundHandler from '../notFoundPage/notFoundHandler';
 
@@ -28,7 +28,7 @@ const appElement = document.getElementById('app');
 router
   .routingResult()
   .flatMap(routingResult=> {
-    let handler = routingResult.handler || notFoundHandler;
+    const handler = routingResult.handler || notFoundHandler;
 
     return toObservable(handler(routingResult.params));
   })
@@ -55,7 +55,7 @@ router
           target = target.length ? target : $('[name=' + hash.slice(1) + ']');
           if (target.length) {
             $('html,body').animate({
-              scrollTop: target.offset().top
+              scrollTop: target.offset().top,
             }, 0);
           }
         }
@@ -64,7 +64,7 @@ router
   });
 
 
-//////////// Performs a smooth page scroll to an anchor on the same page. ////////////
+// ////////// Performs a smooth page scroll to an anchor on the same page. ////////////
 
 $(function() {
   $(document.body).on('click', 'a[href*=#]:not([href=#])', function() {
@@ -73,9 +73,8 @@ $(function() {
       target = target.length ? target : $('[name=' + this.hash.slice(1) + ']');
       if (target.length) {
         $('html,body').animate({
-          scrollTop: target.offset().top
+          scrollTop: target.offset().top,
         }, 400);
-        //return false;
       }
     }
   });

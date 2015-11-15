@@ -1,5 +1,4 @@
 import compileExpression from './expressions/compile.js';
-import contactExpressions from './expressions/concat.js';
 import generatorFromExpression from './expressions/createGenerator.js';
 import matcherFromExpression from './expressions/createMatcher.js';
 
@@ -7,7 +6,7 @@ function compileRoutes(routeDefs) {
   if (process.env.NODE_ENV !== 'production') {
     const usedNames = new Set();
     for (let i = 0, l = routeDefs.length; i < l; i++) {
-      let routeDef = routeDefs[i];
+      const routeDef = routeDefs[i];
       if (!routeDef.name) {
         throw new Error('routes should have name property');
       }
@@ -42,7 +41,7 @@ function compileRoutes(routeDefs) {
       handler: routeDef.handler,
       matchPath: matcherFromExpression(pathExpression),
       generatePath: generatorFromExpression(pathExpression),
-      searchParams: searchParams
+      searchParams: searchParams,
     });
   }
   return rawRoutes;

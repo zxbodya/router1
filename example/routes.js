@@ -9,43 +9,43 @@ export default [
   {
     name: 'home',
     url: '/',
-    handler: homeHandler
+    handler: homeHandler,
   },
 
   {
     name: 'contact',
     url: '/contact',
-    handler: contactHandler
+    handler: contactHandler,
   },
   {
     name: 'services',
     url: '/services',
-    handler: servicesHandler
+    handler: servicesHandler,
   },
   {
     name: 'team',
     url: '/team',
-    handler: teamHandler
+    handler: teamHandler,
   },
   {
     name: 'case',
     url: '/case/<slug:\w+>',
-    handler: caseHandler
+    handler: caseHandler,
   },
-  //<Redirect from="/case/" to="/case"/>
+  // <Redirect from="/case/" to="/case"/>
   {
     name: 'cases-redirect',
     url: '/case/',
-    handler: function() {
+    handler() {
       return {
         redirect: '/case',
-        status: 301
-      }
-    }
+        status: 301,
+      };
+    },
   },
   {
     name: 'cases',
     url: '/case',
-    handler: casesHandler
-  }
+    handler: casesHandler,
+  },
 ];

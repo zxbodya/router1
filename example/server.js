@@ -13,41 +13,35 @@ import toObservable from '../utils/toObservable';
 import {Observable} from 'rx';
 
 export default function prerender(requestPath, cb) {
-
-
-  let history = createServerHistory(requestPath);
+  const history = createServerHistory(requestPath);
 
   const router = new Router(
     history,
     routes);
 
-  let resultMeta;
   router.routingResult()
     .flatMap(routingResult=> {
-      let handler = routingResult.handler || notFoundHandler;
+      const handler = routingResult.handler || notFoundHandler;
 
       return toObservable(handler(routingResult.params));
     })
     .flatMapLatest(({view, redirect, status, meta})=> {
       if (redirect) {
-        return Observable.return({redirect, status})
-      } else {
-        return view.first().map(({component, props})=> {
-          const html = ReactDOM.renderToString(
-            <RouterContext router={router} component={component} props={props}/>
-          );
-          return {
-            view: html,
-            meta,
-            status
-          }
-        });
+        return Observable.return({redirect, status});
       }
-
+      return view.first().map(({component, props})=> {
+        const html = ReactDOM.renderToString(
+          <RouterContext router={router} component={component} props={props}/>
+        );
+        return {
+          view: html,
+          meta,
+          status,
+        };
+      });
     })
     .first()
     .forEach((data)=> {
       cb(null, data);
     }, error=>cb(error));
-
 }

@@ -13,13 +13,13 @@ class RouterContext extends React.Component {
 }
 
 RouterContext.childContextTypes = {
-  router: React.PropTypes.object.isRequired
+  router: React.PropTypes.object.isRequired,
 };
 
 RouterContext.propTypes = {
   component: React.PropTypes.func.isRequired,
   router: React.PropTypes.object.isRequired,
-  props: React.PropTypes.object.isRequired
+  props: React.PropTypes.object.isRequired,
 };
 
 export default RouterContext;

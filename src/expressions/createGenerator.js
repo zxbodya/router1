@@ -1,18 +1,19 @@
-let generatorFromExpression = (info)=> {
-  let generateParts = info[1], paramNames = info[2];
+function generatorFromExpression(info) {
+  const generateParts = info[1];
+  const paramNames = info[2];
 
   return (params = {}) => {
     if (process.env.NODE_ENV !== 'production') {
-      var missingParams = paramNames.filter(paramName=>!(paramName in params));
+      const missingParams = paramNames.filter(paramName=>!(paramName in params));
 
       if (missingParams.length) {
         throw new Error(`missing parameters [${missingParams.join(',')}]`);
       }
     }
 
-    let res = [];
+    const res = [];
     for (let i = 0, l = generateParts.length, pn = 0, pl = paramNames.length; i < l; i++) {
-      let g = generateParts[i];
+      const g = generateParts[i];
       if (g !== null) {
         res.push(g);
       } else {
@@ -22,9 +23,9 @@ let generatorFromExpression = (info)=> {
         }
       }
     }
-    //todo: test if matcher can match the result, and throw if it can not
+    // todo: test if matcher can match the result, and throw if it can not
     return res.join('');
   };
-};
+}
 
 export default generatorFromExpression;

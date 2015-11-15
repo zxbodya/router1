@@ -6,11 +6,7 @@ const isObservable = Observable.isObservable;
 const isPromise = helpers.isPromise;
 
 export default function(data) {
-  return isObservable(data)
-    ? data
-    : (
-    isPromise(data)
-      ? observableFromPromise(data)
-      : observableReturn(data)
-  );
+  if (isObservable(data)) return data;
+  if (isPromise(data)) return observableFromPromise(data);
+  return observableReturn(data);
 }

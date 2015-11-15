@@ -1,20 +1,20 @@
-import {Observable, Subject} from 'rx';
+import {Observable} from 'rx';
 
 function historyFactory(pathname) {
   return {
-    push(){
+    push() {
       throw new Error('navication not supported');
     },
-    replace(){
+    replace() {
       throw new Error('navication not supported');
     },
     location: Observable
       .return({
         pathname,
         search: '',
-        hash: ''
+        hash: '',
       })
-      .shareReplay()
+      .shareReplay(),
   };
 }
 

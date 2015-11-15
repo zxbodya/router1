@@ -1,5 +1,4 @@
 import compileRoutes from './compileRoutes';
-import splitUrl from './utils/splitUrl';
 
 
 class Router {
@@ -25,8 +24,7 @@ class Router {
     return this.history
       .location
       .map((location)=> {
-
-        const {pathname, search, hash} = location;
+        const {pathname} = location;
         const matched = [];
 
         for (let i = 0, l = this.routes.length; i < l; i++) {
@@ -39,7 +37,7 @@ class Router {
 
         let res;
         if (matched.length === 0) {
-          //todo: route not found clause
+          // todo: route not found clause
           console.log('route not found');
         } else {
           res = matched[0];
@@ -59,9 +57,8 @@ class Router {
           const params = res[1];
 
           return {route: route.name, handler: route.handler, params, location};
-        } else {
-          return {route: null, handler: null, params: {}, location};
         }
+        return {route: null, handler: null, params: {}, location};
       })
       .do(({route, params})=> {
         this.activeRoute = [route, params];
@@ -73,7 +70,8 @@ class Router {
     if (this.activeRoute[0] && route === this.activeRoute[0]) {
       let active = true;
 
-      for (let paramName in params) {
+      let paramName;
+      for (paramName in params) {
         if (params.hasOwnProperty(paramName)) {
           active = active && params[paramName].toString() === this.activeRoute[1][paramName].toString();
         }
@@ -84,21 +82,17 @@ class Router {
   }
 
   createUrl(name, params = {}, hash = '') {
-    let route = this.routesByName[name];
+    const route = this.routesByName[name];
     if (route) {
       const pathname = route.generatePath(Object.assign({}, this.activeRoute[1], params));
-      if (hash) {
-        return hash = '#' + hash;
-      }
-      return `${pathname}${hash}`;
-    } else {
-      console.error(`Route "${name}" not found`);
-      return `#route-${name}-not-found`;
+      return `${pathname}${hash ? `#${hash}` : ''}`;
     }
+    console.error(`Route "${name}" not found`);
+    return `#route-${name}-not-found`;
   }
 
   navigate(route, params = {}, hash = '') {
-    let url = this.createUrl(route, params, hash);
+    const url = this.createUrl(route, params, hash);
     this.history.push(url);
   }
 

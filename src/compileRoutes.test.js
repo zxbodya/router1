@@ -1,5 +1,4 @@
 import compileRoutes from './compileRoutes.js';
-import compileExpression from './expressions/compile.js';
 
 describe('Router, compiling route collection', function() {
   it('compiles empty collection', ()=> {
@@ -7,32 +6,32 @@ describe('Router, compiling route collection', function() {
   });
 
   it('compiles flat route collection', ()=> {
-    let compiled = compileRoutes([
+    const compiled = compileRoutes([
       {
         name: 'route1',
         handler: {},
-        url: 'aaa<param1>bbb'
+        url: 'aaa<param1>bbb',
       },
       {
         name: 'route2',
         handler: {},
-        url: 'ccc<param2>ddd'
+        url: 'ccc<param2>ddd',
       },
       {
         name: 'route3',
         handler: {},
-        url: 'ccc<param2>ddd?a'
+        url: 'ccc<param2>ddd?a',
       },
       {
         name: 'route4',
         handler: {},
-        url: 'ccc<param2>ddd'
+        url: 'ccc<param2>ddd',
       },
       {
         name: 'route5',
         handler: {},
-        url: 'ccc<param2>ddd?a&b'
-      }
+        url: 'ccc<param2>ddd?a&b',
+      },
     ]);
 
     expect(compiled[0].name).toEqual('route1');
@@ -54,8 +53,7 @@ describe('Router, compiling route collection', function() {
 
   it('throws when route name is missing', ()=> {
     expect(()=>compileRoutes([
-      {}
+      {},
     ])).toThrow();
   });
-
 });

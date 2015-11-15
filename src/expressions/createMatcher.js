@@ -1,9 +1,11 @@
-let matcherFromExpression = (info)=> {
-  let matcher = info[0], paramNames = info[2];
-  let matcherExp = new RegExp('^' + matcher + '$');
+function matcherFromExpression(info) {
+  const matcher = info[0];
+  const paramNames = info[2];
+  const matcherExp = new RegExp('^' + matcher + '$');
 
   return (path)=> {
-    let matches = path.match(matcherExp), res = false;
+    const matches = path.match(matcherExp);
+    let res = false;
     if (matches) {
       res = {};
       for (let i = 0, l = paramNames.length; i < l; i++) {
@@ -12,6 +14,6 @@ let matcherFromExpression = (info)=> {
     }
     return res;
   };
-};
+}
 
 export default matcherFromExpression;

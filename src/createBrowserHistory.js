@@ -5,7 +5,7 @@ function historyFactory() {
     return {
       pathname: window.location.pathname,
       search: window.location.search,
-      hash: window.location.hash
+      hash: window.location.hash,
     };
   }
 
@@ -15,11 +15,11 @@ function historyFactory() {
   };
   if ('onpopstate' in window) {
     return {
-      push(url, data = null, title = null){
+      push(url, data = null, title = null) {
         window.history.pushState(data, title, url);
         next();
       },
-      replace(url, data = null, title = null){
+      replace(url, data = null, title = null) {
         window.history.replaceState(data, title, url);
         next();
       },
@@ -28,24 +28,24 @@ function historyFactory() {
         .map(()=>currentLocation())
         .startWith(currentLocation())
         .merge(changes)
-        .shareReplay()
-    }
-  } else {
-    return {
-      push(url){
-        window.location.assign(url);
-        next();
-      },
-      replace(url){
-        window.location.replace(url);
-        next();
-      },
-      location: Observable
-        .return(currentLocation())
-        .merge(changes)
-        .shareReplay()
+        .shareReplay(),
     };
   }
+
+  return {
+    push(url) {
+      window.location.assign(url);
+      next();
+    },
+    replace(url) {
+      window.location.replace(url);
+      next();
+    },
+    location: Observable
+      .return(currentLocation())
+      .merge(changes)
+      .shareReplay(),
+  };
 }
 
 export default historyFactory;

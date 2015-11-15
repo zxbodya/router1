@@ -3,15 +3,15 @@ import classnames from 'classnames';
 
 class Link extends Component {
   render() {
-    let {href, route, params, hash, className, activeClassName, onClick:onClickOriginal} = this.props;
-    let {router} = this.context;
+    const {href, route, params, hash, className, activeClassName, onClick: onClickOriginal} = this.props;
+    const {router} = this.context;
 
     if (!router) {
       console.error('No router in context');
 
       return React.createElement(
         'a',
-        Object.assign({href: url, onClick}, this.props),
+        Object.assign({href: href, onClickOriginal}, this.props),
         this.props.children
       );
     }
@@ -22,7 +22,7 @@ class Link extends Component {
     if (href) {
       url = href;
       onClick = (e)=> {
-        onClickOriginal && onClickOriginal(e);
+        if (onClickOriginal) onClickOriginal(e);
         e.preventDefault();
         router.navigateToUrl(href);
       };
@@ -30,18 +30,18 @@ class Link extends Component {
     } else {
       url = router.createUrl(route, params, hash);
       onClick = (e)=> {
-        onClickOriginal && onClickOriginal(e);
+        if (onClickOriginal) onClickOriginal(e);
         e.preventDefault();
         router.navigate(route, params, hash);
       };
 
       isActive = router.isActive(route, params);
     }
-    let props = Object.assign(
+    const props = Object.assign(
       {},
       this.props, {
         href: url,
-        onClick
+        onClick,
       },
       {className: classnames(className || '', {[activeClassName || 'active']: isActive && activeClassName})}
     );
@@ -61,11 +61,11 @@ Link.propTypes = {
   hash: PropTypes.string,
   children: PropTypes.any,
   className: PropTypes.string,
-  activeClassName: PropTypes.string
+  activeClassName: PropTypes.string,
 };
 
 Link.contextTypes = {
-  router: PropTypes.object
+  router: PropTypes.object,
 };
 
 export default Link;
