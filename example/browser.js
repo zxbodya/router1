@@ -2,6 +2,8 @@ import React from 'react';
 
 import ReactDOM from 'react-dom';
 
+import {Observable} from 'rx';
+
 import $ from 'jquery';
 
 import '../styles/main.sass';
@@ -24,6 +26,24 @@ const router = new Router(
   history,
   routes);
 
+const doScroll = (time)=> {
+  const hash = window.location.hash;
+  if (hash) {
+    let target = $(hash);
+    target = target.length ? target : $('[name=' + hash.slice(1) + ']');
+    if (target.length) {
+      $('html,body').animate({
+        scrollTop: target.offset().top,
+      }, time);
+    }
+  } else {
+    $('html,body').animate({
+      scrollTop: 0,
+    }, time);
+  }
+};
+
+const renderObservable = Observable.fromCallback(ReactDOM.render);
 const appElement = document.getElementById('app');
 router
   .routingResult()
@@ -43,39 +63,30 @@ router
   })
   .filter(({redirect})=>!redirect)
   .flatMapLatest(({view})=>view)
-  .distinctUntilChanged()
-  .forEach(({component, props})=> {
-    ReactDOM.render(
-      <RouterContext router={router} component={component} props={props}/>,
-      appElement,
-      ()=> {
-        const hash = window.location.hash;
-        if (hash) {
-          let target = $(hash);
-          target = target.length ? target : $('[name=' + hash.slice(1) + ']');
-          if (target.length) {
-            $('html,body').animate({
-              scrollTop: target.offset().top,
-            }, 0);
-          }
-        }
-        window.ga('send', 'pageview', window.location.pathname);
-      });
+  .flatMap(({component, props})=> {
+    return renderObservable(
+      <RouterContext
+        router={router}
+        component={component}
+        props={props}/>,
+      appElement
+    );
+  })
+  .forEach(()=> {
+    console.log('pageview', window.location.pathname);
+    window.ga('send', 'pageview', window.location.pathname);
+    doScroll(0);
   });
 
-
-// ////////// Performs a smooth page scroll to an anchor on the same page. ////////////
-
-$(function() {
-  $(document.body).on('click', 'a[href*=#]:not([href=#])', function() {
-    if (location.pathname.replace(/^\//, '') === this.pathname.replace(/^\//, '') && location.hostname === this.hostname) {
-      let target = $(this.hash);
-      target = target.length ? target : $('[name=' + this.hash.slice(1) + ']');
-      if (target.length) {
-        $('html,body').animate({
-          scrollTop: target.offset().top,
-        }, 400);
-      }
-    }
-  });
-});
+// .flatMap(()=> {
+//  return Observable.merge(
+//    // for each render
+//    history.hash.first().do(()=> {
+//      doScroll(0);
+//    }),
+//    // for all except first
+//    history.hash.skip(1).do(()=> {
+//      doScroll(400);
+//    })
+//  );
+// })
