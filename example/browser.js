@@ -22,9 +22,39 @@ import Router from '../router/Router';
 import RouterContext from '../router/RouterContext';
 
 import toObservable from '../utils/toObservable';
-const router = new Router(
+
+const renderObservable = Observable.fromCallback(ReactDOM.render);
+const appElement = document.getElementById('app');
+
+const router = new Router({
   history,
-  routes);
+  routes,
+  render: (routingResult)=> {
+    const handler = routingResult.handler || notFoundHandler;
+
+    return toObservable(handler(routingResult.params))
+      .flatMap(({view, meta, redirect})=> {
+        if (redirect) {
+          history.replace(redirect);
+          return Observable.empty();
+        }
+
+        document.title = meta.title || '';
+
+        $('meta[name=description]').text(meta.description || '');
+
+        return view.map(({component, props})=> {
+          return renderObservable(
+            <RouterContext
+              router={router}
+              component={component}
+              props={props}/>,
+            appElement
+          );
+        });
+      });
+  },
+});
 
 const doScroll = (time)=> {
   const hash = window.location.hash;
@@ -43,35 +73,8 @@ const doScroll = (time)=> {
   }
 };
 
-const renderObservable = Observable.fromCallback(ReactDOM.render);
-const appElement = document.getElementById('app');
 router
-  .routingResult()
-  .flatMap(routingResult=> {
-    const handler = routingResult.handler || notFoundHandler;
-
-    return toObservable(handler(routingResult.params));
-  })
-  .flatMapLatest(({view, meta, redirect})=> {
-    if (redirect) {
-      history.replace(redirect);
-      return Observable.empty();
-    }
-
-    document.title = meta.title || '';
-
-    $('meta[name=description]').text(meta.description || '');
-
-    return view.do(({component, props})=> {
-      return renderObservable(
-        <RouterContext
-          router={router}
-          component={component}
-          props={props}/>,
-        appElement
-      );
-    });
-  })
+  .renderResult()
   .forEach(()=> {
     console.log('pageview', window.location.pathname);
     window.ga('send', 'pageview', window.location.pathname);

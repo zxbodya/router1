@@ -2,14 +2,15 @@ import compileRoutes from './compileRoutes';
 
 
 class Router {
-  constructor(history, routes) {
+  constructor({history, routes, render}) {
     this.history = history;
-
     this.routes = [];
+    this.render = render;
+
     this.routesByName = {};
+    this.addRoutes(routes);
 
     this.activeRoute = [null, {}];
-    this.addRoutes(routes);
   }
 
   addRoutes(routeDefs) {
@@ -58,13 +59,14 @@ class Router {
     return {route: null, handler: null, params: {}, location};
   }
 
-  routingResult() {
+  renderResult() {
     return this.history
       .location
       .map(this.matchRoute.bind(this))
       .do(({route, params})=> {
         this.activeRoute = [route, params];
       })
+      .flatMapLatest(this.render)
       .share();
   }
 
