@@ -20,50 +20,52 @@ class Router {
       });
   }
 
+  matchRoute(location) {
+    const {pathname} = location;
+    const matched = [];
+
+    for (let i = 0, l = this.routes.length; i < l; i++) {
+      const route = this.routes[i];
+      const params = route.matchPath(pathname);
+      if (params) {
+        matched.push([route, params]);
+      }
+    }
+
+    let res;
+    if (matched.length === 0) {
+      // todo: route not found clause
+      console.log('route not found');
+    } else {
+      res = matched[0];
+
+      // todo: conflict clause
+      if (matched.length > 1) {
+        console.log('matched few routes');
+      }
+      // 1.  warning in dev mode
+      // 2.  optional data resolving step
+      // 2.1 select from conflicting
+      // 2.2 resource not found clause
+    }
+
+    if (res) {
+      const route = res[0];
+      const params = res[1];
+
+      return {route: route.name, handler: route.handler, params, location};
+    }
+    return {route: null, handler: null, params: {}, location};
+  }
+
   routingResult() {
     return this.history
       .location
-      .map((location)=> {
-        const {pathname} = location;
-        const matched = [];
-
-        for (let i = 0, l = this.routes.length; i < l; i++) {
-          const route = this.routes[i];
-          const params = route.matchPath(pathname);
-          if (params) {
-            matched.push([route, params]);
-          }
-        }
-
-        let res;
-        if (matched.length === 0) {
-          // todo: route not found clause
-          console.log('route not found');
-        } else {
-          res = matched[0];
-
-          // todo: conflict clause
-          if (matched.length > 1) {
-            console.log('matched few routes');
-          }
-          // 1.  warning in dev mode
-          // 2.  optional data resolving step
-          // 2.1 select from conflicting
-          // 2.2 resource not found clause
-        }
-
-        if (res) {
-          const route = res[0];
-          const params = res[1];
-
-          return {route: route.name, handler: route.handler, params, location};
-        }
-        return {route: null, handler: null, params: {}, location};
-      })
+      .map(this.matchRoute.bind(this))
       .do(({route, params})=> {
         this.activeRoute = [route, params];
       })
-      .shareReplay();
+      .share();
   }
 
   isActive(route, params) {

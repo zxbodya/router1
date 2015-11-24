@@ -52,41 +52,28 @@ router
 
     return toObservable(handler(routingResult.params));
   })
-  .do(({meta, redirect})=> {
+  .flatMapLatest(({view, meta, redirect})=> {
     if (redirect) {
       history.replace(redirect);
-    } else {
-      document.title = meta.title || '';
-
-      $('meta[name=description]').text(meta.description || '');
+      return Observable.empty();
     }
-  })
-  .filter(({redirect})=>!redirect)
-  .flatMapLatest(({view})=>view)
-  .flatMap(({component, props})=> {
-    return renderObservable(
-      <RouterContext
-        router={router}
-        component={component}
-        props={props}/>,
-      appElement
-    );
+
+    document.title = meta.title || '';
+
+    $('meta[name=description]').text(meta.description || '');
+
+    return view.do(({component, props})=> {
+      return renderObservable(
+        <RouterContext
+          router={router}
+          component={component}
+          props={props}/>,
+        appElement
+      );
+    });
   })
   .forEach(()=> {
     console.log('pageview', window.location.pathname);
     window.ga('send', 'pageview', window.location.pathname);
     doScroll(0);
   });
-
-// .flatMap(()=> {
-//  return Observable.merge(
-//    // for each render
-//    history.hash.first().do(()=> {
-//      doScroll(0);
-//    }),
-//    // for all except first
-//    history.hash.skip(1).do(()=> {
-//      doScroll(400);
-//    })
-//  );
-// })

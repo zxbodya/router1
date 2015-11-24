@@ -19,7 +19,8 @@ export default function prerender(requestPath, cb) {
     history,
     routes);
 
-  router.routingResult()
+  router
+    .routingResult()
     .flatMap(routingResult=> {
       const handler = routingResult.handler || notFoundHandler;
 
