@@ -32,6 +32,9 @@ const router = new Router({
   render: (routingResult)=> {
     const handler = routingResult.handler || notFoundHandler;
 
+    const locationSource = routingResult.location.source;
+    const locationHash = routingResult.location.hash;
+
     return toObservable(handler(routingResult.params))
       .flatMap(({view, meta, redirect})=> {
         if (redirect) {
@@ -52,31 +55,34 @@ const router = new Router({
             appElement
           );
         });
+      })
+      .do(()=> {
+        if (locationHash !== '' && locationHash !== '#') {
+          if (locationSource === 'push' || locationSource === 'replace' || locationSource === 'init') {
+            // scrollto anchor position
+            let target = $(locationHash);
+            target = target.length ? target : $('[name=' + locationHash.slice(1) + ']');
+            if (target.length) {
+              $('html,body').animate({
+                scrollTop: target.offset().top,
+              }, 0);
+            }
+          }
+        } else {
+          if (locationSource === 'push' || locationSource === 'replace') {
+            // scrollto 0,0
+            $('html,body').animate({
+              scrollTop: 0,
+            }, 0);
+          }
+        }
       });
   },
 });
-
-const doScroll = (time)=> {
-  const hash = window.location.hash;
-  if (hash) {
-    let target = $(hash);
-    target = target.length ? target : $('[name=' + hash.slice(1) + ']');
-    if (target.length) {
-      $('html,body').animate({
-        scrollTop: target.offset().top,
-      }, time);
-    }
-  } else {
-    $('html,body').animate({
-      scrollTop: 0,
-    }, time);
-  }
-};
 
 router
   .renderResult()
   .forEach(()=> {
     console.log('pageview', window.location.pathname);
     window.ga('send', 'pageview', window.location.pathname);
-    doScroll(0);
   });
