@@ -3,10 +3,10 @@ import {Observable} from 'rx';
 function historyFactory(pathname) {
   return {
     push() {
-      throw new Error('navication not supported');
+      throw new Error('navigation not supported');
     },
     replace() {
-      throw new Error('navication not supported');
+      throw new Error('navigation not supported');
     },
     location: Observable
       .return({

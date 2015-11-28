@@ -4,8 +4,6 @@ import ReactDOM from 'react-dom';
 
 import {Observable} from 'rx';
 
-import $ from 'jquery';
-
 import '../styles/main.sass';
 import '../styles/icons.scss';
 
@@ -44,7 +42,7 @@ const router = new Router({
 
         document.title = meta.title || '';
 
-        $('meta[name=description]').text(meta.description || '');
+        // $('meta[name=description]').text(meta.description || '');
 
         return view.map(({component, props})=> {
           return renderObservable(
@@ -58,22 +56,20 @@ const router = new Router({
       })
       .do(()=> {
         if (locationHash !== '' && locationHash !== '#') {
-          if (locationSource === 'push' || locationSource === 'replace' || locationSource === 'init') {
+          if (locationSource === 'push' || locationSource === 'replace') {
             // scrollto anchor position
-            let target = $(locationHash);
-            target = target.length ? target : $('[name=' + locationHash.slice(1) + ']');
-            if (target.length) {
-              $('html,body').animate({
-                scrollTop: target.offset().top,
-              }, 0);
+            const target = document.getElementById(locationHash.substr(1));
+            if (target) {
+              setTimeout(()=> {
+                window.scrollTo(0, target.getBoundingClientRect().top);
+              });
             }
           }
         } else {
           if (locationSource === 'push' || locationSource === 'replace') {
-            // scrollto 0,0
-            $('html,body').animate({
-              scrollTop: 0,
-            }, 0);
+            setTimeout(()=> {
+              window.scrollTo(0, 0);
+            });
           }
         }
       });
@@ -83,6 +79,5 @@ const router = new Router({
 router
   .renderResult()
   .forEach(()=> {
-    console.log('pageview', window.location.pathname);
     window.ga('send', 'pageview', window.location.pathname);
   });
