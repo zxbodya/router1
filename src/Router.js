@@ -65,8 +65,7 @@ class Router {
       .location
       .filter(location=> {
         let needUpdate = true;
-        // todo: search
-        if (this.currentLocation.pathname === location.pathname) {
+        if (this.currentLocation.pathname === location.pathname && this.currentLocation.search === location.search) {
           this.hashChange.onNext(location);
           needUpdate = false;
         }
