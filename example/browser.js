@@ -76,6 +76,41 @@ const router = new Router({
   },
 });
 
+function animateScroll(top) {
+  const duration = 400;
+  const startTime = Date.now();
+  const startTop = window.pageYOffset;
+
+  return Observable.create((observer)=> {
+    let id;
+    const animate = ()=> {
+      const elapsed = Date.now() - startTime;
+      if (duration <= elapsed) {
+        window.scrollTo(0, top);
+        observer.onCompleted();
+      } else {
+        const ratio = elapsed / duration;
+        window.scrollTo(0, startTop * (1 - ratio) + top * ratio);
+        id = window.requestAnimationFrame(animate);
+      }
+    };
+
+    animate();
+    return ()=> {
+      window.cancelAnimationFrame(id);
+    };
+  });
+}
+
+let scrollAnimationDispose = null;
+
+router.hashChange.forEach(hash=> {
+  const target = document.getElementById(hash.substr(1));
+  if (target) {
+    scrollAnimationDispose = animateScroll(window.pageYOffset + target.getBoundingClientRect().top).subscribe();
+  }
+});
+
 router
   .renderResult()
   .forEach(()=> {
