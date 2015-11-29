@@ -121,7 +121,9 @@ router.hashChange.forEach(({hash, source})=> {
   if (source !== 'push' && source !== 'replace') return;
   const target = document.getElementById(hash.substr(1));
   if (target) {
-    scrollAnimationDispose = animateScroll(window.pageYOffset + target.getBoundingClientRect().top).subscribe();
+    scrollAnimationDispose = animateScroll(window.pageYOffset + target.getBoundingClientRect().top)
+      .takeUntil(Observable.fromEvent(window, 'wheel'))
+      .subscribe();
   }
 });
 
