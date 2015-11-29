@@ -1,6 +1,8 @@
 import compileRoutes from './compileRoutes';
 import {Subject} from 'rx';
 
+import {parse as parseQuery, generate as generateQuery} from './utils/queryString';
+
 class Router {
   constructor({history, routes, render}) {
     this.history = history;
@@ -25,7 +27,7 @@ class Router {
   }
 
   matchRoute(location) {
-    const {pathname} = location;
+    const {pathname, search} = location;
     const matched = [];
 
     for (let i = 0, l = this.routes.length; i < l; i++) {
@@ -36,30 +38,26 @@ class Router {
       }
     }
 
-    let res;
     if (matched.length === 0) {
-      // todo: route not found clause
-      console.log('route not found');
-    } else {
-      res = matched[0];
-
-      // todo: conflict clause
-      if (matched.length > 1) {
-        console.log('matched few routes');
-      }
-      // 1.  warning in dev mode
-      // 2.  optional data resolving step
-      // 2.1 select from conflicting
-      // 2.2 resource not found clause
+      return {route: null, handler: null, params: {}, location};
     }
+    const res = matched[0];
 
-    if (res) {
-      const route = res[0];
-      const params = res[1];
 
-      return {route: route.name, handler: route.handler, params, location};
+    // todo: conflict clause
+    if (matched.length > 1) {
+      console.log('matched few routes');
     }
-    return {route: null, handler: null, params: {}, location};
+    // 1.  warning in dev mode
+    // 2.  optional data resolving step
+    // 2.1 select from conflicting
+
+    const route = res[0];
+    const params = res[1];
+
+    const searchParams = search ? parseQuery(search.substr(1), route.searchParams) : {};
+
+    return {route: route.name, handler: route.handler, params: Object.assign(params, searchParams), location};
   }
 
   renderResult() {
@@ -102,7 +100,8 @@ class Router {
     const route = this.routesByName[name];
     if (route) {
       const pathname = route.generatePath(Object.assign({}, this.activeRoute[1], params));
-      return `${pathname}${hash ? `#${hash}` : ''}`;
+      const search = generateQuery(params, route.searchParams);
+      return `${pathname}${search ? `#${search}` : ''}${hash ? `#${hash}` : ''}`;
     }
     console.error(`Route "${name}" not found`);
     return `#route-${name}-not-found`;
