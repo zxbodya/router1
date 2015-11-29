@@ -61,7 +61,7 @@ const router = new Router({
             const target = document.getElementById(locationHash.substr(1));
             if (target) {
               setTimeout(()=> {
-                window.scrollTo(0, target.getBoundingClientRect().top);
+                window.scrollTo(0, window.pageYOffset + target.getBoundingClientRect().top);
               });
             }
           }
