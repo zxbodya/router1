@@ -7,7 +7,6 @@
   enter - done
   leave
   beforeunload - stream of strings or falsy values
-6. query string
 ? state updates (reuse state parts acrouse routes, allow updates without whole state rebuild)
 8. Allow baseurl, add createHref to history
 10. Post requests handling (?)

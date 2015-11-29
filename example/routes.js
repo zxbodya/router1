@@ -14,7 +14,7 @@ export default [
 
   {
     name: 'contact',
-    url: '/contact',
+    url: '/contact?sent',
     handler: contactHandler,
   },
   {
