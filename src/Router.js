@@ -1,5 +1,5 @@
 import compileRoutes from './compileRoutes';
-
+import {Subject} from 'rx';
 
 class Router {
   constructor({history, routes, render}) {
@@ -11,6 +11,9 @@ class Router {
     this.addRoutes(routes);
 
     this.activeRoute = [null, {}];
+
+    this.hashChange = new Subject();
+    this.currentLocation = {};
   }
 
   addRoutes(routeDefs) {
@@ -62,6 +65,16 @@ class Router {
   renderResult() {
     return this.history
       .location
+      .filter(location=> {
+        let needUpdate = true;
+        // todo: search
+        if (this.currentLocation.pathname === location.pathname) {
+          this.hashChange.onNext(location.hash);
+          needUpdate = false;
+        }
+        this.currentLocation = location;
+        return needUpdate;
+      })
       .map(this.matchRoute.bind(this))
       .do(({route, params})=> {
         this.activeRoute = [route, params];
