@@ -24,10 +24,21 @@ import toObservable from '../utils/toObservable';
 const renderObservable = Observable.fromCallback(ReactDOM.render);
 const appElement = document.getElementById('app');
 
+let scrollAnimationDispose = null;
+
+const cancelScrollAnimation = ()=> {
+  if (scrollAnimationDispose) {
+    scrollAnimationDispose.dispose();
+  }
+};
+
+
 const router = new Router({
   history,
   routes,
   render: (routingResult)=> {
+    cancelScrollAnimation();
+
     const handler = routingResult.handler || notFoundHandler;
 
     const locationSource = routingResult.location.source;
@@ -80,10 +91,12 @@ function animateScroll(top) {
   const duration = 400;
   const startTime = Date.now();
   const startTop = window.pageYOffset;
+  let cancel = false;
 
   return Observable.create((observer)=> {
     let id;
     const animate = ()=> {
+      if (cancel) return;
       const elapsed = Date.now() - startTime;
       if (duration <= elapsed) {
         window.scrollTo(0, top);
@@ -97,14 +110,15 @@ function animateScroll(top) {
 
     animate();
     return ()=> {
+      cancel = true;
       window.cancelAnimationFrame(id);
     };
   });
 }
 
-let scrollAnimationDispose = null;
-
-router.hashChange.forEach(hash=> {
+router.hashChange.forEach(({hash, source})=> {
+  cancelScrollAnimation();
+  if (source !== 'push' && source !== 'replace') return;
   const target = document.getElementById(hash.substr(1));
   if (target) {
     scrollAnimationDispose = animateScroll(window.pageYOffset + target.getBoundingClientRect().top).subscribe();

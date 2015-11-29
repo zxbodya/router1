@@ -69,7 +69,7 @@ class Router {
         let needUpdate = true;
         // todo: search
         if (this.currentLocation.pathname === location.pathname) {
-          this.hashChange.onNext(location.hash);
+          this.hashChange.onNext(location);
           needUpdate = false;
         }
         this.currentLocation = location;
