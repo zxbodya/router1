@@ -4,22 +4,17 @@ import ReactDOM from 'react-dom';
 
 import {Observable} from 'rx';
 
-import '../styles/main.sass';
-import '../styles/icons.scss';
-
-import './ga';
-
-import createBrowserHistory from './../router/createBrowserHistory';
+import createBrowserHistory from 'router1/createBrowserHistory';
 
 const history = createBrowserHistory();
 
 import notFoundHandler from '../notFoundPage/notFoundHandler';
 
-import routes from '../routes';
-import Router from '../router/Router';
-import RouterContext from '../router/RouterContext';
+import routes from './routes';
+import Router from 'router1/Router';
+import RouterContext from 'router1/RouterContext';
 
-import toObservable from '../utils/toObservable';
+import toObservable from './utils/toObservable';
 
 const renderObservable = Observable.fromCallback(ReactDOM.render);
 const appElement = document.getElementById('app');

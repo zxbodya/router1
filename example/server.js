@@ -1,15 +1,15 @@
 import React from 'react';
 import ReactDOM from 'react-dom/server';
 
-import createServerHistory from './../router/createServerHistory';
+import createServerHistory from 'router1/createServerHistory';
 
 import notFoundHandler from '../notFoundPage/notFoundHandler';
 
-import routes from '../routes';
-import Router from '../router/Router';
-import RouterContext from '../router/RouterContext';
+import routes from './routes';
+import Router from 'router1/Router';
+import RouterContext from 'router1/RouterContext';
 
-import toObservable from '../utils/toObservable';
+import toObservable from './utils/toObservable';
 import {Observable} from 'rx';
 
 export default function prerender(requestPath, cb) {
