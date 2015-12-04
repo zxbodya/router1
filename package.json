@@ -1,0 +1,25 @@
+{
+  "name": "router1",
+  "version": "0.0.1",
+  "description": "Complete routing soulution for isomophic reactive applications",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/zxbodya/router1.git"
+  },
+  "keywords": [
+    "router",
+    "rx",
+    "isomorphic",
+    "reactive"
+  ],
+  "author": "Bogdan Savluk <savluk.bogdan@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/zxbodya/router1/issues"
+  },
+  "homepage": "https://github.com/zxbodya/router1#readme"
+}
