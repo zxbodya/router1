@@ -4,15 +4,15 @@ import ReactDOM from 'react-dom';
 
 import {Observable} from 'rx';
 
-import createBrowserHistory from 'router1/createBrowserHistory';
+import createBrowserHistory from 'router1/lib/createBrowserHistory';
 
 const history = createBrowserHistory();
 
 import notFoundHandler from '../notFoundPage/notFoundHandler';
 
 import routes from './routes';
-import Router from 'router1/Router';
-import RouterContext from 'router1/RouterContext';
+import Router from 'router1/lib/Router';
+import RouterContext from 'router1/lib/RouterContext';
 
 import toObservable from './utils/toObservable';
 
