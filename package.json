@@ -1,9 +1,9 @@
 {
   "name": "router1",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Complete routing solution for isomophic reactive applications",
   "main": "lib/index.js",
-  "jsnext:main": "src/di.js",
+  "jsnext:main": "src/index.js",
   "scripts": {
     "lint": "eslint ./src/",
     "test": "babel-node -- ./node_modules/karma-cli/bin/karma start",
