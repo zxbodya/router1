@@ -7,9 +7,9 @@
   "scripts": {
     "lint": "eslint ./src/",
     "test": "babel-node -- ./node_modules/karma-cli/bin/karma start",
-    "prepublish": "babel --optional runtime src --out-dir lib"
+    "build": "rimraf lib && babel --optional runtime src --out-dir lib",
+    "prepublish": "npm run build"
   },
-
   "repository": {
     "type": "git",
     "url": "git+ssh://git@github.com/zxbodya/router1.git"
@@ -45,6 +45,7 @@
     "karma-jasmine": "^0.3.6",
     "karma-sourcemap-loader": "^0.3.5",
     "karma-webpack": "^1.5.1",
+    "rimraf": "^2.4.4",
     "webpack": "^1.10.1",
     "webpack-dev-server": "^1.12.1"
   },
