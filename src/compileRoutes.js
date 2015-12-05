@@ -1,6 +1,6 @@
-import compileExpression from './expressions/compile.js';
-import generatorFromExpression from './expressions/createGenerator.js';
-import matcherFromExpression from './expressions/createMatcher.js';
+import compile from './expressions/compile.js';
+import createGenerator from './expressions/createGenerator.js';
+import createMatcher from './expressions/createMatcher.js';
 
 function compileRoutes(routeDefs) {
   if (process.env.NODE_ENV !== 'production') {
@@ -30,7 +30,7 @@ function compileRoutes(routeDefs) {
 
     const urlParts = (routeDef.url || '').match(/^([^?]*)(?:\?(.*))?$/);
 
-    const pathExpression = compileExpression(urlParts[1]);
+    const pathExpression = compile(urlParts[1]);
     const searchParams = urlParts[2] ? urlParts[2].split('&') : [];
 
     // todo: warning if query param is overridden by search param
@@ -39,8 +39,8 @@ function compileRoutes(routeDefs) {
     rawRoutes.push({
       name: routeDef.name,
       handler: routeDef.handler,
-      matchPath: matcherFromExpression(pathExpression),
-      generatePath: generatorFromExpression(pathExpression),
+      matchPath: createMatcher(pathExpression),
+      generatePath: createGenerator(pathExpression),
       searchParams: searchParams,
     });
   }

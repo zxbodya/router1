@@ -5,10 +5,7 @@ class RouterContext extends React.Component {
   }
 
   render() {
-    const Component = this.props.component;
-    return (
-      <Component {...this.props.props}/>
-    );
+    return this.props.render();
   }
 }
 
@@ -17,9 +14,8 @@ RouterContext.childContextTypes = {
 };
 
 RouterContext.propTypes = {
-  component: React.PropTypes.func.isRequired,
+  render: React.PropTypes.func.isRequired,
   router: React.PropTypes.object.isRequired,
-  props: React.PropTypes.object.isRequired,
 };
 
 export default RouterContext;
