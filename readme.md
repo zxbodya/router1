@@ -1,5 +1,10 @@
 ## Router1 
 
+[![Build Status](https://travis-ci.org/zxbodya/router1.svg)](https://travis-ci.org/zxbodya/router1)
+[![Coverage Status](https://coveralls.io/repos/zxbodya/router1/badge.svg?branch=master&service=github)](https://coveralls.io/github/zxbodya/router1?branch=master)
+
+
+
 Complete routing solution for isomophic reactive applications
 
 ```JSX

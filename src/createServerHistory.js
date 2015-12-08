@@ -1,6 +1,8 @@
 import {Observable} from 'rx';
+import splitUrl from './utils/splitUrl';
 
-function historyFactory(pathname) {
+function historyFactory(url) {
+  const [pathname, search, hash] = splitUrl(url);
   return {
     push() {
       throw new Error('navigation not supported');
@@ -11,8 +13,8 @@ function historyFactory(pathname) {
     location: Observable
       .return({
         pathname,
-        search: '',
-        hash: '',
+        search: search ? `?${search}` : '',
+        hash: hash ? `#${hash}` : '',
       })
       .shareReplay(),
   };

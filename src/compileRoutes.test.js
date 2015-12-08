@@ -53,7 +53,19 @@ describe('Router, compiling route collection', () => {
 
   it('throws when route name is missing', ()=> {
     expect(()=>compileRoutes([
-      {},
+      {handler: 'aaa'},
+    ])).toThrow();
+  });
+
+  it('throws when route handler is missing', ()=> {
+    expect(()=>compileRoutes([
+      {name: 'aaa'},
+    ])).toThrow();
+  });
+  it('throws when route names are not uniq', ()=> {
+    expect(()=>compileRoutes([
+      {name: 'aaa', handler: '1'},
+      {name: 'aaa', handler: '2'},
     ])).toThrow();
   });
 });

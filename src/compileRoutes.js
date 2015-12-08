@@ -13,9 +13,6 @@ function compileRoutes(routeDefs) {
       if (!routeDef.handler) {
         throw new Error('routes should have handler property');
       }
-      if (/[\/.]/.test(routeDef.name)) {
-        throw new Error('route name should not contain slashes and dots');
-      }
       if (usedNames.has(routeDef.name)) {
         throw new Error('route names should be uniq');
       }
