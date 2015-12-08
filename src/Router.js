@@ -100,7 +100,7 @@ class Router {
     if (route) {
       const pathname = route.generatePath(Object.assign({}, this.activeRoute[1], params));
       const search = generateQuery(params, route.searchParams);
-      return `${pathname}${search ? `#${search}` : ''}${hash ? `#${hash}` : ''}`;
+      return `${pathname}${search ? `?${search}` : ''}${hash ? `#${hash}` : ''}`;
     }
     console.error(`Route "${name}" not found`);
     return `#route-${name}-not-found`;
