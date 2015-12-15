@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/zxbodya/router1.svg)](https://travis-ci.org/zxbodya/router1)
 [![Coverage Status](https://coveralls.io/repos/zxbodya/router1/badge.svg?branch=master&service=github)](https://coveralls.io/github/zxbodya/router1?branch=master)
+[![codecov.io](https://codecov.io/github/zxbodya/router1/coverage.svg?branch=master)](https://codecov.io/github/zxbodya/router1?branch=master)
 
 
 

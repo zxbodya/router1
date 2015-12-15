@@ -6,9 +6,11 @@
   "jsnext:main": "src/index.js",
   "scripts": {
     "lint": "eslint ./src/",
-    "test": "rimraf coverage && babel-node -- ./node_modules/karma-cli/bin/karma start",
-    "coveralls": "cat ./coverage/*/lcov.info | ./node_modules/.bin/coveralls",
-    "build": "rimraf lib && babel --optional runtime src --out-dir lib",
+    "cover": "rimraf coverage && istanbul cover -x \"*.test.js\" ./node_modules/jasmine/bin/jasmine.js && npm run cover_remapping",
+    "cover_remapping": "remap-istanbul -i coverage/coverage.json -o coverage/coverage-remapped.json && remap-istanbul -i coverage/coverage.json -o coverage/coverage-remapped.lcov -t lcovonly && remap-istanbul -i coverage/coverage.json -o coverage/coverage-remapped -t html",
+    "test": "jasmine",
+    "coveralls": "cat ./coverage/*/coverage-remapped.lcov | ./node_modules/.bin/coveralls",
+    "build": "rimraf lib && babel --optional runtime src --out-dir lib --source-maps",
     "prepublish": "npm run build"
   },
   "repository": {
@@ -19,6 +21,7 @@
     "router",
     "rx",
     "isomorphic",
+    "universal",
     "reactive"
   ],
   "author": "Bogdan Savluk <savluk.bogdan@gmail.com>",
@@ -34,25 +37,16 @@
     "babel": "^5.6.14",
     "babel-core": "^5.8.29",
     "babel-eslint": "^4.1.5",
-    "babel-loader": "^5.3.0",
+    "codecov.io": "^0.1.6",
     "coveralls": "^2.11.4",
     "eslint": "^1.9.0",
     "eslint-config-airbnb": "^1.0.0",
     "eslint-plugin-react": "^3.8.0",
-    "istanbul-instrumenter-loader": "^0.1.3",
-    "jasmine-core": "^2.3.0",
-    "karma": "^0.13.6",
-    "karma-chrome-launcher": "^0.2.0",
-    "karma-cli": "0.1.1",
-    "karma-coverage": "^0.5.3",
-    "karma-firefox-launcher": "^0.1.3",
-    "karma-jasmine": "^0.3.6",
-    "karma-sourcemap-loader": "^0.3.5",
-    "karma-webpack": "^1.5.1",
-    "rimraf": "^2.4.4",
-    "rx": "^4.0.7",
-    "webpack": "^1.10.1",
-    "webpack-dev-server": "^1.12.1"
+    "istanbul": "^0.4.1",
+    "jasmine": "^2.4.1",
+    "jasmine-core": "^2.4.1",
+    "remap-istanbul": "^0.5.1",
+    "rimraf": "^2.4.4"
   },
   "dependencies": {
     "babel-runtime": "^5.8.29"
