@@ -46,7 +46,8 @@
     "jasmine": "^2.4.1",
     "jasmine-core": "^2.4.1",
     "remap-istanbul": "^0.5.1",
-    "rimraf": "^2.4.4"
+    "rimraf": "^2.4.4",
+    "rx": "^4.0.0"
   },
   "dependencies": {
     "babel-runtime": "^5.8.29"
