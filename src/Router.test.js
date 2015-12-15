@@ -13,6 +13,8 @@ describe('Router', ()=> {
       },
     });
 
+    expect(router.createUrl('main', {}, '')).toEqual('#route-main-not-found');
+
     router.renderResult().subscribe(renderResult=> {
       expect(renderResult.route).toEqual(null);
       expect(renderResult.params).toEqual({});
@@ -39,6 +41,7 @@ describe('Router', ()=> {
     });
 
     expect(router.createUrl('main', {}, '')).toEqual('/');
+    expect(router.createUrl('main2', {}, '')).toEqual('#route-main2-not-found');
 
     router.renderResult().subscribe(renderResult=> {
       expect(renderResult.route).toEqual('main');

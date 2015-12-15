@@ -38,11 +38,11 @@ function historyFactory() {
   } else {
     replace = (url)=> {
       window.location.replace(url);
-      next('push');
+      next('replace');
     };
     push = (url)=> {
       window.location.assign(url);
-      next('replace');
+      next('push');
     };
     location = Observable
       .return(currentLocation('init'))
