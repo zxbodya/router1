@@ -1,6 +1,6 @@
 {
   "name": "router1",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "Complete routing solution for isomophic reactive applications",
   "main": "lib/index.js",
   "jsnext:main": "src/index.js",
@@ -10,7 +10,7 @@
     "cover_remapping": "remap-istanbul -i coverage/coverage.json -o coverage/coverage-remapped.json && remap-istanbul -i coverage/coverage.json -o coverage/coverage-remapped.lcov -t lcovonly && remap-istanbul -i coverage/coverage.json -o coverage/coverage-remapped -t html",
     "test": "jasmine",
     "coveralls": "cat ./coverage/*/coverage-remapped.lcov | ./node_modules/.bin/coveralls",
-    "build": "rimraf lib && babel --optional runtime src --out-dir lib --source-maps",
+    "build": "rimraf lib && babel --presets es2015 --plugins transform-runtime src --out-dir lib --source-maps",
     "prepublish": "npm run build"
   },
   "repository": {
@@ -34,9 +34,10 @@
   },
   "homepage": "https://github.com/zxbodya/router1#readme",
   "devDependencies": {
-    "babel": "^5.6.14",
-    "babel-core": "^5.8.29",
-    "babel-eslint": "^4.1.5",
+    "babel-cli": "^6.4.5",
+    "babel-core": "^6.4.5",
+    "babel-plugin-transform-runtime": "^6.4.3",
+    "babel-preset-es2015": "^6.3.13",
     "codecov.io": "^0.1.6",
     "coveralls": "^2.11.4",
     "eslint": "^1.9.0",
@@ -50,7 +51,7 @@
     "rx": "^4.0.0"
   },
   "dependencies": {
-    "babel-runtime": "^5.8.29"
+    "babel-runtime": "^6.3.19"
   },
   "peerDependencies": {
     "rx": "*"

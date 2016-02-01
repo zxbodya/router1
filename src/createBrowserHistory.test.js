@@ -60,7 +60,7 @@ describe('createBrowserHistory modern browsers', ()=> {
       addListener(e, l) {
         this.onpopstate = l;
       },
-      removeListener(){
+      removeListener() {
         this.onpopstate = undefined;
       },
     };
