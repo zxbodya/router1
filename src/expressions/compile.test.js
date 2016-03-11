@@ -59,4 +59,11 @@ describe('Router, expression parsing', () => {
     expect(()=>compileExpression('aaaa<a:(?!\\ad+)>aaaa')).not.toThrow();
     expect(()=>compileExpression('aaaa<a:(?=\\d+)>aaaa')).not.toThrow();
   });
+
+  it('throws for incorrect expression', ()=> {
+    expect(()=>compileExpression('/cart/<tab:items|delivery>|login|payment>')).toThrow();
+    //                         problem is here ------------^
+    // /^(?:(?:[^<>:])*(?:<([^>:]+?)(?::([^>]+))?>)*(?:[^<>:])*)*$/.test(expression)
+    // had timeout there
+  });
 });
