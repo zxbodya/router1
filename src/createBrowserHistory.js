@@ -1,4 +1,4 @@
-import {Observable, Subject} from 'rx';
+import { Observable, Subject } from 'rx';
 
 function historyFactory() {
   function currentLocation(source) {
@@ -11,7 +11,7 @@ function historyFactory() {
   }
 
   const changes = new Subject();
-  const next = (source)=> {
+  const next = (source) => {
     changes.onNext(currentLocation(source));
   };
 
@@ -22,25 +22,25 @@ function historyFactory() {
   if ('onpopstate' in window) {
     location = Observable
       .fromEvent(window, 'popstate')
-      .map(()=>currentLocation('pop'))
+      .map(() => currentLocation('pop'))
       .startWith(currentLocation('init'))
       .merge(changes)
       .shareReplay();
 
-    push = (url, data = null, title = null)=> {
+    push = (url, data = null, title = null) => {
       window.history.pushState(data, title, url);
       next('push');
     };
-    replace = (url, data = null, title = null)=> {
+    replace = (url, data = null, title = null) => {
       window.history.replaceState(data, title, url);
       next('replace');
     };
   } else {
-    replace = (url)=> {
+    replace = (url) => {
       window.location.replace(url);
       next('replace');
     };
-    push = (url)=> {
+    push = (url) => {
       window.location.assign(url);
       next('push');
     };

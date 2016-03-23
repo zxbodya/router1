@@ -1,7 +1,7 @@
 export function parse(query, keys = null) {
   const data = {};
   query.split('&')
-    .forEach(part=> {
+    .forEach(part => {
       if (part === '') return;
       const parts = part.split('=');
       const name = decodeURIComponent(parts[0]);
@@ -10,7 +10,7 @@ export function parse(query, keys = null) {
     });
   if (keys === null) return data;
   const res = {};
-  keys.forEach(name=> {
+  keys.forEach(name => {
     res[name] = data[name] || false;
   });
   return res;
@@ -18,15 +18,15 @@ export function parse(query, keys = null) {
 
 export function generate(params, keys = Object.keys(params)) {
   return keys
-    .map((name)=> {
+    .map((name) => {
       const value = params[name];
       if (!value && value !== '') return '';
       return encodeURIComponent(name) +
         (value !== true
-            ? '=' + encodeURIComponent(value)
+            ? `=${encodeURIComponent(value)}`
             : ''
         );
     })
-    .filter(part=>part.length > 0)
+    .filter(part => part.length > 0)
     .join('&');
 }

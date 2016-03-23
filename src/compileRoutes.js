@@ -38,7 +38,7 @@ function compileRoutes(routeDefs) {
       handler: routeDef.handler,
       matchPath: createMatcher(pathExpression),
       generatePath: createGenerator(pathExpression),
-      searchParams: searchParams,
+      searchParams,
     });
   }
   return rawRoutes;

@@ -1,10 +1,9 @@
 import compileRoutes from './compileRoutes';
-import {Subject} from 'rx';
-
-import {parse as parseQuery, generate as generateQuery} from './utils/queryString';
+import { Subject } from 'rx';
+import { parse as parseQuery, generate as generateQuery } from './utils/queryString';
 
 class Router {
-  constructor({history, routes, render}) {
+  constructor({ history, routes, render }) {
     this.history = history;
     this.routes = [];
     this.render = render;
@@ -20,14 +19,14 @@ class Router {
 
   addRoutes(routeDefs) {
     compileRoutes(routeDefs)
-      .forEach(route=> {
+      .forEach(route => {
         this.routes.push(route);
         this.routesByName[route.name] = route;
       });
   }
 
   matchRoute(location) {
-    const {pathname, search} = location;
+    const { pathname, search } = location;
     const matched = [];
 
     for (let i = 0, l = this.routes.length; i < l; i++) {
@@ -39,7 +38,7 @@ class Router {
     }
 
     if (matched.length === 0) {
-      return {route: null, handler: null, params: {}, location};
+      return { route: null, handler: null, params: {}, location };
     }
     const res = matched[0];
 
@@ -57,13 +56,13 @@ class Router {
 
     const searchParams = search ? parseQuery(search.substr(1), route.searchParams) : {};
 
-    return {route: route.name, handler: route.handler, params: Object.assign(params, searchParams), location};
+    return { route: route.name, handler: route.handler, params: Object.assign(params, searchParams), location };
   }
 
   renderResult() {
     return this.history
       .location
-      .filter(location=> {
+      .filter(location => {
         let needUpdate = true;
         if (this.currentLocation.pathname === location.pathname && this.currentLocation.search === location.search) {
           this.hashChange.onNext(location);
@@ -73,7 +72,7 @@ class Router {
         return needUpdate;
       })
       .map(this.matchRoute.bind(this))
-      .do(({route, params})=> {
+      .do(({ route, params }) => {
         this.activeRoute = [route, params];
       })
       .flatMapLatest(this.render)

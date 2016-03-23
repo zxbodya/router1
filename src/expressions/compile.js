@@ -1,4 +1,4 @@
-const compileExpression = (expression)=> {
+const compileExpression = (expression) => {
   // todo: if syntax is not valid show messages about typical errors
 
   // http://stackoverflow.com/questions/8844256/split-string-including-regular-expression-match

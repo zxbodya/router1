@@ -35,33 +35,33 @@ describe('Router, expression parsing', () => {
   ];
 
 
-  tests.forEach((test, testIndex)=> {
-    const {expression, expected, description} = test;
+  tests.forEach((test, testIndex) => {
+    const { expression, expected, description } = test;
 
-    it(description || ('passes test #' + testIndex), ()=> {
+    it(description || (`passes test #${testIndex}`), () => {
       const compiled = compileExpression(expression);
       expect(compiled).toEqual(expected);
     });
   });
 
-  it('throws for incorrect expression', ()=> {
-    expect(()=>compileExpression('aaaa<aaaa')).toThrow();
-    expect(()=>compileExpression('aaaa>aaaa')).toThrow();
-    expect(()=>compileExpression('aaaa<>aaaa')).toThrow();
-    expect(()=>compileExpression('aaaa<<>>aaaa')).toThrow();
-    expect(()=>compileExpression('aaaa<aaaa:>aaaa')).toThrow();
-    expect(()=>compileExpression('aaaa<:\\d+>aaaa')).toThrow();
+  it('throws for incorrect expression', () => {
+    expect(() => compileExpression('aaaa<aaaa')).toThrow();
+    expect(() => compileExpression('aaaa>aaaa')).toThrow();
+    expect(() => compileExpression('aaaa<>aaaa')).toThrow();
+    expect(() => compileExpression('aaaa<<>>aaaa')).toThrow();
+    expect(() => compileExpression('aaaa<aaaa:>aaaa')).toThrow();
+    expect(() => compileExpression('aaaa<:\\d+>aaaa')).toThrow();
   });
 
-  it('throws for incorrect param regexp', ()=> {
-    expect(()=>compileExpression('aaaa<a:(\\d+)>aaaa')).toThrow();
-    expect(()=>compileExpression('aaaa<a:(?:\\d+)>aaaa')).not.toThrow();
-    expect(()=>compileExpression('aaaa<a:(?!\\ad+)>aaaa')).not.toThrow();
-    expect(()=>compileExpression('aaaa<a:(?=\\d+)>aaaa')).not.toThrow();
+  it('throws for incorrect param regexp', () => {
+    expect(() => compileExpression('aaaa<a:(\\d+)>aaaa')).toThrow();
+    expect(() => compileExpression('aaaa<a:(?:\\d+)>aaaa')).not.toThrow();
+    expect(() => compileExpression('aaaa<a:(?!\\ad+)>aaaa')).not.toThrow();
+    expect(() => compileExpression('aaaa<a:(?=\\d+)>aaaa')).not.toThrow();
   });
 
-  it('throws for incorrect expression', ()=> {
-    expect(()=>compileExpression('/cart/<tab:items|delivery>|login|payment>')).toThrow();
+  it('throws for incorrect expression', () => {
+    expect(() => compileExpression('/cart/<tab:items|delivery>|login|payment>')).toThrow();
     //                         problem is here ------------^
     // /^(?:(?:[^<>:])*(?:<([^>:]+?)(?::([^>]+))?>)*(?:[^<>:])*)*$/.test(expression)
     // had timeout there

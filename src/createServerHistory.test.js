@@ -1,39 +1,39 @@
 import createServerHistory from './createServerHistory';
 
-describe('createServerHistory', ()=> {
-  it('throws on push', ()=> {
+describe('createServerHistory', () => {
+  it('throws on push', () => {
     const h = createServerHistory('/abc?qwe#123');
-    expect(()=>h.push()).toThrow();
+    expect(() => h.push()).toThrow();
   });
 
-  it('throws on replace', ()=> {
+  it('throws on replace', () => {
     const h = createServerHistory('/abc?qwe#123');
-    expect(()=>h.replace()).toThrow();
+    expect(() => h.replace()).toThrow();
   });
 
-  it('returns location from passedUrl', (done)=> {
+  it('returns location from passedUrl', (done) => {
     let h;
     h = createServerHistory('/abc?qwe#123');
-    h.location.subscribe(location=> {
-      expect(location).toEqual({pathname: '/abc', search: '?qwe', hash: '#123'});
+    h.location.subscribe(location => {
+      expect(location).toEqual({ pathname: '/abc', search: '?qwe', hash: '#123' });
       done();
     });
 
     h = createServerHistory('/abc#123');
-    h.location.subscribe(location=> {
-      expect(location).toEqual({pathname: '/abc', search: '', hash: '#123'});
+    h.location.subscribe(location => {
+      expect(location).toEqual({ pathname: '/abc', search: '', hash: '#123' });
       done();
     });
 
     h = createServerHistory('/abc');
-    h.location.subscribe(location=> {
-      expect(location).toEqual({pathname: '/abc', search: '', hash: ''});
+    h.location.subscribe(location => {
+      expect(location).toEqual({ pathname: '/abc', search: '', hash: '' });
       done();
     });
 
     h = createServerHistory('');
-    h.location.subscribe(location=> {
-      expect(location).toEqual({pathname: '', search: '', hash: ''});
+    h.location.subscribe(location => {
+      expect(location).toEqual({ pathname: '', search: '', hash: '' });
       done();
     });
   });

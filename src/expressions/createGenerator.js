@@ -4,7 +4,7 @@ function generatorFromExpression(info) {
 
   return (params = {}) => {
     if (process.env.NODE_ENV !== 'production') {
-      const missingParams = paramNames.filter(paramName=>!(paramName in params));
+      const missingParams = paramNames.filter(paramName => !(paramName in params));
 
       if (missingParams.length) {
         throw new Error(`missing parameters [${missingParams.join(',')}]`);

@@ -1,11 +1,11 @@
 import compileRoutes from './compileRoutes.js';
 
 describe('Router, compiling route collection', () => {
-  it('compiles empty collection', ()=> {
+  it('compiles empty collection', () => {
     expect(compileRoutes([])).toEqual([]);
   });
 
-  it('compiles flat route collection', ()=> {
+  it('compiles flat route collection', () => {
     const compiled = compileRoutes([
       {
         name: 'route1',
@@ -51,21 +51,21 @@ describe('Router, compiling route collection', () => {
   });
 
 
-  it('throws when route name is missing', ()=> {
-    expect(()=>compileRoutes([
-      {handler: 'aaa'},
+  it('throws when route name is missing', () => {
+    expect(() => compileRoutes([
+      { handler: 'aaa' },
     ])).toThrow();
   });
 
-  it('throws when route handler is missing', ()=> {
-    expect(()=>compileRoutes([
-      {name: 'aaa'},
+  it('throws when route handler is missing', () => {
+    expect(() => compileRoutes([
+      { name: 'aaa' },
     ])).toThrow();
   });
-  it('throws when route names are not uniq', ()=> {
-    expect(()=>compileRoutes([
-      {name: 'aaa', handler: '1'},
-      {name: 'aaa', handler: '2'},
+  it('throws when route names are not uniq', () => {
+    expect(() => compileRoutes([
+      { name: 'aaa', handler: '1' },
+      { name: 'aaa', handler: '2' },
     ])).toThrow();
   });
 });

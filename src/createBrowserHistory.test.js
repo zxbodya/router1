@@ -1,7 +1,7 @@
 import createBrowserHistory from './createBrowserHistory';
 
-describe('createBrowserHistory legacy browsers', ()=> {
-  beforeEach(()=> {
+describe('createBrowserHistory legacy browsers', () => {
+  beforeEach(() => {
     global.window = {};
     global.window.history = {};
     global.window.location = {
@@ -19,42 +19,42 @@ describe('createBrowserHistory legacy browsers', ()=> {
     };
   });
 
-  it('has correct initial location', (done)=> {
+  it('has correct initial location', (done) => {
     const h = createBrowserHistory();
-    h.location.subscribe(location=> {
-      expect(location).toEqual({pathname: '/abc', search: '?qwe', hash: '#123', source: 'init'});
+    h.location.subscribe(location => {
+      expect(location).toEqual({ pathname: '/abc', search: '?qwe', hash: '#123', source: 'init' });
       done();
     });
   });
 
-  it('uses assign and replace to update location, emits correct events', (done)=> {
+  it('uses assign and replace to update location, emits correct events', (done) => {
     const h = createBrowserHistory();
-    h.location.first().subscribe(location=> {
-      expect(location).toEqual({pathname: '/abc', search: '?qwe', hash: '#123', source: 'init'});
+    h.location.first().subscribe(location => {
+      expect(location).toEqual({ pathname: '/abc', search: '?qwe', hash: '#123', source: 'init' });
     });
 
-    h.location.skip(1).first().subscribe(location=> {
+    h.location.skip(1).first().subscribe(location => {
       expect(location.source).toEqual('push');
     });
 
-    h.location.skip(2).first().subscribe(location=> {
+    h.location.skip(2).first().subscribe(location => {
       expect(location.source).toEqual('replace');
       expect(global.window.location.assignCallCount).toEqual(1);
       expect(global.window.location.replaceCallCount).toEqual(1);
       done();
     });
 
-    setTimeout(()=> {
+    setTimeout(() => {
       h.push('/');
     });
-    setTimeout(()=> {
+    setTimeout(() => {
       h.replace('/');
     });
   });
 });
 
-describe('createBrowserHistory modern browsers', ()=> {
-  beforeEach(()=> {
+describe('createBrowserHistory modern browsers', () => {
+  beforeEach(() => {
     global.window = {
       onpopstate: undefined,
       addListener(e, l) {
@@ -81,41 +81,41 @@ describe('createBrowserHistory modern browsers', ()=> {
     };
   });
 
-  it('has correct initial location', (done)=> {
+  it('has correct initial location', (done) => {
     const h = createBrowserHistory();
-    h.location.subscribe(location=> {
-      expect(location).toEqual({pathname: '/abc', search: '?qwe', hash: '#123', source: 'init'});
+    h.location.subscribe(location => {
+      expect(location).toEqual({ pathname: '/abc', search: '?qwe', hash: '#123', source: 'init' });
       done();
     });
   });
 
-  it('uses assign and replace to update location, emits correct events', (done)=> {
+  it('uses assign and replace to update location, emits correct events', (done) => {
     const h = createBrowserHistory();
-    h.location.first().subscribe(location=> {
-      expect(location).toEqual({pathname: '/abc', search: '?qwe', hash: '#123', source: 'init'});
+    h.location.first().subscribe(location => {
+      expect(location).toEqual({ pathname: '/abc', search: '?qwe', hash: '#123', source: 'init' });
     });
 
-    h.location.skip(1).first().subscribe(location=> {
+    h.location.skip(1).first().subscribe(location => {
       expect(location.source).toEqual('push');
     });
 
-    h.location.skip(2).first().subscribe(location=> {
+    h.location.skip(2).first().subscribe(location => {
       expect(location.source).toEqual('replace');
       expect(global.window.history.pushCallCount).toEqual(1);
       expect(global.window.history.replaceCallCount).toEqual(1);
     });
-    h.location.skip(3).first().subscribe(location=> {
+    h.location.skip(3).first().subscribe(location => {
       expect(location.source).toEqual('pop');
       done();
     });
 
-    setTimeout(()=> {
+    setTimeout(() => {
       h.push('/');
     });
-    setTimeout(()=> {
+    setTimeout(() => {
       h.replace('/');
     });
-    setTimeout(()=> {
+    setTimeout(() => {
       global.window.onpopstate();
     });
   });

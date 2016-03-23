@@ -1,4 +1,4 @@
-import {Observable} from 'rx';
+import { Observable } from 'rx';
 import splitUrl from './utils/splitUrl';
 
 function historyFactory(url) {

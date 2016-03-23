@@ -76,3 +76,15 @@
 	- generate url
 	- is route active
 	- subscribe for 'route active' changes
+
+
+
+-------------
+Undefined in search params
+Nested routes definition syntax
+Check cmd+click
+
+
+https://www.npmjs.com/package/selenium-webdriver
+http://seleniumhq.github.io/selenium/docs/api/javascript/
+https://code.google.com/p/selenium/wiki/WebDriverJs

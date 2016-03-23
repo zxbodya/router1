@@ -1,14 +1,14 @@
 import concat from './concat';
 
-describe('concat', ()=> {
-  it('works with one arg', ()=> {
+describe('concat', () => {
+  it('works with one arg', () => {
     // '<a:\\d+>'
     const exp1 = ['(\\d+)', ['', null, ''], ['a']];
 
     expect(concat([exp1])).toEqual(exp1);
   });
 
-  it('works with two args', ()=> {
+  it('works with two args', () => {
     // '<a:\\d+>' + '<b:\\d+>'
     const exp1 = ['(\\d+)', ['', null, ''], ['a']];
     const exp2 = ['(\\d+)', ['', null, ''], ['b']];

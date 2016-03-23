@@ -1,9 +1,9 @@
 function matcherFromExpression(info) {
   const matcher = info[0];
   const paramNames = info[2];
-  const matcherExp = new RegExp('^' + matcher + '$');
+  const matcherExp = new RegExp(`^${matcher}$`);
 
-  return (path)=> {
+  return (path) => {
     const matches = path.match(matcherExp);
     let res = false;
     if (matches) {
