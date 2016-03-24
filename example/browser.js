@@ -50,7 +50,7 @@ const router = new Router({
 
         // $('meta[name=description]').text(meta.description || '');
 
-        return view.map(({component, props})=> {
+        return view.flatMap(({component, props})=> {
           return renderObservable(
             <RouterContext
               router={router}
@@ -61,19 +61,20 @@ const router = new Router({
         });
       })
       .do(()=> {
-        if (locationHash !== '' && locationHash !== '#') {
-          if (locationSource === 'push' || locationSource === 'replace') {
-            // scrollto anchor position
-            const target = document.getElementById(locationHash.substr(1));
-            if (target) {
-              setTimeout(()=> {
-                window.scrollTo(0, window.pageYOffset + target.getBoundingClientRect().top);
-              });
-            }
+        // should scroll only on this location sources
+        if (locationSource === 'push' || locationSource === 'replace') {
+          let target;
+          if (locationHash !== '' && locationHash !== '#') {
+            target = document.getElementById(locationHash.substr(1));
           }
-        } else {
-          if (locationSource === 'push' || locationSource === 'replace') {
-            setTimeout(()=> {
+
+          if (target) {
+            // scrollto anchor position
+            setTimeout(() => {
+              window.scrollTo(0, window.pageYOffset + target.getBoundingClientRect().top);
+            });
+          } else {
+            setTimeout(() => {
               window.scrollTo(0, 0);
             });
           }
