@@ -29,8 +29,12 @@ describe('Query string utility', () => {
     expect(parse('a=b&c')).toEqual({ a: 'b', c: true });
   });
 
-  it('parses query string with boolean param', () => {
+  it('parses query string with false boolean param', () => {
     expect(parse('a=b', ['a', 'c'])).toEqual({ a: 'b', c: false });
+  });
+
+  it('parses query string with empty param without replacing it with false', () => {
+    expect(parse('a=b&c=', ['a', 'c'])).toEqual({ a: 'b', c: '' });
   });
 
   it('generates string with boolean param === true', () => {

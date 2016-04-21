@@ -54,7 +54,7 @@ class Router {
     const route = res[0];
     const params = res[1];
 
-    const searchParams = search ? parseQuery(search.substr(1), route.searchParams) : {};
+    const searchParams = parseQuery(search.substr(1), route.searchParams);
 
     return { route: route.name, handler: route.handler, params: Object.assign(params, searchParams), location };
   }

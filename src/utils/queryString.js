@@ -11,7 +11,7 @@ export function parse(query, keys = null) {
   if (keys === null) return data;
   const res = {};
   keys.forEach(name => {
-    res[name] = data[name] || false;
+    res[name] = (data[name] === undefined) ? false : data[name];
   });
   return res;
 }
