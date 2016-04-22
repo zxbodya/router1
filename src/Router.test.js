@@ -16,7 +16,7 @@ describe('Router', () => {
     router.renderResult().subscribe(renderResult => {
       expect(renderResult.route).toEqual(null);
       expect(renderResult.params).toEqual({});
-      expect(renderResult.handler).toEqual(null);
+      expect(renderResult.handlers).toEqual([]);
       expect(renderResult.location).toEqual({ pathname: '/', search: '', hash: '', state: {} });
     }, () => {
     }, () => {
@@ -42,7 +42,7 @@ describe('Router', () => {
     router.renderResult().subscribe(renderResult => {
       expect(renderResult.route).toEqual('main');
       expect(renderResult.params).toEqual({});
-      expect(renderResult.handler).toEqual('main');
+      expect(renderResult.handlers).toEqual(['main']);
       expect(renderResult.location).toEqual({ pathname: '/', search: '', hash: '', state: {} });
     }, () => {
     }, () => {
@@ -68,7 +68,7 @@ describe('Router', () => {
     router.renderResult().subscribe(renderResult => {
       expect(renderResult.route).toEqual('main');
       expect(renderResult.params).toEqual({ page: '123' });
-      expect(renderResult.handler).toEqual('main');
+      expect(renderResult.handlers).toEqual(['main']);
       expect(renderResult.location).toEqual({ pathname: '/123', search: '', hash: '', state: {} });
     }, () => {
     }, () => {
@@ -95,7 +95,7 @@ describe('Router', () => {
     router.renderResult().subscribe(renderResult => {
       expect(renderResult.route).toEqual('main');
       expect(renderResult.params).toEqual({ page: '123', q: 'text' });
-      expect(renderResult.handler).toEqual('main');
+      expect(renderResult.handlers).toEqual(['main']);
       expect(renderResult.location).toEqual({ pathname: '/123', search: '?q=text', hash: '#anchor', state: {} });
     }, () => {
     }, () => {

@@ -50,6 +50,48 @@ describe('Router, compiling route collection', () => {
     expect(compiled[4].searchParams).toEqual(['a', 'b']);
   });
 
+  it('compiles nested route collection', () => {
+    const compiled = compileRoutes([
+      {
+        name: 'a',
+        handler: {},
+        url: 'aaa<param1>bbb',
+      },
+      {
+        name: 'b',
+        handler: {},
+        url: 'ccc<param2>',
+        routes: [
+          {
+            name: 'c',
+            handler: {},
+            url: 'ddd',
+            routes: [
+              {
+                name: 'd',
+                handler: {},
+                url: '?a',
+              },
+              {
+                name: 'e',
+                handler: {},
+                url: '?a&b',
+              },
+            ],
+          },
+        ],
+      },
+    ]);
+
+    expect(compiled[0].name).toEqual('a');
+    expect(compiled[0].searchParams).toEqual([]);
+
+    expect(compiled[1].name).toEqual('b.c.d');
+    expect(compiled[1].searchParams).toEqual(['a']);
+
+    expect(compiled[2].name).toEqual('b.c.e');
+    expect(compiled[2].searchParams).toEqual(['a', 'b']);
+  });
 
   it('throws when route name is missing', () => {
     expect(() => compileRoutes([

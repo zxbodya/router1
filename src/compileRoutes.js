@@ -2,16 +2,15 @@ import compile from './expressions/compile.js';
 import createGenerator from './expressions/createGenerator.js';
 import createMatcher from './expressions/createMatcher.js';
 
-function compileRoutes(routeDefs) {
+import concat from './expressions/concat';
+
+function parseRoutes(routeDefs) {
   if (process.env.NODE_ENV !== 'production') {
     const usedNames = new Set();
     for (let i = 0, l = routeDefs.length; i < l; i++) {
       const routeDef = routeDefs[i];
       if (!routeDef.name) {
         throw new Error('routes should have name property');
-      }
-      if (!routeDef.handler) {
-        throw new Error('routes should have handler property');
       }
       if (usedNames.has(routeDef.name)) {
         throw new Error('route names should be uniq');
@@ -33,15 +32,56 @@ function compileRoutes(routeDefs) {
     // todo: warning if query param is overridden by search param
     // todo: warning if param is duplicated
 
-    rawRoutes.push({
-      name: routeDef.name,
-      handler: routeDef.handler,
-      matchPath: createMatcher(pathExpression),
-      generatePath: createGenerator(pathExpression),
-      searchParams,
-    });
+    if (routeDef.routes) {
+      const nestedRoutes = parseRoutes(routeDef.routes);
+      for (let ni = 0, nl = nestedRoutes.length; ni < nl; ni++) {
+        const nestedRoute = nestedRoutes[ni];
+        let handlers;
+        if (routeDef.handlers) {
+          handlers = [...routeDef.handlers, ...nestedRoute.handlers];
+        } else {
+          handlers = routeDef.handler
+            ? [routeDef.handler, ...nestedRoute.handlers]
+            : nestedRoute.handlers;
+        }
+
+        rawRoutes.push({
+          names: [routeDef.name, ...nestedRoute.names],
+          handlers,
+          pathExpressions: [pathExpression, ...nestedRoute.pathExpressions],
+          searchParams: [...searchParams, ...nestedRoute.searchParams],
+        });
+      }
+    } else {
+      rawRoutes.push({
+        names: [routeDef.name],
+        handlers: routeDef.handlers || routeDef.handler ? [routeDef.handler] : [],
+        pathExpressions: [pathExpression],
+        searchParams,
+      });
+    }
   }
   return rawRoutes;
 }
 
-export default compileRoutes;
+export default function compileRoutes(routeDefs) {
+  return parseRoutes(routeDefs).map(routeDef => {
+    const name = routeDef.names.join('.');
+
+    if (process.env.NODE_ENV !== 'production') {
+      if (routeDef.handlers.length === 0) {
+        throw new Error(`route "${name}"should have at least one handler`);
+      }
+    }
+
+    const pathExpression = concat(routeDef.pathExpressions);
+
+    return {
+      name,
+      handlers: routeDef.handlers,
+      matchPath: createMatcher(pathExpression),
+      generatePath: createGenerator(pathExpression),
+      searchParams: routeDef.searchParams,
+    };
+  });
+}

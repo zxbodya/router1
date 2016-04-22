@@ -38,7 +38,7 @@ class Router {
     }
 
     if (matched.length === 0) {
-      return { route: null, handler: null, params: {}, location };
+      return { route: null, handlers: [], params: {}, location };
     }
     const res = matched[0];
 
@@ -56,7 +56,7 @@ class Router {
 
     const searchParams = parseQuery(search.substr(1), route.searchParams);
 
-    return { route: route.name, handler: route.handler, params: Object.assign(params, searchParams), location };
+    return { route: route.name, handlers: route.handlers, params: Object.assign(params, searchParams), location };
   }
 
   renderResult() {
