@@ -80,7 +80,7 @@ class Router {
   }
 
   isActive(route, params) {
-    if (this.activeRoute[0] && route === this.activeRoute[0]) {
+    if (this.activeRoute[0] && this.activeRoute[0].substr(0, route.length) === route) {
       let active = true;
 
       let paramName;
