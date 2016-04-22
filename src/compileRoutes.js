@@ -9,13 +9,10 @@ function parseRoutes(routeDefs) {
     const usedNames = new Set();
     for (let i = 0, l = routeDefs.length; i < l; i++) {
       const routeDef = routeDefs[i];
-      if (!routeDef.name) {
-        throw new Error('routes should have name property');
-      }
-      if (usedNames.has(routeDef.name)) {
+      if (usedNames.has(routeDef.name || '')) {
         throw new Error('route names should be uniq');
       }
-      usedNames.add(routeDef.name);
+      usedNames.add(routeDef.name || '');
     }
   }
 
@@ -66,7 +63,7 @@ function parseRoutes(routeDefs) {
 
 export default function compileRoutes(routeDefs) {
   return parseRoutes(routeDefs).map(routeDef => {
-    const name = routeDef.names.join('.');
+    const name = routeDef.names.filter(v => v).join('.');
 
     if (process.env.NODE_ENV !== 'production') {
       if (routeDef.handlers.length === 0) {
