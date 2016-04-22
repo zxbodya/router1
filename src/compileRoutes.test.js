@@ -93,12 +93,6 @@ describe('Router, compiling route collection', () => {
     expect(compiled[2].searchParams).toEqual(['a', 'b']);
   });
 
-  it('throws when route name is missing', () => {
-    expect(() => compileRoutes([
-      { handler: 'aaa' },
-    ])).toThrow();
-  });
-
   it('throws when route handler is missing', () => {
     expect(() => compileRoutes([
       { name: 'aaa' },
