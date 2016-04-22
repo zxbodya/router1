@@ -105,13 +105,13 @@ class Router {
     return `#route-${name}-not-found`;
   }
 
-  navigate(route, params = {}, hash = '', data = {}) {
+  navigate(route, params = {}, hash = '', state = {}) {
     const url = this.createUrl(route, params, hash);
-    this.history.push(url, data);
+    this.history.push(url, state);
   }
 
-  navigateToUrl(url, data = {}) {
-    this.history.push(url, data);
+  navigateToUrl(url, state = {}) {
+    this.history.push(url, state);
   }
 
 }

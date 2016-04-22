@@ -7,7 +7,7 @@ function historyFactory() {
       search: window.location.search,
       hash: window.location.hash,
       source,
-      data: window.history.state || {},
+      state: window.history.state || {},
     };
   }
 
@@ -28,12 +28,12 @@ function historyFactory() {
       .merge(changes)
       .shareReplay();
 
-    push = (url, data = null, title = null) => {
-      window.history.pushState(data, title, url);
+    push = (url, state = null, title = null) => {
+      window.history.pushState(state, title, url);
       next('push');
     };
-    replace = (url, data = null, title = null) => {
-      window.history.replaceState(data, title, url);
+    replace = (url, state = null, title = null) => {
+      window.history.replaceState(state, title, url);
       next('replace');
     };
   } else {

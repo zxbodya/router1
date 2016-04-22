@@ -15,7 +15,7 @@ function historyFactory(url) {
         pathname,
         search: search ? `?${search}` : '',
         hash: hash ? `#${hash}` : '',
-        data: {},
+        state: {},
       })
       .shareReplay(),
   };

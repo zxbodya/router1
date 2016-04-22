@@ -24,7 +24,7 @@ describe('createBrowserHistory legacy browsers', () => {
   it('has correct initial location', (done) => {
     const h = createBrowserHistory();
     h.location.subscribe(location => {
-      expect(location).toEqual({ pathname: '/abc', search: '?qwe', hash: '#123', source: 'init', data: {} });
+      expect(location).toEqual({ pathname: '/abc', search: '?qwe', hash: '#123', source: 'init', state: {} });
       done();
     });
   });
@@ -32,7 +32,7 @@ describe('createBrowserHistory legacy browsers', () => {
   it('uses assign and replace to update location, emits correct events', (done) => {
     const h = createBrowserHistory();
     h.location.first().subscribe(location => {
-      expect(location).toEqual({ pathname: '/abc', search: '?qwe', hash: '#123', source: 'init', data: {} });
+      expect(location).toEqual({ pathname: '/abc', search: '?qwe', hash: '#123', source: 'init', state: {} });
     });
 
     h.location.skip(1).first().subscribe(location => {
@@ -87,7 +87,7 @@ describe('createBrowserHistory modern browsers', () => {
   it('has correct initial location', (done) => {
     const h = createBrowserHistory();
     h.location.subscribe(location => {
-      expect(location).toEqual({ pathname: '/abc', search: '?qwe', hash: '#123', source: 'init', data: {} });
+      expect(location).toEqual({ pathname: '/abc', search: '?qwe', hash: '#123', source: 'init', state: {} });
       done();
     });
   });
@@ -95,7 +95,7 @@ describe('createBrowserHistory modern browsers', () => {
   it('uses assign and replace to update location, emits correct events', (done) => {
     const h = createBrowserHistory();
     h.location.first().subscribe(location => {
-      expect(location).toEqual({ pathname: '/abc', search: '?qwe', hash: '#123', source: 'init', data: {} });
+      expect(location).toEqual({ pathname: '/abc', search: '?qwe', hash: '#123', source: 'init', state: {} });
     });
 
     h.location.skip(1).first().subscribe(location => {
