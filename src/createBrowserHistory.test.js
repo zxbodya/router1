@@ -3,7 +3,9 @@ import createBrowserHistory from './createBrowserHistory';
 describe('createBrowserHistory legacy browsers', () => {
   beforeEach(() => {
     global.window = {};
-    global.window.history = {};
+    global.window.history = {
+      state: {},
+    };
     global.window.location = {
       pathname: '/abc',
       search: '?qwe',
@@ -22,7 +24,7 @@ describe('createBrowserHistory legacy browsers', () => {
   it('has correct initial location', (done) => {
     const h = createBrowserHistory();
     h.location.subscribe(location => {
-      expect(location).toEqual({ pathname: '/abc', search: '?qwe', hash: '#123', source: 'init' });
+      expect(location).toEqual({ pathname: '/abc', search: '?qwe', hash: '#123', source: 'init', data: {} });
       done();
     });
   });
@@ -30,7 +32,7 @@ describe('createBrowserHistory legacy browsers', () => {
   it('uses assign and replace to update location, emits correct events', (done) => {
     const h = createBrowserHistory();
     h.location.first().subscribe(location => {
-      expect(location).toEqual({ pathname: '/abc', search: '?qwe', hash: '#123', source: 'init' });
+      expect(location).toEqual({ pathname: '/abc', search: '?qwe', hash: '#123', source: 'init', data: {} });
     });
 
     h.location.skip(1).first().subscribe(location => {
@@ -73,6 +75,7 @@ describe('createBrowserHistory modern browsers', () => {
       replaceState() {
         this.replaceCallCount += 1;
       },
+      state: {},
     };
     global.window.location = {
       pathname: '/abc',
@@ -84,7 +87,7 @@ describe('createBrowserHistory modern browsers', () => {
   it('has correct initial location', (done) => {
     const h = createBrowserHistory();
     h.location.subscribe(location => {
-      expect(location).toEqual({ pathname: '/abc', search: '?qwe', hash: '#123', source: 'init' });
+      expect(location).toEqual({ pathname: '/abc', search: '?qwe', hash: '#123', source: 'init', data: {} });
       done();
     });
   });
@@ -92,7 +95,7 @@ describe('createBrowserHistory modern browsers', () => {
   it('uses assign and replace to update location, emits correct events', (done) => {
     const h = createBrowserHistory();
     h.location.first().subscribe(location => {
-      expect(location).toEqual({ pathname: '/abc', search: '?qwe', hash: '#123', source: 'init' });
+      expect(location).toEqual({ pathname: '/abc', search: '?qwe', hash: '#123', source: 'init', data: {} });
     });
 
     h.location.skip(1).first().subscribe(location => {

@@ -7,6 +7,7 @@ function historyFactory() {
       search: window.location.search,
       hash: window.location.hash,
       source,
+      data: window.history.state || {},
     };
   }
 

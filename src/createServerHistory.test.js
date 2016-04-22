@@ -15,25 +15,25 @@ describe('createServerHistory', () => {
     let h;
     h = createServerHistory('/abc?qwe#123');
     h.location.subscribe(location => {
-      expect(location).toEqual({ pathname: '/abc', search: '?qwe', hash: '#123' });
+      expect(location).toEqual({ pathname: '/abc', search: '?qwe', hash: '#123', data: {} });
       done();
     });
 
     h = createServerHistory('/abc#123');
     h.location.subscribe(location => {
-      expect(location).toEqual({ pathname: '/abc', search: '', hash: '#123' });
+      expect(location).toEqual({ pathname: '/abc', search: '', hash: '#123', data: {} });
       done();
     });
 
     h = createServerHistory('/abc');
     h.location.subscribe(location => {
-      expect(location).toEqual({ pathname: '/abc', search: '', hash: '' });
+      expect(location).toEqual({ pathname: '/abc', search: '', hash: '', data: {} });
       done();
     });
 
     h = createServerHistory('');
     h.location.subscribe(location => {
-      expect(location).toEqual({ pathname: '', search: '', hash: '' });
+      expect(location).toEqual({ pathname: '', search: '', hash: '', data: {} });
       done();
     });
   });
