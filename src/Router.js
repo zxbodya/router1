@@ -86,7 +86,8 @@ class Router {
       let paramName;
       for (paramName in params) {
         if (params.hasOwnProperty(paramName)) {
-          active = active && params[paramName].toString() === this.activeRoute[1][paramName].toString();
+          active = active
+            && ('' + params[paramName]) === ('' + this.activeRoute[1][paramName]);
         }
       }
       return active;
