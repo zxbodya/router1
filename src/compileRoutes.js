@@ -1,8 +1,8 @@
-import compile from './expressions/compile.js';
-import createGenerator from './expressions/createGenerator.js';
-import createMatcher from './expressions/createMatcher.js';
+import { compile } from './expressions/compile.js';
+import { createGenerator } from './expressions/createGenerator.js';
+import { createMatcher as createMatcher } from './expressions/createMatcher.js';
 
-import concat from './expressions/concat';
+import { concat } from './expressions/concat';
 
 function parseRoutes(routeDefs) {
   if (process.env.NODE_ENV !== 'production') {
@@ -61,7 +61,7 @@ function parseRoutes(routeDefs) {
   return rawRoutes;
 }
 
-export default function compileRoutes(routeDefs) {
+export function compileRoutes(routeDefs) {
   return parseRoutes(routeDefs).map(routeDef => {
     const name = routeDef.names.filter(v => v).join('.');
 

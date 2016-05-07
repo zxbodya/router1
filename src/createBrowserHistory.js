@@ -1,6 +1,6 @@
 import { Observable, Subject } from 'rx';
 
-function historyFactory() {
+export function createBrowserHistory() {
   function currentLocation(source) {
     return {
       pathname: window.location.pathname,
@@ -57,5 +57,3 @@ function historyFactory() {
     location,
   };
 }
-
-export default historyFactory;

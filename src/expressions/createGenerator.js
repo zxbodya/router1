@@ -1,4 +1,4 @@
-function generatorFromExpression(info) {
+export function createGenerator(info) {
   const generateParts = info[1];
   const paramNames = info[2];
 
@@ -27,5 +27,3 @@ function generatorFromExpression(info) {
     return res.join('');
   };
 }
-
-export default generatorFromExpression;

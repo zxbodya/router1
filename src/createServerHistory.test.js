@@ -1,4 +1,4 @@
-import createServerHistory from './createServerHistory';
+import { createServerHistory } from './createServerHistory';
 
 describe('createServerHistory', () => {
   it('throws on push', () => {

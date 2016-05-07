@@ -1,10 +1,10 @@
-import compileExpression from './compile.js';
-import generatorFromExpression from './createGenerator.js';
+import { compile } from './compile.js';
+import { createGenerator } from './createGenerator.js';
 
 describe('Router, generator from expression', () => {
   it('it generates strings without params', () => {
-    const expression = compileExpression('aaaaa');
-    const generator = generatorFromExpression(expression);
+    const expression = compile('aaaaa');
+    const generator = createGenerator(expression);
 
     expect(generator()).toBe('aaaaa');
     expect(generator({})).toBe('aaaaa');
@@ -12,8 +12,8 @@ describe('Router, generator from expression', () => {
   });
 
   it('it generates strings with one param', () => {
-    const expression = compileExpression('aaaaa<a>');
-    const generator = generatorFromExpression(expression);
+    const expression = compile('aaaaa<a>');
+    const generator = createGenerator(expression);
 
     expect(generator({ a: 123 })).toBe('aaaaa123');
     expect(generator({ a: 321 })).toBe('aaaaa321');
@@ -21,16 +21,16 @@ describe('Router, generator from expression', () => {
   });
 
   it('it generates strings with few params', () => {
-    const expression = compileExpression('aaaaa<a>-<b>');
-    const generator = generatorFromExpression(expression);
+    const expression = compile('aaaaa<a>-<b>');
+    const generator = createGenerator(expression);
 
     expect(generator({ a: 321, b: 1 })).toBe('aaaaa321-1');
     expect(generator({ a: 321, b: 444 })).toBe('aaaaa321-444');
   });
 
   it('throws when parameters are missing', () => {
-    const expression = compileExpression('aaaaa<a>-<b>');
-    const generator = generatorFromExpression(expression);
+    const expression = compile('aaaaa<a>-<b>');
+    const generator = createGenerator(expression);
 
     expect(() => generator({ a: 321, b: 1 })).not.toThrow();
     expect(() => generator({ a: 321 })).toThrow();

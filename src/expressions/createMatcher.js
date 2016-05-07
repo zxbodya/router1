@@ -1,4 +1,4 @@
-function matcherFromExpression(info) {
+export function createMatcher(info) {
   const matcher = info[0];
   const paramNames = info[2];
   const matcherExp = new RegExp(`^${matcher}$`);
@@ -15,5 +15,3 @@ function matcherFromExpression(info) {
     return res;
   };
 }
-
-export default matcherFromExpression;

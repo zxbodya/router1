@@ -1,4 +1,4 @@
-import createBrowserHistory from './createBrowserHistory';
+import { createBrowserHistory } from './createBrowserHistory';
 
 describe('createBrowserHistory legacy browsers', () => {
   beforeEach(() => {

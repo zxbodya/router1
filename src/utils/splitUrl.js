@@ -1,4 +1,4 @@
-export default function (url) {
+export function splitUrl(url) {
   const urlParts = url.match(/^([^?#]*)(?:\?([^#]*))?#?(.*)$/);
   const path = urlParts[1];
   const query = urlParts[2] || '';

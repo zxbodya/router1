@@ -1,4 +1,4 @@
-import compileRoutes from './compileRoutes.js';
+import { compileRoutes } from './compileRoutes.js';
 
 describe('Router, compiling route collection', () => {
   it('compiles empty collection', () => {

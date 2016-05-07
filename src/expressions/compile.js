@@ -1,4 +1,4 @@
-const compileExpression = (expression) => {
+export function compile(expression) {
   // todo: if syntax is not valid show messages about typical errors
 
   // http://stackoverflow.com/questions/8844256/split-string-including-regular-expression-match
@@ -40,6 +40,5 @@ const compileExpression = (expression) => {
     }
   }
   return [matcher.join(''), generateParts, paramNames];
-};
+}
 
-export default compileExpression;

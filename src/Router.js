@@ -1,8 +1,8 @@
-import compileRoutes from './compileRoutes';
+import { compileRoutes } from './compileRoutes';
 import { Subject } from 'rx';
 import { parse as parseQuery, generate as generateQuery } from './utils/queryString';
 
-class Router {
+export class Router {
   constructor({ history, routes, render }) {
     this.history = history;
     this.routes = [];
@@ -116,5 +116,3 @@ class Router {
   }
 
 }
-
-export default Router;

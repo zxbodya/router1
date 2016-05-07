@@ -1,6 +1,6 @@
-import Router from './Router';
-import Rx from 'rx';
-import createServerHistory from './createServerHistory';
+import { Router } from './Router';
+import { Observable } from 'rx';
+import { createServerHistory } from './createServerHistory';
 
 describe('Router', () => {
   it('works with empty route collection', (done) => {
@@ -8,7 +8,7 @@ describe('Router', () => {
     const router = new Router({
       routes: [],
       history,
-      render: (routingResult) => Rx.Observable.return(routingResult),
+      render: (routingResult) => Observable.return(routingResult),
     });
 
     expect(router.createUrl('main', {}, '')).toEqual('#route-main-not-found');
@@ -33,7 +33,7 @@ describe('Router', () => {
         url: '/',
       }],
       history,
-      render: (routingResult) => Rx.Observable.return(routingResult),
+      render: (routingResult) => Observable.return(routingResult),
     });
 
     expect(router.createUrl('main', {}, '')).toEqual('/');
@@ -60,7 +60,7 @@ describe('Router', () => {
         url: '/<page:\\d+>',
       }],
       history,
-      render: (routingResult) => Rx.Observable.return(routingResult),
+      render: (routingResult) => Observable.return(routingResult),
     });
 
     expect(router.createUrl('main', { page: 1000 }, '')).toEqual('/1000');
@@ -86,7 +86,7 @@ describe('Router', () => {
         url: '/<page:\\d+>?q',
       }],
       history,
-      render: (routingResult) => Rx.Observable.return(routingResult),
+      render: (routingResult) => Observable.return(routingResult),
     });
 
     expect(router.createUrl('main', { page: 1000, q: 1234 }, '')).toEqual('/1000?q=1234');

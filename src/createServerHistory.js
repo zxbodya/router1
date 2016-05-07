@@ -1,7 +1,7 @@
 import { Observable } from 'rx';
-import splitUrl from './utils/splitUrl';
+import { splitUrl } from './utils/splitUrl';
 
-function historyFactory(url) {
+export function createServerHistory(url) {
   const [pathname, search, hash] = splitUrl(url);
   return {
     push() {
@@ -20,5 +20,3 @@ function historyFactory(url) {
       .shareReplay(),
   };
 }
-
-export default historyFactory;

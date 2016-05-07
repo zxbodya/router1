@@ -1,4 +1,4 @@
-import concat from './concat';
+import { concat } from './concat';
 
 describe('concat', () => {
   it('works with one arg', () => {

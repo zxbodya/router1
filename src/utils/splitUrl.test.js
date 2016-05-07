@@ -1,4 +1,4 @@
-import splitUrl from './splitUrl';
+import { splitUrl } from './splitUrl';
 
 describe('splitUrl', () => {
   it('works with pathname only', () => {
