@@ -87,7 +87,7 @@ class Router {
       for (paramName in params) {
         if (params.hasOwnProperty(paramName)) {
           active = active
-            && ('' + params[paramName]) === ('' + this.activeRoute[1][paramName]);
+            && (`${params[paramName]}` === `${this.activeRoute[1][paramName]}`);
         }
       }
       return active;
