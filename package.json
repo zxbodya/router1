@@ -11,6 +11,7 @@
     "test": "jasmine",
     "coveralls": "cat ./coverage/*/coverage-remapped.lcov | ./node_modules/.bin/coveralls",
     "build": "rimraf lib && babel --presets es2015 --plugins transform-runtime src --out-dir lib --source-maps",
+    "watch": "rimraf lib && babel --presets es2015 --plugins transform-runtime src --watch --out-dir lib --source-maps",
     "prepublish": "npm run build"
   },
   "repository": {

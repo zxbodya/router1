@@ -113,4 +113,63 @@ describe('Router', () => {
       done();
     });
   });
+
+  it('navigates', (done) => {
+    const history = createTestHistory('/123?q=text#anchor');
+    const router = new Router({
+      routes: [
+        {
+          name: 'main',
+          handler: 'main',
+          url: '/<page:\\d+>?q',
+        },
+        {
+          name: 'main1',
+          handler: 'main1',
+          url: '/m2/<page:\\d+>?q',
+        },
+      ],
+      history,
+      render: (routingResult) => Observable.return(routingResult),
+    });
+
+    let count = 0;
+
+    router.renderResult().take(2).subscribe(renderResult => {
+      if (count === 0) {
+        expect(renderResult.route).toEqual('main');
+        expect(renderResult.params).toEqual({ page: '123', q: 'text' });
+        expect(renderResult.handlers).toEqual(['main']);
+        expect(renderResult.location).toEqual({ pathname: '/123', search: '?q=text', hash: '#anchor', state: {} });
+
+
+        expect(router.isActive('main')).toEqual(true);
+        expect(router.isActive('main', { page: '123', q: 'text' })).toEqual(true);
+        expect(router.isActive('main', { page: '123', q: 'text' })).toEqual(true);
+        expect(router.isActive('main', { page: '123', q: 'tex' })).toEqual(false);
+        expect(router.isActive('main', { page: '12', q: 'text' })).toEqual(false);
+      }
+
+      if (count === 1) {
+        expect(renderResult.route).toEqual('main1');
+        expect(renderResult.params).toEqual({ page: '123', q: false });
+        expect(renderResult.handlers).toEqual(['main1']);
+        expect(renderResult.location).toEqual({ pathname: '/m2/123', search: '', hash: '', state: {} });
+
+        expect(router.isActive('main1')).toEqual(true);
+        expect(router.isActive('main1', { page: '123' })).toEqual(true);
+        expect(router.isActive('main1', { page: '123', q: false })).toEqual(true);
+        expect(router.isActive('main1', { page: '123', q: 'tex' })).toEqual(false);
+        expect(router.isActive('main1', { page: '12', q: 'text' })).toEqual(false);
+
+      }
+      count += 1;
+    }, () => {
+    }, () => {
+      done();
+    });
+    setTimeout(() => {
+      router.navigate('main1', { page: '123' });
+    }, 10);
+  });
 });
