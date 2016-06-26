@@ -123,8 +123,8 @@ const router = new Router({
   render: (routingResult) => {
     // routingResult:
     //  - route: route name or null if nothing matched,
-    //  - handler: handler specified in configuration
-    //  - params: params in matched route
+    //  - handlers: handlers specified in route configuration
+    //  - params: params from matched route
     //  - location: current location
     
     // should return an observable with render results
