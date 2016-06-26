@@ -26,7 +26,7 @@ export function createBrowserHistory() {
       .map(() => currentLocation('pop'))
       .startWith(currentLocation('init'))
       .merge(changes)
-      .shareReplay();
+      .shareReplay(1);
 
     push = (url, state = null, title = null) => {
       window.history.pushState(state, title, url);
@@ -48,7 +48,7 @@ export function createBrowserHistory() {
     location = Observable
       .return(currentLocation('init'))
       .merge(changes)
-      .shareReplay();
+      .shareReplay(1);
   }
 
   return {

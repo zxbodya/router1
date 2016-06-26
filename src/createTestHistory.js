@@ -16,6 +16,6 @@ export function createTestHistory(initialUrl, cb) {
       .startWith(
         locationFromUrl(initialUrl)
       )
-      .shareReplay(),
+      .shareReplay(1),
   };
 }

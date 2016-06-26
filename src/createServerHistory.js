@@ -13,6 +13,6 @@ export function createServerHistory(url) {
       .return(
         locationFromUrl(url)
       )
-      .shareReplay(),
+      .shareReplay(1),
   };
 }
