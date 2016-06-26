@@ -135,7 +135,11 @@ describe('Router', () => {
 
     let count = 0;
 
-    router.renderResult().take(2).subscribe(renderResult => {
+    router.hashChange.take(1).subscribe(location => {
+      expect(location).toEqual({ pathname: '/123', search: '?q=text', hash: '#anc', state: {} });
+    });
+
+    router.renderResult().take(3).subscribe(renderResult => {
       if (count === 0) {
         expect(renderResult.route).toEqual('main');
         expect(renderResult.params).toEqual({ page: '123', q: 'text' });
@@ -161,7 +165,24 @@ describe('Router', () => {
         expect(router.isActive('main1', { page: '123', q: false })).toEqual(true);
         expect(router.isActive('main1', { page: '123', q: 'tex' })).toEqual(false);
         expect(router.isActive('main1', { page: '12', q: 'text' })).toEqual(false);
+      }
+      if (count === 2) {
+        expect(renderResult.route).toEqual('main');
+        expect(renderResult.params).toEqual({ page: '123', q: 'text' });
+        expect(renderResult.handlers).toEqual(['main']);
+        expect(renderResult.location).toEqual({
+          pathname: '/123',
+          search: '?q=text',
+          hash: '#anc',
+          state: { a: true },
+        });
 
+
+        expect(router.isActive('main')).toEqual(true);
+        expect(router.isActive('main', { page: '123', q: 'text' })).toEqual(true);
+        expect(router.isActive('main', { page: '123', q: 'text' })).toEqual(true);
+        expect(router.isActive('main', { page: '123', q: 'tex' })).toEqual(false);
+        expect(router.isActive('main', { page: '12', q: 'text' })).toEqual(false);
       }
       count += 1;
     }, () => {
@@ -169,7 +190,9 @@ describe('Router', () => {
       done();
     });
     setTimeout(() => {
+      router.navigate('main', { page: '123', q: 'text' }, 'anc');
       router.navigate('main1', { page: '123' });
+      router.navigate('main', { page: '123', q: 'text' }, 'anc', { a: true });
     }, 10);
   });
 });

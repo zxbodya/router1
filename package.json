@@ -1,6 +1,6 @@
 {
   "name": "router1",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "Complete routing solution for isomophic reactive applications",
   "main": "lib/index.js",
   "jsnext:main": "src/index.js",
