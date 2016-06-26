@@ -1,8 +1,7 @@
 import { Observable } from 'rx';
-import { splitUrl } from './utils/splitUrl';
+import { locationFromUrl } from './utils/locationFromUrl';
 
 export function createServerHistory(url) {
-  const [pathname, search, hash] = splitUrl(url);
   return {
     push() {
       throw new Error('navigation not supported');
@@ -11,12 +10,9 @@ export function createServerHistory(url) {
       throw new Error('navigation not supported');
     },
     location: Observable
-      .return({
-        pathname,
-        search: search ? `?${search}` : '',
-        hash: hash ? `#${hash}` : '',
-        state: {},
-      })
+      .return(
+        locationFromUrl(url)
+      )
       .shareReplay(),
   };
 }
