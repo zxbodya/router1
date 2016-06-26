@@ -2,28 +2,29 @@ import { createBrowserHistory } from './createBrowserHistory';
 
 describe('createBrowserHistory legacy browsers', () => {
   beforeEach(() => {
-    global.window = {};
-    global.window.history = {
-      state: {},
-    };
-    global.window.location = {
-      pathname: '/abc',
-      search: '?qwe',
-      hash: '#123',
-      assignCallCount: 0,
-      assign() {
-        this.assignCallCount += 1;
+    global.window = {
+      location: {
+        pathname: '/abc',
+        search: '?qwe',
+        hash: '#123',
+        assignCallCount: 0,
+        assign() {
+          this.assignCallCount += 1;
+        },
+        replaceCallCount: 0,
+        replace() {
+          this.replaceCallCount += 1;
+        },
       },
-      replaceCallCount: 0,
-      replace() {
-        this.replaceCallCount += 1;
+      history: {
+        state: {},
       },
     };
   });
 
   it('has correct initial location', (done) => {
     const h = createBrowserHistory();
-    h.location.subscribe(location => {
+    h.location.first().subscribe(location => {
       expect(location).toEqual({ pathname: '/abc', search: '?qwe', hash: '#123', source: 'init', state: {} });
       done();
     });
@@ -31,25 +32,25 @@ describe('createBrowserHistory legacy browsers', () => {
 
   it('uses assign and replace to update location, emits correct events', (done) => {
     const h = createBrowserHistory();
-    h.location.first().subscribe(location => {
-      expect(location).toEqual({ pathname: '/abc', search: '?qwe', hash: '#123', source: 'init', state: {} });
-    });
-
-    h.location.skip(1).first().subscribe(location => {
-      expect(location.source).toEqual('push');
-    });
-
-    h.location.skip(2).first().subscribe(location => {
-      expect(location.source).toEqual('replace');
-      expect(global.window.location.assignCallCount).toEqual(1);
-      expect(global.window.location.replaceCallCount).toEqual(1);
-      done();
+    let count = 0;
+    h.location.take(3).subscribe(location => {
+      if (count === 0) {
+        expect(location).toEqual({ pathname: '/abc', search: '?qwe', hash: '#123', source: 'init', state: {} });
+      }
+      if (count === 1) {
+        expect(location.source).toEqual('push');
+      }
+      if (count === 2) {
+        expect(location.source).toEqual('replace');
+        expect(global.window.location.assignCallCount).toEqual(1);
+        expect(global.window.location.replaceCallCount).toEqual(1);
+        done();
+      }
+      count += 1;
     });
 
     setTimeout(() => {
       h.push('/');
-    });
-    setTimeout(() => {
       h.replace('/');
     });
   });
@@ -65,61 +66,62 @@ describe('createBrowserHistory modern browsers', () => {
       removeListener() {
         this.onpopstate = undefined;
       },
-    };
-    global.window.history = {
-      pushCallCount: 0,
-      pushState() {
-        this.pushCallCount += 1;
+
+      history: {
+        pushCallCount: 0,
+        pushState() {
+          this.pushCallCount += 1;
+        },
+        replaceCallCount: 0,
+        replaceState() {
+          this.replaceCallCount += 1;
+        },
+        state: {},
       },
-      replaceCallCount: 0,
-      replaceState() {
-        this.replaceCallCount += 1;
+      location: {
+        pathname: '/abc',
+        search: '?qwe',
+        hash: '#123',
       },
-      state: {},
-    };
-    global.window.location = {
-      pathname: '/abc',
-      search: '?qwe',
-      hash: '#123',
     };
   });
 
   it('has correct initial location', (done) => {
     const h = createBrowserHistory();
-    h.location.subscribe(location => {
+    h.location.first().subscribe(location => {
       expect(location).toEqual({ pathname: '/abc', search: '?qwe', hash: '#123', source: 'init', state: {} });
       done();
     });
   });
 
   it('uses assign and replace to update location, emits correct events', (done) => {
+    const window = global.window;
     const h = createBrowserHistory();
-    h.location.first().subscribe(location => {
-      expect(location).toEqual({ pathname: '/abc', search: '?qwe', hash: '#123', source: 'init', state: {} });
-    });
 
-    h.location.skip(1).first().subscribe(location => {
-      expect(location.source).toEqual('push');
-    });
-
-    h.location.skip(2).first().subscribe(location => {
-      expect(location.source).toEqual('replace');
-      expect(global.window.history.pushCallCount).toEqual(1);
-      expect(global.window.history.replaceCallCount).toEqual(1);
-    });
-    h.location.skip(3).first().subscribe(location => {
-      expect(location.source).toEqual('pop');
-      done();
+    let count = 0;
+    h.location.take(4).subscribe(location => {
+      if (count === 0) {
+        expect(location).toEqual({ pathname: '/abc', search: '?qwe', hash: '#123', source: 'init', state: {} });
+      }
+      if (count === 1) {
+        expect(location.source).toEqual('push');
+      }
+      if (count === 2) {
+        expect(location.source).toEqual('replace');
+        expect(global.window.history.pushCallCount).toEqual(1);
+        expect(global.window.history.replaceCallCount).toEqual(1);
+      }
+      if (count === 3) {
+        expect(location.source).toEqual('pop');
+        done();
+      }
+      count += 1;
     });
 
     setTimeout(() => {
       h.push('/');
-    });
-    setTimeout(() => {
       h.replace('/');
-    });
-    setTimeout(() => {
-      global.window.onpopstate();
+      window.onpopstate();
     });
   });
 });
