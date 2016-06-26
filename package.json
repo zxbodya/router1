@@ -1,6 +1,6 @@
 {
   "name": "router1",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Complete routing solution for isomophic reactive applications",
   "main": "lib/index.js",
   "jsnext:main": "src/index.js",
@@ -41,7 +41,7 @@
     "codecov.io": "^0.1.6",
     "coveralls": "^2.11.4",
     "eslint": "^2.2.0",
-    "eslint-config-airbnb": "^8.0.0",
+    "eslint-config-airbnb": "^9.0.1",
     "eslint-plugin-import": "^1.7.0",
     "eslint-plugin-jsx-a11y": "^1.2.0",
     "eslint-plugin-react": "^5.0.1",

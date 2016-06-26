@@ -104,4 +104,60 @@ describe('Router, compiling route collection', () => {
       { name: 'aaa', handler: '2' },
     ])).toThrow();
   });
+
+  it('allows to pass array of handlers', () => {
+    const compiled = compileRoutes([
+      {
+        name: 'a1',
+        handlers: ['0', '1'],
+      },
+    ]);
+
+    expect(compiled[0].name).toEqual('a1');
+    expect(compiled[0].handlers).toEqual(['0', '1']);
+  });
+  it('allows to pass array of handlers, prepends it with singular handler', () => {
+    const compiled = compileRoutes([
+      {
+        name: 'a2',
+        handler: '2',
+        routes: [
+          { name: 'a1', handlers: ['0', '1'] },
+        ],
+      },
+    ]);
+
+    expect(compiled[0].name).toEqual('a2.a1');
+    expect(compiled[0].handlers).toEqual(['2', '0', '1']);
+  });
+
+  it('allows to pass array of handlers, appends it with singular handler', () => {
+    const compiled = compileRoutes([
+      {
+        name: 'a3',
+        handlers: ['0', '1'],
+        routes: [
+          { name: 'a1', handler: '2' },
+        ],
+      },
+    ]);
+
+    expect(compiled[0].name).toEqual('a3.a1');
+    expect(compiled[0].handlers).toEqual(['0', '1', '2']);
+  });
+
+  it('allows to pass array of handlers, appends it with handlers array', () => {
+    const compiled = compileRoutes([
+      {
+        name: 'a3',
+        handlers: ['0', '1'],
+        routes: [
+          { name: 'a1', handlers: ['0', '1'] },
+        ],
+      },
+    ]);
+
+    expect(compiled[0].name).toEqual('a3.a1');
+    expect(compiled[0].handlers).toEqual(['0', '1', '0', '1']);
+  });
 });
