@@ -7,7 +7,7 @@
   "scripts": {
     "lint": "eslint ./src/",
     "cover": "rimraf coverage && istanbul cover -x \"*.test.js\" ./node_modules/jasmine/bin/jasmine.js && npm run cover_remapping",
-    "cover_remapping": "remap-istanbul -i coverage/coverage.json -o coverage/coverage-remapped.json && remap-istanbul -i coverage/coverage.json -o coverage/coverage-remapped -t html",
+    "cover_remapping": "istanbul-sourcemap-report ./coverage/coverage.json --json.file=./coverage/coverage-remapped.json --html.dir=./coverage/coverage-remapped",
     "test": "jasmine",
     "build": "rimraf lib && babel --presets es2015 --plugins transform-runtime src --out-dir lib --source-maps",
     "watch": "rimraf lib && babel --presets es2015 --plugins transform-runtime src --watch --out-dir lib --source-maps",
@@ -47,7 +47,7 @@
     "istanbul": "^0.4.1",
     "jasmine": "^2.4.1",
     "jasmine-core": "^2.4.1",
-    "remap-istanbul": "^0.6.3",
+    "istanbul-sourcemap-report": "^0.1.0",
     "rimraf": "^2.4.4",
     "rx": "^4.0.0"
   },
