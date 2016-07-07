@@ -1,3 +1,11 @@
+export function pickValues(data, keys) {
+  const res = {};
+  keys.forEach(name => {
+    res[name] = (data[name] === undefined) ? false : data[name];
+  });
+  return res;
+}
+
 export function parse(query, keys = null) {
   const data = {};
   query.split('&')
@@ -9,11 +17,7 @@ export function parse(query, keys = null) {
       data[name] = rawValue || rawValue === '' ? decodeURIComponent(rawValue) : true;
     });
   if (keys === null) return data;
-  const res = {};
-  keys.forEach(name => {
-    res[name] = (data[name] === undefined) ? false : data[name];
-  });
-  return res;
+  return pickValues(data, keys);
 }
 
 export function generate(params, keys = Object.keys(params)) {

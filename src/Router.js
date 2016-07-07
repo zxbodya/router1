@@ -1,6 +1,31 @@
 import { compileRoutes } from './compileRoutes';
 import { Subject } from 'rx';
-import { parse as parseQuery, generate as generateQuery } from './utils/queryString';
+import {
+  parse as parseQuery,
+  generate as generateQuery,
+  pickValues as pickQueryValues,
+} from './utils/queryString';
+
+function resolveConflict(matchedRoutes, location) {
+  if (process.env.NODE_ENV !== 'production') {
+    // todo: make decision about best way to handle this case
+    //  - always use first and do not warn about conflicts
+    //  - allow to override match selection
+    //  - something else?
+    if (matchedRoutes.length > 1) {
+      console.warn([
+        'matched few routes (using first matched route)',
+        ` location: ${JSON.stringify(location)}`,
+        ' routes: ',
+        ...matchedRoutes.map(([route, params]) =>
+          ` - ${route.name}(${JSON.stringify(params)})`
+        )].join('\n')
+      );
+    }
+  }
+
+  return matchedRoutes[0];
+}
 
 export class Router {
   constructor({ history, routes, render }) {
@@ -26,37 +51,36 @@ export class Router {
   }
 
   matchRoute(location) {
-    const { pathname, search } = location;
+    const { pathname } = location;
+    const search = location.search.substr(1);
     const matched = [];
+    const queryData = parseQuery(search);
 
     for (let i = 0, l = this.routes.length; i < l; i++) {
       const route = this.routes[i];
       const params = route.matchPath(pathname);
       if (params) {
-        matched.push([route, params]);
+        matched.push([
+          route,
+          Object.assign(
+            params,
+            pickQueryValues(queryData, route.searchParams)
+          )]);
       }
     }
 
     if (matched.length === 0) {
       return { route: null, handlers: [], params: {}, location };
     }
-    const res = matched[0];
 
+    const [route, params] = resolveConflict(matched, location);
 
-    // todo: conflict clause
-    if (matched.length > 1) {
-      console.log('matched few routes');
-    }
-    // 1.  warning in dev mode
-    // 2.  optional data resolving step
-    // 2.1 select from conflicting
-
-    const route = res[0];
-    const params = res[1];
-
-    const searchParams = parseQuery(search.substr(1), route.searchParams);
-
-    return { route: route.name, handlers: route.handlers, params: Object.assign(params, searchParams), location };
+    return {
+      route: route.name,
+      handlers: route.handlers,
+      params,
+      location,
+    };
   }
 
   renderResult() {
@@ -80,14 +104,16 @@ export class Router {
   }
 
   isActive(route, params) {
-    if (this.activeRoute[0] && this.activeRoute[0].substr(0, route.length) === route) {
+    const activeRoute = this.activeRoute[0];
+    if (activeRoute && activeRoute.substr(0, route.length) === route) {
       let active = true;
+      const activeRouteParams = this.activeRoute[1];
 
       let paramName;
       for (paramName in params) {
         if (params.hasOwnProperty(paramName)) {
           active = active
-            && (`${params[paramName]}` === `${this.activeRoute[1][paramName]}`);
+            && (`${params[paramName]}` === `${activeRouteParams[paramName]}`);
         }
       }
       return active;
@@ -102,8 +128,11 @@ export class Router {
       const search = generateQuery(params, route.searchParams);
       return `${pathname}${search ? `?${search}` : ''}${hash ? `#${hash}` : ''}`;
     }
-    console.error(`Route "${name}" not found`);
-    return `#route-${name}-not-found`;
+    if (process.env.NODE_ENV !== 'production') {
+      console.error(`Route "${name}" not found`);
+      return `#route-${name}-not-found`;
+    }
+    return '#';
   }
 
   navigate(route, params = {}, hash = '', state = {}) {

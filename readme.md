@@ -30,10 +30,10 @@ Note: query parameters can be boolean - if parameter is not passed it would be r
 
 ### History abstractions
 
- - `router1/lib/createServerHistory` provides static location from url, meant to be used server side 
- - `router1/lib/createBrowserHistory` provides browser location. 
+ - `createServerHistory` provides static location from url, meant to be used server side 
+ - `createBrowserHistory` provides browser location. 
    uses html5 history, when available, or `location.assign/replace` when history API is not supported 
- - `router1/lib/createTestHistory` almost the same as `createServerHistory` but allows to navigate, meant to be used for testing  
+ - `createTestHistory` almost the same as `createServerHistory` but allows to navigate, meant to be used for testing  
 
 ### Routes definition 
 
