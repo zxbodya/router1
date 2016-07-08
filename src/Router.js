@@ -7,10 +7,9 @@ import {
 } from './utils/queryString';
 
 export class Router {
-  constructor({ history, routes, render }) {
+  constructor({ history, routes, createNotFoundHandler, createHandler }) {
     this.history = history;
     this.routes = [];
-    this.render = render;
 
     this.routesByName = {};
     this.addRoutes(routes);
@@ -20,8 +19,10 @@ export class Router {
     this.currentLocation = {};
     this.locationSubscription = null;
 
-    this.hashChange = new Subject();
     this.renderResult$ = new Subject();
+
+    this.createNotFoundHandler = createNotFoundHandler;
+    this.createHandler = createHandler;
   }
 
   addRoutes(routeDefs) {
@@ -32,60 +33,20 @@ export class Router {
       });
   }
 
-  createNotFoundHandler(routingResult) {
-    return {
-      load: () => Promise.resolve(true),
-      hashChange: (v) => {
-        this.hashChange.onNext(v);
-      },
-      beforeLeave: () => '',
-      render: () => {
-        const { location } = routingResult;
-
-        return this.render({
-          route: null,
-          handlers: [],
-          params: {},
-          location,
-        });
-      },
-    };
-  }
-
-  createHandler(routingResult, route, params) {
-    return {
-      load: () => Promise.resolve(true),
-      hashChange: (v) => {
-        this.hashChange.onNext(v);
-      },
-      beforeLeave: () => '',
-      render: () => {
-        const { location } = routingResult;
-
-        return this.render({
-          route: route.name,
-          handlers: route.handlers,
-          params,
-          location,
-        });
-      },
-    };
-  }
-
   start() {
     this.locationSubscription = this.history
       .location
       .filter(location => {
         let needUpdate = true;
         if (this.currentLocation.pathname === location.pathname && this.currentLocation.search === location.search) {
-          this.hashChange.onNext(location);
+          this.activeRoute[2].hashChange(location);
           needUpdate = false;
         }
         this.currentLocation = location;
         return needUpdate;
       })
       // create transition object
-      .map(location => ({ location }))
+      .map(location => ({ location, router: this }))
       // transition handling
       .map(transition => {
         const { location } = transition;
