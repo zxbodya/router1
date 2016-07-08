@@ -6,27 +6,6 @@ import {
   pickValues as pickQueryValues,
 } from './utils/queryString';
 
-function resolveConflict(matchedRoutes, location) {
-  if (process.env.NODE_ENV !== 'production') {
-    // todo: make decision about best way to handle this case
-    //  - always use first and do not warn about conflicts
-    //  - allow to override match selection
-    //  - something else?
-    if (matchedRoutes.length > 1) {
-      console.warn([
-        'matched few routes (using first matched route)',
-        ` location: ${JSON.stringify(location)}`,
-        ' routes: ',
-        ...matchedRoutes.map(([route, params]) =>
-          ` - ${route.name}(${JSON.stringify(params)})`
-        )].join('\n')
-      );
-    }
-  }
-
-  return matchedRoutes[0];
-}
-
 export class Router {
   constructor({ history, routes, render }) {
     this.history = history;
@@ -36,10 +15,13 @@ export class Router {
     this.routesByName = {};
     this.addRoutes(routes);
 
-    this.activeRoute = [null, {}];
+    this.activeRoute = [null, {}, null];
+
+    this.currentLocation = {};
+    this.locationSubscription = null;
 
     this.hashChange = new Subject();
-    this.currentLocation = {};
+    this.renderResult$ = new Subject();
   }
 
   addRoutes(routeDefs) {
@@ -50,41 +32,48 @@ export class Router {
       });
   }
 
-  matchRoute(location) {
-    const { pathname } = location;
-    const search = location.search.substr(1);
-    const matched = [];
-    const queryData = parseQuery(search);
-
-    for (let i = 0, l = this.routes.length; i < l; i++) {
-      const route = this.routes[i];
-      const params = route.matchPath(pathname);
-      if (params) {
-        matched.push([
-          route,
-          Object.assign(
-            params,
-            pickQueryValues(queryData, route.searchParams)
-          )]);
-      }
-    }
-
-    if (matched.length === 0) {
-      return { route: null, handlers: [], params: {}, location };
-    }
-
-    const [route, params] = resolveConflict(matched, location);
-
+  createNotFoundHandler(routingResult) {
     return {
-      route: route.name,
-      handlers: route.handlers,
-      params,
-      location,
+      load: () => Promise.resolve(true),
+      hashChange: (v) => {
+        this.hashChange.onNext(v);
+      },
+      beforeLeave: () => '',
+      render: () => {
+        const { location } = routingResult;
+
+        return this.render({
+          route: null,
+          handlers: [],
+          params: {},
+          location,
+        });
+      },
     };
   }
 
-  renderResult() {
-    return this.history
+  createHandler(routingResult, route, params) {
+    return {
+      load: () => Promise.resolve(true),
+      hashChange: (v) => {
+        this.hashChange.onNext(v);
+      },
+      beforeLeave: () => '',
+      render: () => {
+        const { location } = routingResult;
+
+        return this.render({
+          route: route.name,
+          handlers: route.handlers,
+          params,
+          location,
+        });
+      },
+    };
+  }
+
+  start() {
+    this.locationSubscription = this.history
       .location
       .filter(location => {
         let needUpdate = true;
@@ -95,12 +84,72 @@ export class Router {
         this.currentLocation = location;
         return needUpdate;
       })
-      .map(this.matchRoute.bind(this))
-      .do(({ route, params }) => {
-        this.activeRoute = [route, params];
+      // create transition object
+      .map(location => ({ location }))
+      // transition handling
+      .map(transition => {
+        const { location } = transition;
+        const queryData = parseQuery(location.search.substr(1));
+        const matched = [];
+
+        for (let i = 0, l = this.routes.length; i < l; i++) {
+          const route = this.routes[i];
+          const params = route.matchPath(location.pathname);
+          if (params) {
+            matched.push([
+              route,
+              Object.assign(
+                params,
+                pickQueryValues(queryData, route.searchParams)
+              )]);
+          }
+        }
+
+        return Object.assign(
+          {},
+          transition,
+          {
+            routes: matched,
+          }
+        );
       })
-      .flatMapLatest(this.render)
-      .share();
+      .flatMap(transition => {
+        const loadRoute = (routes, index) => {
+          if (index >= routes.length) {
+            return Promise.resolve([null, {}, this.createNotFoundHandler(transition)]);
+          }
+
+          const route = routes[index];
+          const handler = this.createHandler(transition, route[0], route[1]);
+          return handler.load().then(loadResult => (
+            loadResult
+              ? [route[0].name, route[1], handler]
+              : loadRoute(routes, index + 1)
+          ));
+        };
+
+        return loadRoute(transition.routes, 0);
+      })
+      .do(([route, params, handler]) => {
+        this.activeRoute = [route, params, handler];
+      })
+      .flatMapLatest(() => this.activeRoute[2].render())
+      .subscribe(
+        this.renderResult$
+      );
+  }
+
+  stop() {
+    if (this.locationSubscription) {
+      this.locationSubscription.dispose();
+    }
+  }
+
+  renderResult() {
+    if (!this.locationSubscription) {
+      this.start();
+    }
+    return this.renderResult$;
   }
 
   isActive(route, params) {

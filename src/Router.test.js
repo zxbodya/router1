@@ -21,7 +21,8 @@ describe('Router', () => {
       expect(renderResult.location).toEqual({ pathname: '/', search: '', hash: '', state: {} });
 
       expect(router.isActive('main')).toEqual(false);
-      expect(router.activeRoute).toEqual([null, {}]);
+      expect(router.activeRoute[0]).toEqual(null);
+      expect(router.activeRoute[1]).toEqual({});
     }, () => {
     }, () => {
       done();
