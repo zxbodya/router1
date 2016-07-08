@@ -6,7 +6,7 @@ const createTestHandler = (routingResult, route = { name: null, handlers: [] }, 
   load: () => Promise.resolve(true),
   hashChange() {
   },
-  beforeLeave() {
+  onBeforeUnload() {
     return '';
   },
   render() {

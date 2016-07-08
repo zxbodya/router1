@@ -25,6 +25,10 @@ export class Router {
     this.createHandler = createHandler;
   }
 
+  onBeforeUnload() {
+    return this.activeRoute[2] ? this.activeRoute[2].onBeforeUnload() : '';
+  }
+
   addRoutes(routeDefs) {
     compileRoutes(routeDefs)
       .forEach(route => {
