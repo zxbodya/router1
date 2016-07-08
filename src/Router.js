@@ -50,7 +50,13 @@ export class Router {
         return needUpdate;
       })
       // create transition object
-      .map(location => ({ location, router: this }))
+      .map(location => ({
+        location,
+        router: this,
+        forward: (redirectUrl) => {
+          this.history.replace(redirectUrl);
+        },
+      }))
       // transition handling
       .map(transition => {
         const { location } = transition;
