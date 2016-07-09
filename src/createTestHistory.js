@@ -16,7 +16,7 @@ export function createTestHistory(initialUrl, cb) {
     replace(url, state = null, title = null) {
       if (cb) cb('replace', { url, state, title });
     },
-    navigate(url, state){
+    navigate(url, state) {
       location$.onNext(locationFromUrl(url, state));
     },
     location: location$

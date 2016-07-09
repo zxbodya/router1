@@ -1,4 +1,4 @@
-import { Observable, Subject } from 'rx';
+import { Observable } from 'rx';
 import { locationFromUrl } from './utils/locationFromUrl';
 
 export function createBrowserHistory() {
@@ -12,11 +12,6 @@ export function createBrowserHistory() {
     };
   }
 
-  const changes = new Subject();
-  const next = (source) => {
-    changes.onNext(currentLocation(source));
-  };
-
   let location;
   let push;
   let replace;
@@ -26,7 +21,6 @@ export function createBrowserHistory() {
       .fromEvent(window, 'popstate')
       .map(() => currentLocation('pop'))
       .startWith(currentLocation('init'))
-      .merge(changes)
       .shareReplay(1);
 
     push = (url, state = null, title = null) => {
@@ -44,7 +38,6 @@ export function createBrowserHistory() {
     };
     location = Observable
       .return(currentLocation('init'))
-      .merge(changes)
       .shareReplay(1);
   }
 

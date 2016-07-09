@@ -1,12 +1,12 @@
 import { Observable } from 'rx';
 import { locationFromUrl } from './utils/locationFromUrl';
 
-export function createServerHistory(url) {
+export function createServerHistory(initialUrl) {
   return {
     createUrl(pathname, search, hash) {
       return `${pathname}${search ? `?${search}` : ''}${hash ? `#${hash}` : ''}`;
     },
-    parseUrl(url){
+    parseUrl(url) {
       return locationFromUrl(url);
     },
     push() {
@@ -17,7 +17,7 @@ export function createServerHistory(url) {
     },
     location: Observable
       .return(
-        locationFromUrl(url)
+        locationFromUrl(initialUrl)
       )
       .shareReplay(1),
   };

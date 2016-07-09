@@ -91,7 +91,11 @@ export class Router {
             needUpdate = false;
             // todo: find better way to revert location change
             this.history.push(
-              this.history.createUrl(this.currentLocation.pathname, this.currentLocation.search, this.currentLocation.hash),
+              this.history.createUrl(
+                this.currentLocation.pathname,
+                this.currentLocation.search,
+                this.currentLocation.hash
+              ),
               this.currentLocation.state
             );
           } else {
