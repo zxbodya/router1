@@ -171,7 +171,8 @@ export class Router {
       .flatMap(transition => {
         const loadRoute = (routes, index) => {
           if (index >= routes.length) {
-            return Promise.resolve([null, {}, this.createNotFoundHandler(transition)]);
+            const notFoundHandler = this.createNotFoundHandler(transition);
+            return notFoundHandler.load().then(() => [null, {}, notFoundHandler]);
           }
 
           const route = routes[index];
