@@ -40,13 +40,39 @@ export class Router {
   }
 
   start() {
-    const transitionFromLocation = location => ({
-      location,
-      router: this,
-      forward: (redirectUrl) => {
-        this.history.replace(redirectUrl);
-      },
-    });
+    const forwardTransition$ = new Subject();
+    const transitionFromLocation = (toLocation, redirectCount = 0) => {
+      const transition = {
+        location: toLocation,
+        router: this,
+        redirectCount,
+        // todo: redirect + forward
+        forward: (redirectUrl) => {
+          if (redirectCount > 10) {
+            throw new Error('To many redirects!');
+          }
+
+          this.history.replace(redirectUrl);
+
+          const location = Object.assign(this.history.parseUrl(redirectUrl), { source: 'replace', state: {} });
+
+          if (this.currentLocation.pathname === location.pathname && this.currentLocation.search === location.search) {
+            this.activeRoute[2].hashChange(location);
+            this.currentLocation = location;
+          } else {
+            this.currentLocation = location;
+
+            forwardTransition$.onNext(
+              transitionFromLocation(
+                location,
+                redirectCount + 1
+              )
+            );
+          }
+        },
+      };
+      return transition;
+    };
     const historyTransition$ = this.history
       .location
       .filter(location => {
@@ -60,7 +86,7 @@ export class Router {
         return needUpdate;
       })
       // create transition object
-      .map(transitionFromLocation);
+      .map(location => transitionFromLocation(location, 0));
 
     const navigateTransition$ = this.navigate$
       .flatMap(({ url, state, source }) => {
@@ -90,12 +116,13 @@ export class Router {
           });
       })
       // create transition object
-      .map(transitionFromLocation);
+      .map(location => transitionFromLocation(location, 0));
 
 
     this.locationSubscription = Observable.merge(
       historyTransition$,
-      navigateTransition$
+      navigateTransition$,
+      forwardTransition$
     )
 
     // transition handling
