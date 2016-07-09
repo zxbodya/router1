@@ -30,21 +30,12 @@ describe('createBrowserHistory legacy browsers', () => {
     });
   });
 
-  it('uses assign and replace to update location, emits correct events', (done) => {
+  it('uses assign and replace to update location', (done) => {
     const h = createBrowserHistory();
     let count = 0;
-    h.location.take(3).subscribe(location => {
+    h.location.subscribe(location => {
       if (count === 0) {
         expect(location).toEqual({ pathname: '/abc', search: '?qwe', hash: '#123', source: 'init', state: {} });
-      }
-      if (count === 1) {
-        expect(location.source).toEqual('push');
-      }
-      if (count === 2) {
-        expect(location.source).toEqual('replace');
-        expect(global.window.location.assignCallCount).toEqual(1);
-        expect(global.window.location.replaceCallCount).toEqual(1);
-        done();
       }
       count += 1;
     });
@@ -52,6 +43,10 @@ describe('createBrowserHistory legacy browsers', () => {
     setTimeout(() => {
       h.push('/');
       h.replace('/');
+
+      expect(global.window.location.assignCallCount).toEqual(1);
+      expect(global.window.location.replaceCallCount).toEqual(1);
+      done();
     });
   });
 });
@@ -99,20 +94,14 @@ describe('createBrowserHistory modern browsers', () => {
     const h = createBrowserHistory();
 
     let count = 0;
-    h.location.take(4).subscribe(location => {
+    h.location.take(2).subscribe(location => {
       if (count === 0) {
         expect(location).toEqual({ pathname: '/abc', search: '?qwe', hash: '#123', source: 'init', state: {} });
       }
       if (count === 1) {
-        expect(location.source).toEqual('push');
-      }
-      if (count === 2) {
-        expect(location.source).toEqual('replace');
+        expect(location.source).toEqual('pop');
         expect(global.window.history.pushCallCount).toEqual(1);
         expect(global.window.history.replaceCallCount).toEqual(1);
-      }
-      if (count === 3) {
-        expect(location.source).toEqual('pop');
         done();
       }
       count += 1;

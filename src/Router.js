@@ -1,5 +1,5 @@
 import { compileRoutes } from './compileRoutes';
-import { Subject } from 'rx';
+import { Observable, Subject } from 'rx';
 import {
   parse as parseQuery,
   generate as generateQuery,
@@ -22,7 +22,9 @@ export class Router {
     this.renderResult$ = new Subject();
 
     this.createNotFoundHandler = createNotFoundHandler;
+
     this.createHandler = createHandler;
+    this.navigate$ = new Subject();
   }
 
   onBeforeUnload() {
@@ -38,26 +40,65 @@ export class Router {
   }
 
   start() {
-    this.locationSubscription = this.history
+    const transitionFromLocation = location => ({
+      location,
+      router: this,
+      forward: (redirectUrl) => {
+        this.history.replace(redirectUrl);
+      },
+    });
+    const historyTransition$ = this.history
       .location
       .filter(location => {
         let needUpdate = true;
         if (this.currentLocation.pathname === location.pathname && this.currentLocation.search === location.search) {
           this.activeRoute[2].hashChange(location);
+          this.currentLocation = location;
           needUpdate = false;
         }
         this.currentLocation = location;
         return needUpdate;
       })
       // create transition object
-      .map(location => ({
-        location,
-        router: this,
-        forward: (redirectUrl) => {
-          this.history.replace(redirectUrl);
-        },
-      }))
-      // transition handling
+      .map(transitionFromLocation);
+
+    const navigateTransition$ = this.navigate$
+      .flatMap(({ url, state, source }) => {
+        const location = Object.assign(
+          this.history.parseUrl(url),
+          { source, state }
+        );
+
+        if (this.currentLocation.pathname === location.pathname && this.currentLocation.search === location.search) {
+          this.activeRoute[2].hashChange(location);
+          this.currentLocation = location;
+          this.history.push(url, state);
+          return [];
+        }
+
+        const beforeUnload = this.onBeforeUnload();
+        const cancelTransition = beforeUnload && !confirm(beforeUnload);
+
+        if (cancelTransition) {
+          return [];
+        }
+        return Observable
+          .return(location)
+          .do(() => {
+            this.currentLocation = location;
+            this.history.push(url, state);
+          });
+      })
+      // create transition object
+      .map(transitionFromLocation);
+
+
+    this.locationSubscription = Observable.merge(
+      historyTransition$,
+      navigateTransition$
+    )
+
+    // transition handling
       .map(transition => {
         const { location } = transition;
         const queryData = parseQuery(location.search.substr(1));
@@ -146,7 +187,7 @@ export class Router {
     if (route) {
       const pathname = route.generatePath(Object.assign({}, this.activeRoute[1], params));
       const search = generateQuery(params, route.searchParams);
-      return `${pathname}${search ? `?${search}` : ''}${hash ? `#${hash}` : ''}`;
+      return this.history.createUrl(pathname, search, hash);
     }
     if (process.env.NODE_ENV !== 'production') {
       console.error(`Route "${name}" not found`);
@@ -161,7 +202,7 @@ export class Router {
   }
 
   navigateToUrl(url, state = {}) {
-    this.history.push(url, state);
+    this.navigate$.onNext({ url, state, source: 'push' });
   }
 
 }

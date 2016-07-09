@@ -183,7 +183,7 @@ describe('Router', () => {
         expect(renderResult.route).toEqual('main1');
         expect(renderResult.params).toEqual({ page: '123', q: false });
         expect(renderResult.handlers).toEqual(['main1']);
-        expect(renderResult.location).toEqual({ pathname: '/m2/123', search: '', hash: '', state: {} });
+        expect(renderResult.location).toEqual({ pathname: '/m2/123', search: '', hash: '', state: {}, source: 'push' });
 
         expect(router.isActive('main1')).toEqual(true);
         expect(router.isActive('main1', { page: '123' })).toEqual(true);
@@ -200,6 +200,7 @@ describe('Router', () => {
           search: '?q=text',
           hash: '#anc',
           state: { a: true },
+          source: 'push',
         });
 
 

@@ -1,4 +1,5 @@
 import { Observable, Subject } from 'rx';
+import { locationFromUrl } from './utils/locationFromUrl';
 
 export function createBrowserHistory() {
   function currentLocation(source) {
@@ -30,20 +31,16 @@ export function createBrowserHistory() {
 
     push = (url, state = null, title = null) => {
       window.history.pushState(state, title, url);
-      next('push');
     };
     replace = (url, state = null, title = null) => {
       window.history.replaceState(state, title, url);
-      next('replace');
     };
   } else {
     replace = (url) => {
       window.location.replace(url);
-      next('replace');
     };
     push = (url) => {
       window.location.assign(url);
-      next('push');
     };
     location = Observable
       .return(currentLocation('init'))
@@ -52,6 +49,12 @@ export function createBrowserHistory() {
   }
 
   return {
+    createUrl(pathname, search, hash) {
+      return `${pathname}${search ? `?${search}` : ''}${hash ? `#${hash}` : ''}`;
+    },
+    parseUrl(url) {
+      return locationFromUrl(url);
+    },
     push,
     replace,
     location,
