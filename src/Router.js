@@ -57,6 +57,9 @@ export class Router {
           const location = Object.assign(this.history.parseUrl(redirectUrl), { source: 'replace', state: {} });
 
           if (this.currentLocation.pathname === location.pathname && this.currentLocation.search === location.search) {
+            if (this.currentLocation.hash === location.hash) {
+              throw new Error('Trying redirect to the same location!');
+            }
             this.activeRoute[2].hashChange(location);
             this.currentLocation = location;
           } else {
