@@ -84,8 +84,21 @@ export class Router {
           this.activeRoute[2].hashChange(location);
           this.currentLocation = location;
           needUpdate = false;
+        } else {
+          const beforeUnload = this.onBeforeUnload();
+          const cancelTransition = beforeUnload && !confirm(beforeUnload);
+          if (cancelTransition) {
+            needUpdate = false;
+            // todo: find better way to revert location change
+            this.history.push(
+              this.history.createUrl(this.currentLocation.pathname, this.currentLocation.search, this.currentLocation.hash),
+              this.currentLocation.state
+            );
+          } else {
+            this.currentLocation = location;
+          }
         }
-        this.currentLocation = location;
+
         return needUpdate;
       })
       // create transition object
