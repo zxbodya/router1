@@ -30,12 +30,14 @@ export function createBrowserHistory() {
       window.history.replaceState(state, title, url);
     };
   } else {
+    // todo: do not reassign location when only hash changed
     replace = (url) => {
       window.location.replace(url);
     };
     push = (url) => {
       window.location.assign(url);
     };
+    // todo: on hashchange
     location = Observable
       .return(currentLocation('init'))
       .shareReplay(1);

@@ -49,6 +49,18 @@ describe('createBrowserHistory legacy browsers', () => {
       done();
     });
   });
+
+  it('has working parseUrl method', () => {
+    const h = createBrowserHistory();
+    const location = h.parseUrl('/abc?qwe#123');
+    expect(location).toEqual({ pathname: '/abc', search: '?qwe', hash: '#123', state: {} });
+  });
+
+  it('has working parseUrl method', () => {
+    const h = createBrowserHistory();
+    const url = h.createUrl('/abc', 'qwe', '123');
+    expect(url).toEqual('/abc?qwe#123');
+  });
 });
 
 describe('createBrowserHistory modern browsers', () => {
@@ -112,5 +124,17 @@ describe('createBrowserHistory modern browsers', () => {
       h.replace('/');
       window.onpopstate();
     });
+  });
+
+  it('has working parseUrl method', () => {
+    const h = createBrowserHistory();
+    const location = h.parseUrl('/abc?qwe#123');
+    expect(location).toEqual({ pathname: '/abc', search: '?qwe', hash: '#123', state: {} });
+  });
+
+  it('has working parseUrl method', () => {
+    const h = createBrowserHistory();
+    const url = h.createUrl('/abc', 'qwe', '123');
+    expect(url).toEqual('/abc?qwe#123');
   });
 });

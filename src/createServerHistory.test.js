@@ -18,4 +18,16 @@ describe('createServerHistory', () => {
       done();
     });
   });
+
+  it('has working parseUrl method', () => {
+    const h = createServerHistory('/abc?qwe#123');
+    const location = h.parseUrl('/abc?qwe#123');
+    expect(location).toEqual({ pathname: '/abc', search: '?qwe', hash: '#123', state: {} });
+  });
+
+  it('has working parseUrl method', () => {
+    const h = createServerHistory('/abc?qwe#123');
+    const url = h.createUrl('/abc', 'qwe', '123');
+    expect(url).toEqual('/abc?qwe#123');
+  });
 });
