@@ -1,56 +1,34 @@
-## Router development roadmap
-
-? move render back
-  
-6. history abstraction testing 
-6. state hooks
-  enter - done
-  leave
-  beforeunload - stream of strings or falsy values
-? state updates (reuse state parts acrouse routes, allow updates without whole state rebuild)
-8. Allow baseurl, add createHref to history
+1. error handlers
+  + 404
+  - 500
+2. interface simplification
+  - one handler create?
+  - location source ? - is it useless
+3. server side
+  + basic rendering
+  + basic redirect
+  - circular redirect errors 
+4. test coverage
+  + history
+  - router new features
+5. refactoring
+  - cleanup Router::start
+6. history
+  - add options object with basePath
+  - hash change event in older browsers
+7. server side redirect
+  - forward ?
+ ---
+ 
+6. onleave ?
+7. state updates (reuse state parts acrouse routes, allow updates without whole state rebuild) ?
 10. Post requests handling (?)
 14. trailing slash handling
-15. allow to return just React.Component instead of RxComponent 
 16. let browser to make request if url is not matched
+15. allow to return just React.Component instead of RxComponent 
 17. disable js navigation for other domains (web.archive.org)
 
-6. search params
-
-==============
-## Router Api change 
-
-+ scroll to anchor animation
- 
-## Router behavior
-
-1. Page load
-  -> resolve route
-  -> render/update
-  -> scroll if hash presented, do not scroll if hash is empty(for ex.: when user refreshes the page)
-
-2. Click on url with new url
-  -> pushState()
-  -> resolve route
-  -> render/update
-  -> scroll top or to anchor 
-
-2. Click on link with same url
-  -> scroll
-
-2. onpopstate event
- - back, forward
-   -> resolve route
-   -> render/update
- - click on anchor
-   -> scroll
- - enter hash in location
-   -> scroll 
-
-
-
-
-## Router roadmap
+--------------
 
 1. route collection
 	match() : url -> name, handlers, parameters || 404
@@ -77,13 +55,7 @@
 	- is route active
 	- subscribe for 'route active' changes
 
-
-
 -------------
-Undefined in search params
-Nested routes definition syntax
-Check cmd+click
-
 
 https://www.npmjs.com/package/selenium-webdriver
 http://seleniumhq.github.io/selenium/docs/api/javascript/

@@ -48,7 +48,7 @@ export class Router {
         redirectCount,
         // todo: redirect + forward
         forward: (redirectUrl) => {
-          if (redirectCount > 10) {
+          if (redirectCount > 20) {
             throw new Error('To many redirects!');
           }
 
