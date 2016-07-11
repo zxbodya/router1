@@ -1,24 +1,25 @@
 import { Router } from './Router';
-import { Observable } from 'rx';
+import { Observable, helpers } from 'rx';
 import { createTestHistory } from './createTestHistory';
 
-const createTestHandler = (routingResult, route = { name: null, handlers: [] }, params = {}) => ({
-  load: () => Promise.resolve(true),
-  hashChange() {
-  },
-  onBeforeUnload() {
-    return '';
-  },
-  render() {
-    const { location } = routingResult;
-    return Observable.return({
-      route: route.name,
-      handlers: route.handlers,
-      params,
-      location,
+const createTestHandler = (options = {}) =>
+  (routingResult, route = { name: null, handlers: [] }, params = {}) =>
+    ({
+      load: () => Promise.resolve(true),
+      hashChange: options.hashChange || helpers.noop,
+      onBeforeUnload() {
+        return '';
+      },
+      render() {
+        const { location } = routingResult;
+        return Observable.return({
+          route: route.name,
+          handlers: route.handlers,
+          params,
+          location,
+        });
+      },
     });
-  },
-});
 
 describe('Router', () => {
   it('works with empty route collection', (done) => {
@@ -26,18 +27,24 @@ describe('Router', () => {
     const router = new Router({
       routes: [],
       history,
-      createNotFoundHandler: createTestHandler,
-      createHandler: createTestHandler,
+      createNotFoundHandler: createTestHandler(),
+      createHandler: createTestHandler(),
     });
 
+    const t = process.env.NODE_ENV;
+    process.env.NODE_ENV = 'development';
     expect(router.createUrl('main', {}, '')).toEqual('#route-main-not-found');
+    process.env.NODE_ENV = 'production';
+    expect(router.createUrl('main', {}, '')).toEqual('#');
+    process.env.NODE_ENV = t;
+
     expect(router.isActive('main')).toEqual(false);
 
     router.renderResult().first().subscribe(renderResult => {
       expect(renderResult.route).toEqual(null);
       expect(renderResult.params).toEqual({});
       expect(renderResult.handlers).toEqual([]);
-      expect(renderResult.location).toEqual({ pathname: '/', search: '', hash: '', state: {} });
+      expect(renderResult.location).toEqual({ pathname: '/', search: '', hash: '', state: {}, source: 'init' });
 
       expect(router.isActive('main')).toEqual(false);
       expect(router.activeRoute[0]).toEqual(null);
@@ -57,8 +64,8 @@ describe('Router', () => {
         url: '/',
       }],
       history,
-      createNotFoundHandler: createTestHandler,
-      createHandler: createTestHandler,
+      createNotFoundHandler: createTestHandler(),
+      createHandler: createTestHandler(),
     });
 
     expect(router.createUrl('main', {}, '')).toEqual('/');
@@ -68,7 +75,7 @@ describe('Router', () => {
       expect(renderResult.route).toEqual('main');
       expect(renderResult.params).toEqual({});
       expect(renderResult.handlers).toEqual(['main']);
-      expect(renderResult.location).toEqual({ pathname: '/', search: '', hash: '', state: {} });
+      expect(renderResult.location).toEqual({ pathname: '/', search: '', hash: '', state: {}, source: 'init' });
     }, () => {
     }, () => {
       expect(router.isActive('main')).toEqual(true);
@@ -85,8 +92,8 @@ describe('Router', () => {
         url: '/<page:\\d+>',
       }],
       history,
-      createNotFoundHandler: createTestHandler,
-      createHandler: createTestHandler,
+      createNotFoundHandler: createTestHandler(),
+      createHandler: createTestHandler(),
     });
 
     expect(router.createUrl('main', { page: 1000 }, '')).toEqual('/1000');
@@ -95,7 +102,7 @@ describe('Router', () => {
       expect(renderResult.route).toEqual('main');
       expect(renderResult.params).toEqual({ page: '123' });
       expect(renderResult.handlers).toEqual(['main']);
-      expect(renderResult.location).toEqual({ pathname: '/123', search: '', hash: '', state: {} });
+      expect(renderResult.location).toEqual({ pathname: '/123', search: '', hash: '', state: {}, source: 'init' });
     }, () => {
     }, () => {
       expect(router.isActive('main')).toEqual(true);
@@ -114,8 +121,8 @@ describe('Router', () => {
         url: '/<page:\\d+>?q',
       }],
       history,
-      createNotFoundHandler: createTestHandler,
-      createHandler: createTestHandler,
+      createNotFoundHandler: createTestHandler(),
+      createHandler: createTestHandler(),
     });
 
     expect(router.createUrl('main', { page: 1000, q: 1234 }, '')).toEqual('/1000?q=1234');
@@ -125,7 +132,13 @@ describe('Router', () => {
       expect(renderResult.route).toEqual('main');
       expect(renderResult.params).toEqual({ page: '123', q: 'text' });
       expect(renderResult.handlers).toEqual(['main']);
-      expect(renderResult.location).toEqual({ pathname: '/123', search: '?q=text', hash: '#anchor', state: {} });
+      expect(renderResult.location).toEqual({
+        pathname: '/123',
+        search: '?q=text',
+        hash: '#anchor',
+        state: {},
+        source: 'init',
+      });
     }, () => {
     }, () => {
       expect(router.isActive('main')).toEqual(true);
@@ -139,6 +152,8 @@ describe('Router', () => {
 
   it('navigates', (done) => {
     const history = createTestHistory('/123?q=text#anchor');
+
+    let hashChangeCount = 0;
     const router = new Router({
       routes: [
         {
@@ -153,23 +168,36 @@ describe('Router', () => {
         },
       ],
       history,
-      createNotFoundHandler: createTestHandler,
-      createHandler: createTestHandler,
+      createNotFoundHandler: createTestHandler(),
+      createHandler: createTestHandler({
+        hashChange(location) {
+          if (hashChangeCount === 0) {
+            // router.navigate
+            expect(location).toEqual({ pathname: '/123', search: '?q=text', hash: '#anc', state: {}, source: 'push' });
+          }
+          if (hashChangeCount === 1) {
+            // onpopstate
+            expect(location).toEqual({ pathname: '/123', search: '?q=text', hash: '#anc2', state: {}, source: 'pop' });
+          }
+          hashChangeCount += 1;
+        },
+      }),
     });
 
     let count = 0;
-
-    // todo: test hashChange
-    // router.hashChange.take(1).subscribe(location => {
-    //   expect(location).toEqual({ pathname: '/123', search: '?q=text', hash: '#anc', state: {} });
-    // });
 
     router.renderResult().take(3).subscribe(renderResult => {
       if (count === 0) {
         expect(renderResult.route).toEqual('main');
         expect(renderResult.params).toEqual({ page: '123', q: 'text' });
         expect(renderResult.handlers).toEqual(['main']);
-        expect(renderResult.location).toEqual({ pathname: '/123', search: '?q=text', hash: '#anchor', state: {} });
+        expect(renderResult.location).toEqual({
+          pathname: '/123',
+          search: '?q=text',
+          hash: '#anchor',
+          state: {},
+          source: 'init',
+        });
 
 
         expect(router.isActive('main')).toEqual(true);
@@ -217,6 +245,7 @@ describe('Router', () => {
     });
     setTimeout(() => {
       router.navigate('main', { page: '123', q: 'text' }, 'anc');
+      history.navigate('/123?q=text#anc2', {});
       router.navigate('main1', { page: '123' });
       router.navigate('main', { page: '123', q: 'text' }, 'anc', { a: true });
     }, 10);

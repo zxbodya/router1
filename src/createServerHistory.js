@@ -17,7 +17,7 @@ export function createServerHistory(initialUrl) {
     },
     location: Observable
       .return(
-        locationFromUrl(initialUrl)
+        Object.assign(locationFromUrl(initialUrl), { source: 'init' })
       )
       .shareReplay(1),
   };

@@ -41,40 +41,40 @@ export class Router {
 
   start() {
     const forwardTransition$ = new Subject();
-    const transitionFromLocation = (toLocation, redirectCount = 0) => {
-      const transition = {
+    const transitionFromLocation = (toLocation, redirectCount) => {
+      const forward = (redirectUrl) => {
+        if (redirectCount > 20) {
+          throw new Error('To many redirects!');
+        }
+
+        this.history.replace(redirectUrl);
+
+        const location = Object.assign(this.history.parseUrl(redirectUrl), { source: 'replace', state: {} });
+
+        if (this.currentLocation.pathname === location.pathname && this.currentLocation.search === location.search) {
+          if (this.currentLocation.hash === location.hash) {
+            throw new Error('Redirect to the same location!');
+          }
+          this.activeRoute[2].hashChange(location);
+          this.currentLocation = location;
+        } else {
+          this.currentLocation = location;
+
+          forwardTransition$.onNext(
+            transitionFromLocation(
+              location,
+              redirectCount + 1
+            )
+          );
+        }
+      };
+      return {
         location: toLocation,
         router: this,
         redirectCount,
         // todo: redirect + forward
-        forward: (redirectUrl) => {
-          if (redirectCount > 20) {
-            throw new Error('To many redirects!');
-          }
-
-          this.history.replace(redirectUrl);
-
-          const location = Object.assign(this.history.parseUrl(redirectUrl), { source: 'replace', state: {} });
-
-          if (this.currentLocation.pathname === location.pathname && this.currentLocation.search === location.search) {
-            if (this.currentLocation.hash === location.hash) {
-              throw new Error('Trying redirect to the same location!');
-            }
-            this.activeRoute[2].hashChange(location);
-            this.currentLocation = location;
-          } else {
-            this.currentLocation = location;
-
-            forwardTransition$.onNext(
-              transitionFromLocation(
-                location,
-                redirectCount + 1
-              )
-            );
-          }
-        },
+        forward,
       };
-      return transition;
     };
     const historyTransition$ = this.history
       .location

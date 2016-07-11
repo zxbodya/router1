@@ -17,11 +17,13 @@ export function createTestHistory(initialUrl, cb) {
       if (cb) cb('replace', { url, state, title });
     },
     navigate(url, state) {
-      location$.onNext(locationFromUrl(url, state));
+      location$.onNext(
+        Object.assign(locationFromUrl(url, state), { source: 'pop' })
+      );
     },
     location: location$
       .startWith(
-        locationFromUrl(initialUrl)
+        Object.assign(locationFromUrl(initialUrl), { source: 'init' })
       )
       .shareReplay(1),
   };
