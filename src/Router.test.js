@@ -7,9 +7,7 @@ const createTestHandler = (options = {}) =>
     ({
       load: () => Promise.resolve(true),
       hashChange: options.hashChange || helpers.noop,
-      onBeforeUnload() {
-        return '';
-      },
+      onBeforeUnload: options.onBeforeUnload || (() => ''),
       render() {
         const { location } = routingResult;
         return Observable.return({
@@ -249,5 +247,63 @@ describe('Router', () => {
       router.navigate('main1', { page: '123' });
       router.navigate('main', { page: '123', q: 'text' }, 'anc', { a: true });
     }, 10);
+  });
+
+
+  it('uses onBeforeUnload', (done) => {
+    const history = createTestHistory('/');
+
+    global.confirm = txt => txt === 'yes';
+
+    let answer = 'no';
+
+    const testHandlerOptions = {
+      onBeforeUnload: () => answer,
+    };
+    const router = new Router({
+      routes: [{
+        name: 'main',
+        handler: 'main',
+        url: '/',
+      }, {
+        name: 'main2',
+        handler: 'main2',
+        url: '/2',
+      }],
+      history,
+      createNotFoundHandler: createTestHandler(testHandlerOptions),
+      createHandler: createTestHandler(testHandlerOptions),
+    });
+
+    router.start();
+
+    setTimeout(() => {
+      answer = 'no';
+      router.navigate('main2', {});
+    }, 5);
+
+    setTimeout(() => {
+      expect(router.isActive('main')).toEqual(true);
+      answer = 'no';
+      history.navigate('/2');
+    }, 10);
+
+    setTimeout(() => {
+      expect(router.isActive('main')).toEqual(true);
+      answer = 'yes';
+      history.navigate('/2');
+    }, 20);
+
+    setTimeout(() => {
+      expect(router.isActive('main2')).toEqual(true);
+      answer = 'yes';
+      router.navigate('main', {});
+    }, 30);
+
+    setTimeout(() => {
+      expect(router.isActive('main')).toEqual(true);
+      router.stop();
+      done();
+    }, 40);
   });
 });

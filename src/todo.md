@@ -10,7 +10,9 @@
   - circular redirect errors 
 4. test coverage
   + history
-  - router new features
+  + router - beforeunload
+  - router - redirect
+  - router - reaction to history updates
 5. refactoring
   - cleanup Router::start
 6. history
