@@ -310,7 +310,7 @@ describe('Router', () => {
   it('handles transition.forward calls', (done) => {
     const history = createTestHistory('/');
 
-    const createHandler = (transition, route = { name: null, handlers: [] }, params = {}) =>
+    const createHandler = (transition, route = { name: null, handlers: [] }) =>
       ({
         load: () => Promise.resolve(true),
         hashChange: helpers.noop,
@@ -345,7 +345,7 @@ describe('Router', () => {
       ],
       history,
       createNotFoundHandler: createHandler,
-      createHandler: createHandler,
+      createHandler,
     });
 
     router.start();
@@ -366,5 +366,107 @@ describe('Router', () => {
       router.stop();
       done();
     }, 15);
+  });
+
+  it('crashes when transition.forward navigates to same page', (done) => {
+    const history = createTestHistory('/');
+
+    const createHandler = (transition, route = { name: null, handlers: [] }) =>
+      ({
+        load: () => Promise.resolve(true),
+        hashChange: helpers.noop,
+        onBeforeUnload: () => '',
+        render() {
+          return Observable.return(route.handlers[0](transition));
+        },
+      });
+
+    const router = new Router({
+      routes: [
+        {
+          name: 'main',
+          handler: () => 'main',
+          url: '/',
+        },
+        {
+          name: 'main2',
+          handler: t => t.forward('/2'),
+          url: '/2',
+        },
+      ],
+      history,
+      createNotFoundHandler: createHandler,
+      createHandler,
+    });
+
+    let hasError = false;
+    router.renderResult().subscribeOnError(() => {
+      hasError = true;
+    });
+
+    setTimeout(() => {
+      expect(router.isActive('main')).toEqual(true);
+      router.navigate('main2', {});
+    }, 5);
+
+    setTimeout(() => {
+      expect(hasError).toEqual(true);
+      router.stop();
+      done();
+    }, 10);
+  });
+
+
+  it('crashes when transition.forward calls cause redirect loop', (done) => {
+    const history = createTestHistory('/');
+
+    const createHandler = (transition, route = { name: null, handlers: [] }) =>
+      ({
+        load: () => Promise.resolve(true),
+        hashChange: helpers.noop,
+        onBeforeUnload: () => '',
+        render() {
+          return Observable.return(route.handlers[0](transition));
+        },
+      });
+
+    const router = new Router({
+      routes: [
+        {
+          name: 'main',
+          handler: () => 'main',
+          url: '/',
+        },
+        {
+          name: 'main2',
+          handler: t => t.forward('/3'),
+          url: '/2',
+        },
+        {
+          name: 'main3',
+          handler: t => t.forward('/2'),
+          url: '/3',
+        },
+      ],
+      history,
+      createNotFoundHandler: createHandler,
+      createHandler,
+    });
+
+    let hasError = false;
+    router.renderResult().subscribeOnError(() => {
+      hasError = true;
+    });
+
+    setTimeout(() => {
+      expect(router.isActive('main')).toEqual(true);
+      router.navigate('main2', {});
+    }, 5);
+
+    setTimeout(() => {
+      expect(hasError).toEqual(true);
+      router.stop();
+      done();
+    }, 30);
   });
 });

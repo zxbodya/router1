@@ -8,11 +8,6 @@
   + basic rendering
   + basic redirect
   - circular redirect errors 
-4. test coverage
-  + history
-  + router - beforeunload
-  + router - redirect
-  + router - redirect errors
 5. refactoring
   - cleanup Router::start
 6. history
