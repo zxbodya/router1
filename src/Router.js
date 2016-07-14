@@ -7,7 +7,7 @@ import {
 } from './utils/queryString';
 
 export class Router {
-  constructor({ history, routes, createNotFoundHandler, createHandler }) {
+  constructor({ history, routes, createHandler }) {
     this.history = history;
     this.routes = [];
 
@@ -20,7 +20,6 @@ export class Router {
     this.resultsSubscription = null;
     this.renderResult$ = new Subject();
 
-    this.createNotFoundHandler = createNotFoundHandler;
     this.createHandler = createHandler;
 
     this.navigate$ = new Subject();
@@ -169,12 +168,16 @@ export class Router {
       .flatMap(transition => {
         const loadRoute = (routes, index) => {
           if (index >= routes.length) {
-            const notFoundHandler = this.createNotFoundHandler(transition);
+            const notFoundHandler = this.createHandler(
+              Object.assign({ route: { name: null, handlers: [] }, params: {} }, transition)
+            );
             return notFoundHandler.load().then(() => [null, {}, notFoundHandler]);
           }
 
           const route = routes[index];
-          const handler = this.createHandler(transition, route[0], route[1]);
+          const handler = this.createHandler(
+            Object.assign({ route: route[0], params: route[1] }, transition)
+          );
           return handler.load().then(loadResult => (
             loadResult
               ? [route[0].name, route[1], handler]

@@ -3,18 +3,17 @@ import { Observable, helpers } from 'rx';
 import { createTestHistory } from './createTestHistory';
 
 const createTestHandler = (options = {}) =>
-  (transition, route = { name: null, handlers: [] }, params = {}) =>
+  (transition) =>
     ({
       load: () => Promise.resolve(true),
       hashChange: options.hashChange || helpers.noop,
       onBeforeUnload: options.onBeforeUnload || (() => ''),
       render() {
-        const { location } = transition;
         return Observable.return({
-          route: route.name,
-          handlers: route.handlers,
-          params,
-          location,
+          route: transition.route.name,
+          handlers: transition.route.handlers,
+          params: transition.params,
+          location: transition.location,
         });
       },
     });
@@ -25,7 +24,6 @@ describe('Router', () => {
     const router = new Router({
       routes: [],
       history,
-      createNotFoundHandler: createTestHandler(),
       createHandler: createTestHandler(),
     });
 
@@ -62,7 +60,6 @@ describe('Router', () => {
         url: '/',
       }],
       history,
-      createNotFoundHandler: createTestHandler(),
       createHandler: createTestHandler(),
     });
 
@@ -90,7 +87,6 @@ describe('Router', () => {
         url: '/<page:\\d+>',
       }],
       history,
-      createNotFoundHandler: createTestHandler(),
       createHandler: createTestHandler(),
     });
 
@@ -119,7 +115,6 @@ describe('Router', () => {
         url: '/<page:\\d+>?q',
       }],
       history,
-      createNotFoundHandler: createTestHandler(),
       createHandler: createTestHandler(),
     });
 
@@ -166,7 +161,6 @@ describe('Router', () => {
         },
       ],
       history,
-      createNotFoundHandler: createTestHandler(),
       createHandler: createTestHandler({
         hashChange(location) {
           if (hashChangeCount === 0) {
@@ -271,7 +265,6 @@ describe('Router', () => {
         url: '/2',
       }],
       history,
-      createNotFoundHandler: createTestHandler(testHandlerOptions),
       createHandler: createTestHandler(testHandlerOptions),
     });
 
@@ -310,13 +303,13 @@ describe('Router', () => {
   it('handles transition.forward calls', (done) => {
     const history = createTestHistory('/');
 
-    const createHandler = (transition, route = { name: null, handlers: [] }) =>
+    const createHandler = (transition) =>
       ({
         load: () => Promise.resolve(true),
         hashChange: helpers.noop,
         onBeforeUnload: () => '',
         render() {
-          return Observable.return(route.handlers[0](transition));
+          return Observable.return(transition.route.handlers[0](transition));
         },
       });
 
@@ -344,7 +337,6 @@ describe('Router', () => {
         },
       ],
       history,
-      createNotFoundHandler: createHandler,
       createHandler,
     });
 
@@ -371,13 +363,13 @@ describe('Router', () => {
   it('crashes when transition.forward navigates to same page', (done) => {
     const history = createTestHistory('/');
 
-    const createHandler = (transition, route = { name: null, handlers: [] }) =>
+    const createHandler = (transition) =>
       ({
         load: () => Promise.resolve(true),
         hashChange: helpers.noop,
         onBeforeUnload: () => '',
         render() {
-          return Observable.return(route.handlers[0](transition));
+          return Observable.return(transition.route.handlers[0](transition));
         },
       });
 
@@ -395,7 +387,6 @@ describe('Router', () => {
         },
       ],
       history,
-      createNotFoundHandler: createHandler,
       createHandler,
     });
 
@@ -420,13 +411,13 @@ describe('Router', () => {
   it('crashes when transition.forward calls cause redirect loop', (done) => {
     const history = createTestHistory('/');
 
-    const createHandler = (transition, route = { name: null, handlers: [] }) =>
+    const createHandler = (transition) =>
       ({
         load: () => Promise.resolve(true),
         hashChange: helpers.noop,
         onBeforeUnload: () => '',
         render() {
-          return Observable.return(route.handlers[0](transition));
+          return Observable.return(transition.route.handlers[0](transition));
         },
       });
 
@@ -449,7 +440,6 @@ describe('Router', () => {
         },
       ],
       history,
-      createNotFoundHandler: createHandler,
       createHandler,
     });
 

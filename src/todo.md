@@ -1,9 +1,5 @@
 1. error handlers
-  + 404
   - 500 - when error happens router should create error handler with error details and render it
-2. interface simplification
-  - one handler create?
-  - location source ? - is it useless
 5. refactoring
   - cleanup Router::start
 6. history
