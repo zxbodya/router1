@@ -1,9 +1,10 @@
 1. error handlers
   + 404
-  - 500
+  - 500 - when error happens router should create error handler with error details and render it
 2. interface simplification
   - one handler create?
   - location source ? - is it useless
+  - remove weird `?` and `#` prefixes
 3. server side
   + basic rendering
   + basic redirect
@@ -15,6 +16,10 @@
   - hash change event in older browsers
 7. server side redirect
   - forward ?
+8. separate router state from router instance ? allow to use on router instance for all requests
+  - ? store info about active route in transition obj
+  - use one router for all requests server-side
+  
  ---
  
 

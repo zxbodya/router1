@@ -15,15 +15,13 @@ export class Router {
     this.addRoutes(routes);
 
     this.activeRoute = [null, {}, null];
-
     this.currentLocation = {};
     this.locationSubscription = null;
-
     this.renderResult$ = new Subject();
 
     this.createNotFoundHandler = createNotFoundHandler;
-
     this.createHandler = createHandler;
+
     this.navigate$ = new Subject();
   }
 
@@ -78,35 +76,32 @@ export class Router {
     };
     const historyTransition$ = this.history
       .location
-      .filter(location => {
-        let needUpdate = true;
+      .flatMap(location => {
         if (this.currentLocation.pathname === location.pathname && this.currentLocation.search === location.search) {
           this.activeRoute[2].hashChange(location);
           this.currentLocation = location;
-          needUpdate = false;
-        } else {
-          const beforeUnload = this.onBeforeUnload();
-          const cancelTransition = beforeUnload && !confirm(beforeUnload);
-          if (cancelTransition) {
-            needUpdate = false;
-            // todo: find better way to revert location change
-            this.history.push(
-              this.history.createUrl(
-                this.currentLocation.pathname,
-                this.currentLocation.search,
-                this.currentLocation.hash
-              ),
-              this.currentLocation.state
-            );
-          } else {
-            this.currentLocation = location;
-          }
+          return [];
         }
 
-        return needUpdate;
-      })
-      // create transition object
-      .map(location => transitionFromLocation(location, 0));
+        const beforeUnload = this.onBeforeUnload();
+        const cancelTransition = beforeUnload && !confirm(beforeUnload);
+        if (cancelTransition) {
+          // todo: find better way to revert location change
+          this.history.push(
+            this.history.createUrl(
+              this.currentLocation.pathname,
+              this.currentLocation.search,
+              this.currentLocation.hash
+            ),
+            this.currentLocation.state
+          );
+          return [];
+        }
+
+        this.currentLocation = location;
+        return [location];
+      });
+
 
     const navigateTransition$ = this.navigate$
       .flatMap(({ url, state, source }) => {
@@ -128,20 +123,21 @@ export class Router {
         if (cancelTransition) {
           return [];
         }
-        return Observable
-          .return(location)
-          .do(() => {
-            this.currentLocation = location;
-            this.history.push(url, state);
-          });
-      })
-      // create transition object
-      .map(location => transitionFromLocation(location, 0));
+
+        this.currentLocation = location;
+        this.history.push(url, state);
+
+        return [location];
+      });
 
 
     this.locationSubscription = Observable.merge(
-      historyTransition$,
-      navigateTransition$,
+      Observable.merge(
+        historyTransition$,
+        navigateTransition$
+      )
+        .map(location => transitionFromLocation(location, 0)),
+
       forwardTransition$
     )
 
