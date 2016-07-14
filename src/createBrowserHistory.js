@@ -5,8 +5,8 @@ export function createBrowserHistory() {
   function currentLocation(source) {
     return {
       pathname: window.location.pathname,
-      search: window.location.search,
-      hash: window.location.hash,
+      search: window.location.search && window.location.search.substr(1),
+      hash: window.location.hash && window.location.hash.substr(1),
       source,
       state: window.history.state || {},
     };

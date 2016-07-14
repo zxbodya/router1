@@ -25,7 +25,7 @@ describe('createBrowserHistory legacy browsers', () => {
   it('has correct initial location', (done) => {
     const h = createBrowserHistory();
     h.location.first().subscribe(location => {
-      expect(location).toEqual({ pathname: '/abc', search: '?qwe', hash: '#123', source: 'init', state: {} });
+      expect(location).toEqual({ pathname: '/abc', search: 'qwe', hash: '123', source: 'init', state: {} });
       done();
     });
   });
@@ -35,7 +35,7 @@ describe('createBrowserHistory legacy browsers', () => {
     let count = 0;
     h.location.subscribe(location => {
       if (count === 0) {
-        expect(location).toEqual({ pathname: '/abc', search: '?qwe', hash: '#123', source: 'init', state: {} });
+        expect(location).toEqual({ pathname: '/abc', search: 'qwe', hash: '123', source: 'init', state: {} });
       }
       count += 1;
     });
@@ -53,7 +53,7 @@ describe('createBrowserHistory legacy browsers', () => {
   it('has working parseUrl method', () => {
     const h = createBrowserHistory();
     const location = h.parseUrl('/abc?qwe#123');
-    expect(location).toEqual({ pathname: '/abc', search: '?qwe', hash: '#123', state: {} });
+    expect(location).toEqual({ pathname: '/abc', search: 'qwe', hash: '123', state: {} });
   });
 
   it('has working parseUrl method', () => {
@@ -96,7 +96,7 @@ describe('createBrowserHistory modern browsers', () => {
   it('has correct initial location', (done) => {
     const h = createBrowserHistory();
     h.location.first().subscribe(location => {
-      expect(location).toEqual({ pathname: '/abc', search: '?qwe', hash: '#123', source: 'init', state: {} });
+      expect(location).toEqual({ pathname: '/abc', search: 'qwe', hash: '123', source: 'init', state: {} });
       done();
     });
   });
@@ -108,7 +108,7 @@ describe('createBrowserHistory modern browsers', () => {
     let count = 0;
     h.location.take(2).subscribe(location => {
       if (count === 0) {
-        expect(location).toEqual({ pathname: '/abc', search: '?qwe', hash: '#123', source: 'init', state: {} });
+        expect(location).toEqual({ pathname: '/abc', search: 'qwe', hash: '123', source: 'init', state: {} });
       }
       if (count === 1) {
         expect(location.source).toEqual('pop');
@@ -129,7 +129,7 @@ describe('createBrowserHistory modern browsers', () => {
   it('has working parseUrl method', () => {
     const h = createBrowserHistory();
     const location = h.parseUrl('/abc?qwe#123');
-    expect(location).toEqual({ pathname: '/abc', search: '?qwe', hash: '#123', state: {} });
+    expect(location).toEqual({ pathname: '/abc', search: 'qwe', hash: '123', state: {} });
   });
 
   it('has working parseUrl method', () => {

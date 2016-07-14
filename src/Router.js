@@ -16,6 +16,7 @@ export class Router {
 
     this.activeRoute = [null, {}, null];
     this.currentLocation = {};
+
     this.resultsSubscription = null;
     this.renderResult$ = new Subject();
 
@@ -141,7 +142,7 @@ export class Router {
       // transition handling
       .map(transition => {
         const { location } = transition;
-        const queryData = parseQuery(location.search.substr(1));
+        const queryData = parseQuery(location.search);
         const matched = [];
 
         for (let i = 0, l = this.routes.length; i < l; i++) {

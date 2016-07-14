@@ -132,8 +132,8 @@ describe('Router', () => {
       expect(renderResult.handlers).toEqual(['main']);
       expect(renderResult.location).toEqual({
         pathname: '/123',
-        search: '?q=text',
-        hash: '#anchor',
+        search: 'q=text',
+        hash: 'anchor',
         state: {},
         source: 'init',
       });
@@ -171,11 +171,11 @@ describe('Router', () => {
         hashChange(location) {
           if (hashChangeCount === 0) {
             // router.navigate
-            expect(location).toEqual({ pathname: '/123', search: '?q=text', hash: '#anc', state: {}, source: 'push' });
+            expect(location).toEqual({ pathname: '/123', search: 'q=text', hash: 'anc', state: {}, source: 'push' });
           }
           if (hashChangeCount === 1) {
             // onpopstate
-            expect(location).toEqual({ pathname: '/123', search: '?q=text', hash: '#anc2', state: {}, source: 'pop' });
+            expect(location).toEqual({ pathname: '/123', search: 'q=text', hash: 'anc2', state: {}, source: 'pop' });
           }
           hashChangeCount += 1;
         },
@@ -191,8 +191,8 @@ describe('Router', () => {
         expect(renderResult.handlers).toEqual(['main']);
         expect(renderResult.location).toEqual({
           pathname: '/123',
-          search: '?q=text',
-          hash: '#anchor',
+          search: 'q=text',
+          hash: 'anchor',
           state: {},
           source: 'init',
         });
@@ -223,8 +223,8 @@ describe('Router', () => {
         expect(renderResult.handlers).toEqual(['main']);
         expect(renderResult.location).toEqual({
           pathname: '/123',
-          search: '?q=text',
-          hash: '#anc',
+          search: 'q=text',
+          hash: 'anc',
           state: { a: true },
           source: 'push',
         });
@@ -362,7 +362,7 @@ describe('Router', () => {
 
     setTimeout(() => {
       expect(router.isActive('main4')).toEqual(true);
-      expect(router.currentLocation.hash === '#123').toEqual(true);
+      expect(router.currentLocation.hash).toEqual('123');
       router.stop();
       done();
     }, 15);
