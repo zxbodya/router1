@@ -11,8 +11,8 @@
 4. test coverage
   + history
   + router - beforeunload
-  - router - redirect
-  - router - reaction to history updates
+  + router - redirect
+  + router - redirect errors
 5. refactoring
   - cleanup Router::start
 6. history
@@ -22,12 +22,11 @@
   - forward ?
  ---
  
-6. onleave ?
+
 7. state updates (reuse state parts acrouse routes, allow updates without whole state rebuild) ?
 10. Post requests handling (?)
 14. trailing slash handling
 16. let browser to make request if url is not matched
-15. allow to return just React.Component instead of RxComponent 
 17. disable js navigation for other domains (web.archive.org)
 
 --------------

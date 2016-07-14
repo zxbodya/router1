@@ -3,13 +3,13 @@ import { Observable, helpers } from 'rx';
 import { createTestHistory } from './createTestHistory';
 
 const createTestHandler = (options = {}) =>
-  (routingResult, route = { name: null, handlers: [] }, params = {}) =>
+  (transition, route = { name: null, handlers: [] }, params = {}) =>
     ({
       load: () => Promise.resolve(true),
       hashChange: options.hashChange || helpers.noop,
       onBeforeUnload: options.onBeforeUnload || (() => ''),
       render() {
-        const { location } = routingResult;
+        const { location } = transition;
         return Observable.return({
           route: route.name,
           handlers: route.handlers,
@@ -305,5 +305,66 @@ describe('Router', () => {
       router.stop();
       done();
     }, 40);
+  });
+
+  it('handles transition.forward calls', (done) => {
+    const history = createTestHistory('/');
+
+    const createHandler = (transition, route = { name: null, handlers: [] }, params = {}) =>
+      ({
+        load: () => Promise.resolve(true),
+        hashChange: helpers.noop,
+        onBeforeUnload: () => '',
+        render() {
+          return Observable.return(route.handlers[0](transition));
+        },
+      });
+
+    const router = new Router({
+      routes: [
+        {
+          name: 'main',
+          handler: () => 'main',
+          url: '/',
+        },
+        {
+          name: 'main2',
+          handler: t => t.forward('/3'),
+          url: '/2',
+        },
+        {
+          name: 'main3',
+          handler: () => 'main3',
+          url: '/3',
+        },
+        {
+          name: 'main4',
+          handler: t => (t.location.hash === '' ? t.forward('/4#123') : ''),
+          url: '/4',
+        },
+      ],
+      history,
+      createNotFoundHandler: createHandler,
+      createHandler: createHandler,
+    });
+
+    router.start();
+
+    setTimeout(() => {
+      expect(router.isActive('main')).toEqual(true);
+      router.navigate('main2', {});
+    }, 5);
+
+    setTimeout(() => {
+      expect(router.isActive('main3')).toEqual(true);
+      router.navigate('main4', {});
+    }, 10);
+
+    setTimeout(() => {
+      expect(router.isActive('main4')).toEqual(true);
+      expect(router.currentLocation.hash === '#123').toEqual(true);
+      router.stop();
+      done();
+    }, 15);
   });
 });
