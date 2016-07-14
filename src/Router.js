@@ -16,7 +16,7 @@ export class Router {
 
     this.activeRoute = [null, {}, null];
     this.currentLocation = {};
-    this.locationSubscription = null;
+    this.resultsSubscription = null;
     this.renderResult$ = new Subject();
 
     this.createNotFoundHandler = createNotFoundHandler;
@@ -38,42 +38,44 @@ export class Router {
   }
 
   start() {
-    const forwardTransition$ = new Subject();
-    const transitionFromLocation = (toLocation, redirectCount) => {
-      const forward = (redirectUrl) => {
-        if (redirectCount > 20) {
-          throw new Error('To many redirects!');
-        }
-
-        this.history.replace(redirectUrl);
-
-        const location = Object.assign(this.history.parseUrl(redirectUrl), { source: 'replace', state: {} });
-
-        if (this.currentLocation.pathname === location.pathname && this.currentLocation.search === location.search) {
-          if (this.currentLocation.hash === location.hash) {
-            throw new Error('Redirect to the same location!');
+    const transitionFromLocation = (toLocation) =>
+      Observable.create(observer => {
+        let redirectCount = 0;
+        const forward = (redirectUrl) => {
+          if (redirectCount > 20) {
+            observer.onError(Error('To many redirects!'));
           }
-          this.activeRoute[2].hashChange(location);
-          this.currentLocation = location;
-        } else {
-          this.currentLocation = location;
 
-          forwardTransition$.onNext(
-            transitionFromLocation(
+          this.history.replace(redirectUrl);
+
+          const location = Object.assign(this.history.parseUrl(redirectUrl), { source: 'replace', state: {} });
+
+          if (this.currentLocation.pathname === location.pathname && this.currentLocation.search === location.search) {
+            if (this.currentLocation.hash === location.hash) {
+              observer.onError(Error('Redirect to the same location!'));
+            }
+            this.activeRoute[2].hashChange(location);
+            this.currentLocation = location;
+          } else {
+            this.currentLocation = location;
+
+            redirectCount += 1;
+            observer.onNext({
               location,
-              redirectCount + 1
-            )
-          );
-        }
-      };
-      return {
-        location: toLocation,
-        router: this,
-        redirectCount,
-        // todo: redirect + forward
-        forward,
-      };
-    };
+              router: this,
+              redirectCount,
+              forward,
+            });
+          }
+        };
+        return observer.onNext({
+          location: toLocation,
+          router: this,
+          redirectCount,
+          forward,
+        });
+      });
+
     const historyTransition$ = this.history
       .location
       .flatMap(location => {
@@ -131,17 +133,12 @@ export class Router {
       });
 
 
-    this.locationSubscription = Observable.merge(
-      Observable.merge(
-        historyTransition$,
-        navigateTransition$
-      )
-        .map(location => transitionFromLocation(location, 0)),
-
-      forwardTransition$
+    this.resultsSubscription = Observable.merge(
+      historyTransition$,
+      navigateTransition$
     )
-
-    // transition handling
+      .flatMap(transitionFromLocation)
+      // transition handling
       .map(transition => {
         const { location } = transition;
         const queryData = parseQuery(location.search.substr(1));
@@ -196,13 +193,13 @@ export class Router {
   }
 
   stop() {
-    if (this.locationSubscription) {
-      this.locationSubscription.dispose();
+    if (this.resultsSubscription) {
+      this.resultsSubscription.dispose();
     }
   }
 
   renderResult() {
-    if (!this.locationSubscription) {
+    if (!this.resultsSubscription) {
       this.start();
     }
     return this.renderResult$;
@@ -210,20 +207,19 @@ export class Router {
 
   isActive(route, params) {
     const activeRoute = this.activeRoute[0];
-    if (activeRoute && activeRoute.substr(0, route.length) === route) {
-      let active = true;
-      const activeRouteParams = this.activeRoute[1];
-
-      let paramName;
-      for (paramName in params) {
-        if (params.hasOwnProperty(paramName)) {
-          active = active
-            && (`${params[paramName]}` === `${activeRouteParams[paramName]}`);
-        }
-      }
-      return active;
+    if (!activeRoute || activeRoute.substr(0, route.length) !== route) {
+      return false;
     }
-    return false;
+
+    const activeRouteParams = this.activeRoute[1];
+
+    let paramName;
+    for (paramName in params) {
+      if (params.hasOwnProperty(paramName) && `${params[paramName]}` !== `${activeRouteParams[paramName]}`) {
+        return false;
+      }
+    }
+    return true;
   }
 
   createUrl(name, params = {}, hash = '') {
