@@ -3,13 +3,19 @@
 [![Build Status](https://travis-ci.org/zxbodya/router1.svg)](https://travis-ci.org/zxbodya/router1)
 [![codecov.io](https://codecov.io/github/zxbodya/router1/coverage.svg?branch=master)](https://codecov.io/github/zxbodya/router1?branch=master)
 
-Reactive routing library for universal(isomorphic) web applications.
+Routing library for universal(isomorphic) web applications.
+
+Meant to be customisable low level solution, which can be used to implement routing in application.  
 
 Features:
 
- - simplicity
  - nodejs and browser support
+ - not coupled with specific framework
+ - powerful url expression language
+ - simplicity
  - nested routes definition
+ - possibility to implement in browser scrolling correctly
+ - hooks for `onbeforeunload` (when navigating between router states)
 
 Router consists of following parts
 
@@ -120,25 +126,31 @@ Router can be created as following:
 const router = new Router({
   history,
   routes,
-  render: (routingResult) => {
-    // routingResult:
-    //  - route: route name or null if nothing matched,
-    //  - handlers: handlers specified in route configuration
-    //  - params: params from matched route
-    //  - location: current location
-    
-    // should return an observable with render results
-  },
+  createHandler: (transition) => {
+    // transition:
+    //  - route - route definition object:
+    //      - name - route name
+    //      - handlers - handlers specified in route configuration
+    //      if no route was matched route would be {name: null, handlers:[]}      
+    //  - params - params from matched route
+    //  - location - transition location
+    //  - forward(url) - method to trigger redirect to specific location
+    //  - router - router istance
+    //
+    // 
+    // should return object with following methods:
+    //  - load() - returns promise which can resolve as:
+    //    - true: handler can hanle this request, and has loaded data required for rendering
+    //    - false: handler can not redner this state - for example data not found or next matcher route handler should be used
+    //  - render() - render state, and returns Observable of rendering results
+    //  - hashChange({pathname, search, hash, state}) 
+    //       method would be called when location hash was changed after rendring (not triggered on first render)
+    //  - onBeforeUnload()
+    //       callback, that would be called before transition from state or user trying to close the page
+    //       should return message text to be displayed in confirm dialogue,
+            or empty string when no confirmation is required
+  },          
 });
-```
-
-Subscribe to hash-only changes:
-```
-router.hashChange
-  .forEach(hash => {
-    // hash changes in route (useful to animate scrolling)
-    // does not emit first hash value
-  });
 ```
 
 Subscribe to render results:
@@ -152,6 +164,18 @@ router.renderResult()
   });
 ```
 
+To handle `onbreforeload` browser event there is callback `onBeforeUnload` in router, it can be used as following:
+
+```
+window.onbeforeunload = (e) => {
+  const returnValue = router.onBeforeUnload();
+  if (returnValue) {
+    e.returnValue = returnValue;
+    return returnValue;
+  }
+};
+```
+
 Other public methods:
 
 - `isActive(route, params)` - check if route is active 
@@ -160,6 +184,7 @@ Other public methods:
 - `createUrl(name, params = {}, hash = '')` - create url for route with params
 - `navigate(route, params = {}, hash = '', state = {})` - navigate to route with params
 - `navigateToUrl(url, state = {})` - navigate to specific url
-
+- `start()` - subscribe to location changes, and start handling routes (also called when using `renderResult`)
+- `stop()` - opposite to start, stop listening to location changes
 
 Complete example with react.js https://github.com/zxbodya/router1-app-template

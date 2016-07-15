@@ -1,5 +1,16 @@
 # Changelog
 
+##0.5.0 (Not released yet)
+
+- route handler create callback `createHandler` in route configuration instead of `render` to offer more possibilities
+- `onbeforeunload` for both page unload and route transitions
+- better redirect handling, catch redirect errors
+  - when trying to reditect to same location
+  - when redirecting to many times sequentially (more than 20 times), to prevent redirect loop 
+- add `start()/stop()` methods in router instance
+- move url generation and parsing to history backends, stop emmiting non user location changes from history (now this is handled internally by router)   
+- better test coverage
+
 ##0.4.4  (2016-07-08)
 
 - Improve warning message for case when few routes are matching same location
