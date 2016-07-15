@@ -1,5 +1,6 @@
-import { Router } from './Router';
 import { Observable, helpers } from 'rx';
+
+import { Router } from './Router';
 import { createTestHistory } from './createTestHistory';
 
 const createTestHandler = (options = {}) =>

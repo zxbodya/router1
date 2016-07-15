@@ -1,5 +1,5 @@
-import { compileRoutes } from './compileRoutes';
 import { Observable, Subject } from 'rx';
+import { compileRoutes } from './compileRoutes';
 import {
   parse as parseQuery,
   generate as generateQuery,
@@ -218,8 +218,10 @@ export class Router {
     const activeRouteParams = this.activeRoute[1];
 
     let paramName;
+    const has = Object.prototype.hasOwnProperty;
+
     for (paramName in params) {
-      if (params.hasOwnProperty(paramName) && `${params[paramName]}` !== `${activeRouteParams[paramName]}`) {
+      if (has.call(params, paramName) && `${params[paramName]}` !== `${activeRouteParams[paramName]}`) {
         return false;
       }
     }

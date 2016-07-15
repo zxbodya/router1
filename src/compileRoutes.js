@@ -1,6 +1,6 @@
 import { compile } from './expressions/compile.js';
 import { createGenerator } from './expressions/createGenerator.js';
-import { createMatcher as createMatcher } from './expressions/createMatcher.js';
+import { createMatcher } from './expressions/createMatcher.js';
 
 import { concat } from './expressions/concat';
 
