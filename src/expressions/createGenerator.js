@@ -16,11 +16,9 @@ export function createGenerator(info) {
       const g = generateParts[i];
       if (g !== null) {
         res.push(g);
-      } else {
-        if (pn < pl) {
-          res.push(params[paramNames[pn]]);
-          pn++;
-        }
+      } else if (pn < pl) {
+        res.push(params[paramNames[pn]]);
+        pn++;
       }
     }
     // todo: test if matcher can match the result, and throw if it can not
