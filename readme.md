@@ -38,7 +38,8 @@ Note: query parameters can be boolean - if parameter is not passed it would be r
 
  - `createServerHistory` provides static location from url, meant to be used server side 
  - `createBrowserHistory` provides browser location. 
-   uses html5 history, when available, or `location.assign/replace` when history API is not supported 
+   uses html5 history, when available, or `location.assign/replace` when history API is not supported
+ - `createHashLocation` like `createBrowserHistory` but using `location.hash` to store url, usefull for cordova apps or supporting older browsers
  - `createTestHistory` almost the same as `createServerHistory` but allows to navigate, meant to be used for testing  
 
 ### Routes definition 

@@ -2,7 +2,7 @@
 
 ##0.5.0 (Not released yet)
 
-- add route handler create callback `createHandler` in route configuration instead of `render` to offer more possibilities
+- `createHandler` in route configuration instead of `render` to offer possibility of adding state hooks, and to better resolve conflicting routes
 - `onbeforeunload` for both page unload and route transitions
 - better redirect handling, catch redirect errors
   - when trying to reditect to same location
@@ -12,6 +12,7 @@
 - remove `?` and `#` prefixes from location search and hash respectively
 - better test coverage
 - extracted RouteCollection class, separate it from router (to allow sharing route collection between multiply router instances server-side)
+- added `createHashHistory` to allow using `location.hash` to store url
 
 ##0.4.4  (2016-07-08)
 

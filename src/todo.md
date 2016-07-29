@@ -8,9 +8,6 @@
 7. server side redirect
   - forward ?
   - circular forward errors ?
-8. separate router state from router instance ? allow to use on router instance for all requests
-  - ? store info about active route in transition obj
-  - use one router for all requests server-side
   
  ---
  
