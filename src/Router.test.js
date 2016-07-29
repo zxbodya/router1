@@ -47,8 +47,10 @@ describe('Router', () => {
       expect(router.activeRoute[1]).toEqual({});
     }, () => {
     }, () => {
+      router.stop();
       done();
     });
+    router.start();
   });
 
   it('matches route', (done) => {
@@ -74,8 +76,10 @@ describe('Router', () => {
     }, () => {
     }, () => {
       expect(router.isActive('main')).toEqual(true);
+      router.stop();
       done();
     });
+    router.start();
   });
 
   it('matches route with params', (done) => {
@@ -102,8 +106,10 @@ describe('Router', () => {
       expect(router.isActive('main')).toEqual(true);
       expect(router.isActive('main', { page: '123' })).toEqual(true);
       expect(router.isActive('main', { page: '321' })).toEqual(false);
+      router.stop();
       done();
     });
+    router.start();
   });
 
   it('matches route with params and search query and hash', (done) => {
@@ -139,8 +145,10 @@ describe('Router', () => {
       expect(router.isActive('main', { page: '123', q: 'text' })).toEqual(true);
       expect(router.isActive('main', { page: '123', q: 'tex' })).toEqual(false);
       expect(router.isActive('main', { page: '12', q: 'text' })).toEqual(false);
+      router.stop();
       done();
     });
+    router.start();
   });
 
   it('navigates', (done) => {
@@ -233,6 +241,7 @@ describe('Router', () => {
       count += 1;
     }, () => {
     }, () => {
+      router.stop();
       done();
     });
     setTimeout(() => {
@@ -241,6 +250,8 @@ describe('Router', () => {
       router.navigate('main1', { page: '123' });
       router.navigate('main', { page: '123', q: 'text' }, 'anc', { a: true });
     }, 10);
+
+    router.start();
   });
 
 
@@ -338,9 +349,6 @@ describe('Router', () => {
       history,
       createHandler,
     });
-
-    router.start();
-
     setTimeout(() => {
       expect(router.isActive('main')).toEqual(true);
       router.navigate('main2', {});
@@ -357,6 +365,9 @@ describe('Router', () => {
       router.stop();
       done();
     }, 15);
+
+    router.start();
+
   });
 
   it('crashes when transition.forward navigates to same page', (done) => {
@@ -403,6 +414,7 @@ describe('Router', () => {
       router.stop();
       done();
     }, 10);
+    router.start();
   });
 
 
@@ -455,5 +467,6 @@ describe('Router', () => {
       router.stop();
       done();
     }, 30);
+    router.start();
   });
 });

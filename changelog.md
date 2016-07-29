@@ -7,7 +7,7 @@
 - better redirect handling, catch redirect errors
   - when trying to reditect to same location
   - when redirecting to many times sequentially (more than 20 times), to prevent redirect loop 
-- add `start()/stop()` methods in router instance
+- add `start()/stop()` methods in router instance, stop starting router in `renderResult()`
 - move url generation and parsing to history backends, stop emmiting non user location changes from history (now this is handled internally by router)
 - remove `?` and `#` prefixes from location search and hash respectively
 - better test coverage

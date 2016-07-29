@@ -1,4 +1,4 @@
-import { Observable, Subject, ReplaySubject } from 'rx';
+import { Observable, Subject } from 'rx';
 import { compileRoutes } from './compileRoutes';
 import {
   parse as parseQuery,
@@ -18,7 +18,7 @@ export class Router {
     this.currentLocation = {};
 
     this.resultsSubscription = null;
-    this.renderResult$ = new ReplaySubject(1);
+    this.renderResult$ = new Subject();
 
     this.createHandler = createHandler;
 
@@ -202,9 +202,6 @@ export class Router {
   }
 
   renderResult() {
-    if (!this.resultsSubscription) {
-      this.start();
-    }
     return this.renderResult$;
   }
 

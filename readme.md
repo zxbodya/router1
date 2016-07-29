@@ -166,6 +166,12 @@ router.renderResult()
   });
 ```
 
+Start/stop listening location changes
+
+ - `start()` - subscribe to location changes, and start handling routes (also called when using `renderResult`)
+ - `stop()` - opposite to start, stop listening to location changes
+
+
 To handle `onbreforeload` browser event there is callback `onBeforeUnload` in router, it can be used as following:
 
 ```
@@ -186,7 +192,5 @@ Other public methods:
 - `createUrl(name, params = {}, hash = '')` - create url for route with params
 - `navigate(route, params = {}, hash = '', state = {})` - navigate to route with params
 - `navigateToUrl(url, state = {})` - navigate to specific url
-- `start()` - subscribe to location changes, and start handling routes (also called when using `renderResult`)
-- `stop()` - opposite to start, stop listening to location changes
 
 Complete example with react.js https://github.com/zxbodya/router1-app-template
