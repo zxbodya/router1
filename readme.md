@@ -138,17 +138,19 @@ const router = new Router({
     //  - router - router istance
     //
     // 
-    // should return object with following methods:
-    //  - load() - returns promise which can resolve as:
-    //    - true: handler can hanle this request, and has loaded data required for rendering
-    //    - false: handler can not redner this state - for example data not found or next matcher route handler should be used
-    //  - render() - render state, and returns Observable of rendering results
-    //  - hashChange({pathname, search, hash, state}) 
-    //       method would be called when location hash was changed after rendring (not triggered on first render)
-    //  - onBeforeUnload()
-    //       callback, that would be called before transition from state or user trying to close the page
-    //       should return message text to be displayed in confirm dialogue,
-            or empty string when no confirmation is required
+    // should return an Observable wich emits value when state is ready to be rendered, 
+    // or when handler does not support that request:
+    //  - false: if handler can not redner this state - for example data not found 
+    //       or next matcher route handler should be used
+    //  - state handler, when data was loaded and can be rendered, object with methods
+    //     - render() - render state, and returns Observable of rendering results
+    //     - hashChange({pathname, search, hash, state}) 
+    //          method would be called when location hash was changed after rendring (not triggered on first render)
+    //     - onBeforeUnload()
+    //          callback, that would be called before transition from state or user trying to close the page
+    //          should return message text to be displayed in confirm dialogue,
+    //          or empty string when no confirmation is required 
+    //           
   },          
 });
 ```

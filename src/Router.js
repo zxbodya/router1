@@ -1,4 +1,4 @@
-import { Observable, Subject } from 'rx';
+import { Observable, Subject, ReplaySubject } from 'rx';
 import { compileRoutes } from './compileRoutes';
 import {
   parse as parseQuery,
@@ -18,7 +18,7 @@ export class Router {
     this.currentLocation = {};
 
     this.resultsSubscription = null;
-    this.renderResult$ = new Subject();
+    this.renderResult$ = new ReplaySubject(1);
 
     this.createHandler = createHandler;
 
@@ -165,22 +165,21 @@ export class Router {
           }
         );
       })
-      .flatMap(transition => {
+      .flatMapLatest(transition => {
         const loadRoute = (routes, index) => {
           if (index >= routes.length) {
-            const notFoundHandler = this.createHandler(
+            return this.createHandler(
               Object.assign({ route: { name: null, handlers: [] }, params: {} }, transition)
-            );
-            return notFoundHandler.load().then(() => [null, {}, notFoundHandler]);
+            ).map(v => [null, {}, v]);
           }
 
           const route = routes[index];
           const handler = this.createHandler(
             Object.assign({ route: route[0], params: route[1] }, transition)
           );
-          return handler.load().then(loadResult => (
+          return handler.flatMapLatest(loadResult => (
             loadResult
-              ? [route[0].name, route[1], handler]
+              ? Observable.return([route[0].name, route[1], loadResult])
               : loadRoute(routes, index + 1)
           ));
         };

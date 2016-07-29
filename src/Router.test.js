@@ -5,8 +5,7 @@ import { createTestHistory } from './createTestHistory';
 
 const createTestHandler = (options = {}) =>
   (transition) =>
-    ({
-      load: () => Promise.resolve(true),
+    Observable.return({
       hashChange: options.hashChange || helpers.noop,
       onBeforeUnload: options.onBeforeUnload || (() => ''),
       render() {
@@ -305,8 +304,7 @@ describe('Router', () => {
     const history = createTestHistory('/');
 
     const createHandler = (transition) =>
-      ({
-        load: () => Promise.resolve(true),
+      Observable.return({
         hashChange: helpers.noop,
         onBeforeUnload: () => '',
         render() {
@@ -365,8 +363,7 @@ describe('Router', () => {
     const history = createTestHistory('/');
 
     const createHandler = (transition) =>
-      ({
-        load: () => Promise.resolve(true),
+      Observable.return({
         hashChange: helpers.noop,
         onBeforeUnload: () => '',
         render() {
@@ -413,8 +410,7 @@ describe('Router', () => {
     const history = createTestHistory('/');
 
     const createHandler = (transition) =>
-      ({
-        load: () => Promise.resolve(true),
+      Observable.return({
         hashChange: helpers.noop,
         onBeforeUnload: () => '',
         render() {
