@@ -11,6 +11,7 @@
 - move url generation and parsing to history backends, stop emmiting non user location changes from history (now this is handled internally by router)
 - remove `?` and `#` prefixes from location search and hash respectively
 - better test coverage
+- extracted RouteCollection class, separate it from router (to allow sharing route collection between multiply router instances server-side)
 
 ##0.4.4  (2016-07-08)
 

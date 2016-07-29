@@ -1,18 +1,13 @@
 import { Observable, Subject } from 'rx';
-import { compileRoutes } from './compileRoutes';
 import {
   parse as parseQuery,
   generate as generateQuery,
-  pickValues as pickQueryValues,
 } from './utils/queryString';
 
 export class Router {
-  constructor({ history, routes, createHandler }) {
+  constructor({ history, routeCollection, createHandler }) {
     this.history = history;
-    this.routes = [];
-
-    this.routesByName = {};
-    this.addRoutes(routes);
+    this.routeCollection = routeCollection;
 
     this.activeRoute = [null, {}, null];
     this.currentLocation = {};
@@ -29,13 +24,6 @@ export class Router {
     return this.activeRoute[2] ? this.activeRoute[2].onBeforeUnload() : '';
   }
 
-  addRoutes(routeDefs) {
-    compileRoutes(routeDefs)
-      .forEach(route => {
-        this.routes.push(route);
-        this.routesByName[route.name] = route;
-      });
-  }
 
   start() {
     const transitionFromLocation = (toLocation) =>
@@ -139,32 +127,18 @@ export class Router {
     )
       .flatMap(transitionFromLocation)
       // transition handling
-      .map(transition => {
-        const { location } = transition;
-        const queryData = parseQuery(location.search);
-        const matched = [];
-
-        for (let i = 0, l = this.routes.length; i < l; i++) {
-          const route = this.routes[i];
-          const params = route.matchPath(location.pathname);
-          if (params) {
-            matched.push([
-              route,
-              Object.assign(
-                params,
-                pickQueryValues(queryData, route.searchParams)
-              )]);
-          }
-        }
-
-        return Object.assign(
+      .map(transition =>
+        Object.assign(
           {},
           transition,
           {
-            routes: matched,
+            routes: this.routeCollection.match(
+              transition.location.pathname,
+              parseQuery(transition.location.search)
+            ),
           }
-        );
-      })
+        )
+      )
       .flatMapLatest(transition => {
         const loadRoute = (routes, index) => {
           if (index >= routes.length) {
@@ -225,7 +199,7 @@ export class Router {
   }
 
   createUrl(name, params = {}, hash = '') {
-    const route = this.routesByName[name];
+    const route = this.routeCollection.getByName(name);
     if (route) {
       const pathname = route.generatePath(Object.assign({}, this.activeRoute[1], params));
       const search = generateQuery(params, route.searchParams);

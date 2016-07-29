@@ -125,7 +125,7 @@ Router can be created as following:
 ```
 const router = new Router({
   history,
-  routes,
+  routeCollection: new RouteCollection(routes),
   createHandler: (transition) => {
     // transition:
     //  - route - route definition object:

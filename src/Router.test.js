@@ -1,6 +1,8 @@
 import { Observable, helpers } from 'rx';
 
 import { Router } from './Router';
+import { RouteCollection } from './RouteCollection';
+
 import { createTestHistory } from './createTestHistory';
 
 const createTestHandler = (options = {}) =>
@@ -22,7 +24,7 @@ describe('Router', () => {
   it('works with empty route collection', (done) => {
     const history = createTestHistory('/');
     const router = new Router({
-      routes: [],
+      routeCollection: new RouteCollection([]),
       history,
       createHandler: createTestHandler(),
     });
@@ -56,11 +58,11 @@ describe('Router', () => {
   it('matches route', (done) => {
     const history = createTestHistory('/');
     const router = new Router({
-      routes: [{
+      routeCollection: new RouteCollection([{
         name: 'main',
         handler: 'main',
         url: '/',
-      }],
+      }]),
       history,
       createHandler: createTestHandler(),
     });
@@ -85,11 +87,11 @@ describe('Router', () => {
   it('matches route with params', (done) => {
     const history = createTestHistory('/123');
     const router = new Router({
-      routes: [{
+      routeCollection: new RouteCollection([{
         name: 'main',
         handler: 'main',
         url: '/<page:\\d+>',
-      }],
+      }]),
       history,
       createHandler: createTestHandler(),
     });
@@ -115,11 +117,11 @@ describe('Router', () => {
   it('matches route with params and search query and hash', (done) => {
     const history = createTestHistory('/123?q=text#anchor');
     const router = new Router({
-      routes: [{
+      routeCollection: new RouteCollection([{
         name: 'main',
         handler: 'main',
         url: '/<page:\\d+>?q',
-      }],
+      }]),
       history,
       createHandler: createTestHandler(),
     });
@@ -156,7 +158,7 @@ describe('Router', () => {
 
     let hashChangeCount = 0;
     const router = new Router({
-      routes: [
+      routeCollection: new RouteCollection([
         {
           name: 'main',
           handler: 'main',
@@ -167,7 +169,7 @@ describe('Router', () => {
           handler: 'main1',
           url: '/m2/<page:\\d+>?q',
         },
-      ],
+      ]),
       history,
       createHandler: createTestHandler({
         hashChange(location) {
@@ -266,7 +268,7 @@ describe('Router', () => {
       onBeforeUnload: () => answer,
     };
     const router = new Router({
-      routes: [{
+      routeCollection: new RouteCollection([{
         name: 'main',
         handler: 'main',
         url: '/',
@@ -274,7 +276,7 @@ describe('Router', () => {
         name: 'main2',
         handler: 'main2',
         url: '/2',
-      }],
+      }]),
       history,
       createHandler: createTestHandler(testHandlerOptions),
     });
@@ -324,7 +326,7 @@ describe('Router', () => {
       });
 
     const router = new Router({
-      routes: [
+      routeCollection: new RouteCollection([
         {
           name: 'main',
           handler: () => 'main',
@@ -345,7 +347,7 @@ describe('Router', () => {
           handler: t => (t.location.hash === '' ? t.forward('/4#123') : ''),
           url: '/4',
         },
-      ],
+      ]),
       history,
       createHandler,
     });
@@ -367,7 +369,6 @@ describe('Router', () => {
     }, 15);
 
     router.start();
-
   });
 
   it('crashes when transition.forward navigates to same page', (done) => {
@@ -383,7 +384,7 @@ describe('Router', () => {
       });
 
     const router = new Router({
-      routes: [
+      routeCollection: new RouteCollection([
         {
           name: 'main',
           handler: () => 'main',
@@ -394,7 +395,7 @@ describe('Router', () => {
           handler: t => t.forward('/2'),
           url: '/2',
         },
-      ],
+      ]),
       history,
       createHandler,
     });
@@ -431,7 +432,7 @@ describe('Router', () => {
       });
 
     const router = new Router({
-      routes: [
+      routeCollection: new RouteCollection([
         {
           name: 'main',
           handler: () => 'main',
@@ -447,7 +448,7 @@ describe('Router', () => {
           handler: t => t.forward('/2'),
           url: '/3',
         },
-      ],
+      ]),
       history,
       createHandler,
     });
