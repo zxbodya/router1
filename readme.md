@@ -3,19 +3,49 @@
 [![Build Status](https://travis-ci.org/zxbodya/router1.svg)](https://travis-ci.org/zxbodya/router1)
 [![codecov.io](https://codecov.io/github/zxbodya/router1/coverage.svg?branch=master)](https://codecov.io/github/zxbodya/router1?branch=master)
 
-Routing library for universal(isomorphic) web applications.
+Reactive routing library for universal(isomorphic) web applications. Built with RxJS.
 
-Meant to be customisable low level solution, which can be used to implement routing in application.  
+Library provides:
 
-Features:
+ - url matching
+ - url generation (by route name and parameters)
+ - history abstractions for various use cases (server-side, html5 browser, and via location.hash)
+ - transition handling (waiting for data, redirect, before enter checks)
+ - state updates handling (`hashchange`, `onbeforeunload`)
+ - checking if route is active
 
- - nodejs and browser support
- - not coupled with specific framework
- - powerful url expression language
- - simplicity
- - nested routes definition
- - possibility to implement in browser scrolling correctly
- - hooks for `onbeforeunload` (when navigating between router states)
+Above that, it:
+
+ - works well both server and browser
+ - is not coupled to specific UI library
+ - has powerful url expression language
+ - supports url query parameters
+ - allows nested routes definition, and is not opinionated about composing handlers for them(it is up to developer using it)
+ - offers possibility for better ux
+     - can wait for minimal required data before transition to new state
+     - scrolling top or to anchor only after initial state render(which happens only when data is loaded)
+     - not scrolling when navigating backward or forward (browser restores correct scroll position on its own)
+     - not finished transition is automatically canceled when new one is started
+
+## Installation 
+
+Library is available on npm as `router1`.
+
+When using with react - [router1-react](https://github.com/zxbodya/router1-react) would be helpful, it provides all required components.
+ 
+Also, I tried to make it as un-opinionated as possible, so there is thing not included:
+ - how rendering should happen
+ - how scrolling should be done
+ - when to scroll and when do not
+
+However all this is quite typical for most application, you can use [router1-app-template](https://github.com/zxbodya/router1-app-template)
+Or just use it as a reference. 
+
+Application template provides webpack build and dev server configurations and routing implementation, also it uses
+ [rx-react-container](https://github.com/zxbodya/rx-react-container) for connecting rxjs logic to react views.
+
+
+## Documntation 
 
 Router consists of following parts
 
@@ -25,7 +55,7 @@ Router consists of following parts
 
 ### Expression language
 
-Url patter for routes can be written using following constructions:
+Url pattern for routes can be written using following constructions:
 
 - `/path/name` - for static path
 - `/path/<param>` - for path with parameter
@@ -62,7 +92,7 @@ Also, it is allowed to skip route properties when defining nested routes, if so 
 
 For example:
 
-```
+```js
 const routes = [
   {
     name: 'home',         
@@ -94,7 +124,7 @@ const routes = [
 
 would be compiled as the following:
 
-```
+```js
 const routes = [
   {
     name: 'home',         
@@ -123,7 +153,7 @@ const routes = [
 
 Router can be created as following:
 
-```
+```js
 const router = new Router({
   history,
   routeCollection: new RouteCollection(routes),
@@ -157,8 +187,7 @@ const router = new Router({
 ```
 
 Subscribe to render results:
-```
-// router will start when you subscribing to results 
+```js
 router.renderResult()
   .forEach(renderResult => {
     // will be called when route was loaded and rendered
@@ -175,7 +204,7 @@ Start/stop listening location changes
 
 To handle `onbreforeload` browser event there is callback `onBeforeUnload` in router, it can be used as following:
 
-```
+```js
 window.onbeforeunload = (e) => {
   const returnValue = router.onBeforeUnload();
   if (returnValue) {
@@ -194,4 +223,3 @@ Other public methods:
 - `navigate(route, params = {}, hash = '', state = {})` - navigate to route with params
 - `navigateToUrl(url, state = {})` - navigate to specific url
 
-Complete example with react.js https://github.com/zxbodya/router1-app-template

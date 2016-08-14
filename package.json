@@ -1,7 +1,7 @@
 {
   "name": "router1",
-  "version": "0.4.4",
-  "description": "Reactive routing library for universal(isomophic) web applications",
+  "version": "0.5.0",
+  "description": "Reactive routing library for universal(isomorphic) web applications",
   "main": "lib/index.js",
   "jsnext:main": "src/index.js",
   "scripts": {

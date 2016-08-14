@@ -1,6 +1,6 @@
 # Changelog
 
-##0.5.0 (Not released yet)
+##0.5.0  (2016-08-15)
 
 - `createHandler` in route configuration instead of `render` to offer possibility of adding state hooks, and to better resolve conflicting routes
 - `onbeforeunload` for both page unload and route transitions
@@ -13,6 +13,8 @@
 - better test coverage
 - extracted RouteCollection class, separate it from router (to allow sharing route collection between multiply router instances server-side)
 - added `createHashHistory` to allow using `location.hash` to store url
+- better documentation in readme
+- start writing changelog
 
 ##0.4.4  (2016-07-08)
 
