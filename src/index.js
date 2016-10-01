@@ -1,9 +1,9 @@
-import { Router } from './Router.js';
-import { createServerHistory } from './createServerHistory.js';
-import { createBrowserHistory } from './createBrowserHistory.js';
-import { createHashHistory } from './createHashHistory.js';
-import { createTestHistory } from './createTestHistory.js';
-import { RouteCollection } from './RouteCollection.js';
+import { Router } from './Router';
+import { createServerHistory } from './createServerHistory';
+import { createBrowserHistory } from './createBrowserHistory';
+import { createHashHistory } from './createHashHistory';
+import { createTestHistory } from './createTestHistory';
+import { RouteCollection } from './RouteCollection';
 
 export {
   Router,

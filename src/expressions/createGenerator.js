@@ -12,13 +12,13 @@ export function createGenerator(info) {
     }
 
     const res = [];
-    for (let i = 0, l = generateParts.length, pn = 0, pl = paramNames.length; i < l; i++) {
+    for (let i = 0, l = generateParts.length, pn = 0, pl = paramNames.length; i < l; i += 1) {
       const g = generateParts[i];
       if (g !== null) {
         res.push(g);
       } else if (pn < pl) {
         res.push(params[paramNames[pn]]);
-        pn++;
+        pn += 1;
       }
     }
     // todo: test if matcher can match the result, and throw if it can not

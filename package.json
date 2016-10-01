@@ -6,7 +6,7 @@
   "jsnext:main": "src/index.js",
   "scripts": {
     "lint": "eslint ./src/",
-    "cover": "rimraf coverage && istanbul cover -x \"*.test.js\" ./node_modules/jasmine/bin/jasmine.js && npm run cover_remapping",
+    "cover": "rimraf coverage && istanbul cover -x \"**/*.test.js\" ./node_modules/jasmine/bin/jasmine.js && npm run cover_remapping",
     "cover_remapping": "istanbul-sourcemap-report ./coverage/coverage.json --json.file=./coverage/coverage-remapped.json --html.dir=./coverage/coverage-remapped",
     "test": "jasmine",
     "build": "rimraf lib && babel --presets es2015 --plugins transform-runtime src --out-dir lib --source-maps",
@@ -40,7 +40,7 @@
     "babel-preset-es2015": "^6.3.13",
     "codecov.io": "^0.1.6",
     "eslint": "^3.0.1",
-    "eslint-config-airbnb-base": "^5.0.0",
+    "eslint-config-airbnb-base": "^8.0.0",
     "eslint-plugin-import": "^1.7.0",
     "istanbul": "^0.4.1",
     "istanbul-sourcemap-report": "^0.1.0",

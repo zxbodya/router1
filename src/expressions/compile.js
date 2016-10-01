@@ -6,7 +6,7 @@ export function compile(expression) {
   const matcher = [];
   const generateParts = [];
   const paramNames = [];
-  for (let i = 0, l = textParts.length; i < l; i++) {
+  for (let i = 0, l = textParts.length; i < l; i += 1) {
     const part = textParts[i];
     if (i % 3 === 0) {
       //  http://stackoverflow.com/questions/3446170/escape-string-for-use-in-javascript-regex#answer-6969486

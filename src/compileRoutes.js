@@ -1,13 +1,13 @@
-import { compile } from './expressions/compile.js';
-import { createGenerator } from './expressions/createGenerator.js';
-import { createMatcher } from './expressions/createMatcher.js';
+import { compile } from './expressions/compile';
+import { createGenerator } from './expressions/createGenerator';
+import { createMatcher } from './expressions/createMatcher';
 
 import { concat } from './expressions/concat';
 
 function parseRoutes(routeDefs) {
   if (process.env.NODE_ENV !== 'production') {
     const usedNames = new Set();
-    for (let i = 0, l = routeDefs.length; i < l; i++) {
+    for (let i = 0, l = routeDefs.length; i < l; i += 1) {
       const routeDef = routeDefs[i];
       if (usedNames.has(routeDef.name || '')) {
         throw new Error('route names should be uniq');
@@ -18,7 +18,7 @@ function parseRoutes(routeDefs) {
 
   const rawRoutes = [];
 
-  for (let i = 0, l = routeDefs.length; i < l; i++) {
+  for (let i = 0, l = routeDefs.length; i < l; i += 1) {
     const routeDef = routeDefs[i];
 
     const urlParts = (routeDef.url || '').match(/^([^?]*)(?:\?(.*))?$/);
@@ -31,7 +31,7 @@ function parseRoutes(routeDefs) {
 
     if (routeDef.routes) {
       const nestedRoutes = parseRoutes(routeDef.routes);
-      for (let ni = 0, nl = nestedRoutes.length; ni < nl; ni++) {
+      for (let ni = 0, nl = nestedRoutes.length; ni < nl; ni += 1) {
         const nestedRoute = nestedRoutes[ni];
         let handlers;
         if (routeDef.handlers) {

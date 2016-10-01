@@ -8,7 +8,7 @@ export function createMatcher(info) {
     let res = false;
     if (matches) {
       res = {};
-      for (let i = 0, l = paramNames.length; i < l; i++) {
+      for (let i = 0, l = paramNames.length; i < l; i += 1) {
         res[paramNames[i]] = matches[i + 1];
       }
     }

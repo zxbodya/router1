@@ -1,5 +1,5 @@
-import { compile } from './compile.js';
-import { createMatcher } from './createMatcher.js';
+import { compile } from './compile';
+import { createMatcher } from './createMatcher';
 
 describe('Router, matcher from expression', () => {
   it('it matches strings without params', () => {

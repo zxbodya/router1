@@ -1,5 +1,5 @@
-import { compile } from './compile.js';
-import { createGenerator } from './createGenerator.js';
+import { compile } from './compile';
+import { createGenerator } from './createGenerator';
 
 describe('Router, generator from expression', () => {
   it('it generates strings without params', () => {

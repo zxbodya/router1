@@ -9,7 +9,7 @@ export function concat(expressions) {
   let params = [];
   let parts = [];
 
-  for (let i = 0, l = expressions.length; i < l; i++) {
+  for (let i = 0, l = expressions.length; i < l; i += 1) {
     const partPath = expressions[i];
     exp += partPath[0];
     parts = parts.concat(partPath[1]);

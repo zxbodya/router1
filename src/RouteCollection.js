@@ -21,7 +21,7 @@ export class RouteCollection {
   match(pathname, queryData) {
     const matched = [];
 
-    for (let i = 0, l = this.routes.length; i < l; i++) {
+    for (let i = 0, l = this.routes.length; i < l; i += 1) {
       const route = this.routes[i];
       const params = route.matchPath(pathname);
       if (params) {
