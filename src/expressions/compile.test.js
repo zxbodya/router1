@@ -9,7 +9,7 @@ describe('Router, expression parsing', () => {
     },
     {
       expression: '-[]/{}()*+?.\\^$|',
-      expected: ['\\-\\[\\]\\/\\{\\}\\(\\)\\*\\+\\?\\.\\\\\\^\\$\\|', ['-[]/{}()*+?.\\^$|'], []],
+      expected: ['-\\[\\]/\\{\\}\\(\\)\\*\\+\\?\\.\\\\\\^\\$\\|', ['-[]/{}()*+?.\\^$|'], []],
       description: 'it escapes regexp special symbols in text',
     },
     {
