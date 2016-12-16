@@ -1,4 +1,5 @@
-import { Observable, helpers } from 'rx';
+import { Observable } from 'rxjs';
+import { noop } from 'rxjs/util/noop';
 
 import { Router } from './Router';
 import { RouteCollection } from './RouteCollection';
@@ -7,11 +8,11 @@ import { createTestHistory } from './createTestHistory';
 
 const createTestHandler = (options = {}) =>
   (transition) =>
-    Observable.return({
-      hashChange: options.hashChange || helpers.noop,
+    Observable.of({
+      hashChange: options.hashChange || noop,
       onBeforeUnload: options.onBeforeUnload || (() => ''),
       render() {
-        return Observable.return({
+        return Observable.of({
           route: transition.route.name,
           handlers: transition.route.handlers,
           params: transition.params,
@@ -317,11 +318,11 @@ describe('Router', () => {
     const history = createTestHistory('/');
 
     const createHandler = (transition) =>
-      Observable.return({
-        hashChange: helpers.noop,
+      Observable.of({
+        hashChange: noop,
         onBeforeUnload: () => '',
         render() {
-          return Observable.return(transition.route.handlers[0](transition));
+          return Observable.of(transition.route.handlers[0](transition));
         },
       });
 
@@ -375,11 +376,11 @@ describe('Router', () => {
     const history = createTestHistory('/');
 
     const createHandler = (transition) =>
-      Observable.return({
-        hashChange: helpers.noop,
+      Observable.of({
+        hashChange: noop,
         onBeforeUnload: () => '',
         render() {
-          return Observable.return(transition.route.handlers[0](transition));
+          return Observable.of(transition.route.handlers[0](transition));
         },
       });
 
@@ -401,7 +402,7 @@ describe('Router', () => {
     });
 
     let hasError = false;
-    router.renderResult().subscribeOnError(() => {
+    router.renderResult().subscribe(null, () => {
       hasError = true;
     });
 
@@ -423,11 +424,11 @@ describe('Router', () => {
     const history = createTestHistory('/');
 
     const createHandler = (transition) =>
-      Observable.return({
-        hashChange: helpers.noop,
+      Observable.of({
+        hashChange: noop,
         onBeforeUnload: () => '',
         render() {
-          return Observable.return(transition.route.handlers[0](transition));
+          return Observable.of(transition.route.handlers[0](transition));
         },
       });
 
@@ -454,7 +455,7 @@ describe('Router', () => {
     });
 
     let hasError = false;
-    router.renderResult().subscribeOnError(() => {
+    router.renderResult().subscribe(null, () => {
       hasError = true;
     });
 

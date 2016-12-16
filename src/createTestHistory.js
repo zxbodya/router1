@@ -1,4 +1,4 @@
-import { Subject } from 'rx';
+import { Subject } from 'rxjs';
 import { locationFromUrl } from './utils/locationFromUrl';
 
 export function createTestHistory(initialUrl, cb) {
@@ -17,7 +17,7 @@ export function createTestHistory(initialUrl, cb) {
       if (cb) cb('replace', { url, state, title });
     },
     navigate(url, state) {
-      location$.onNext(
+      location$.next(
         Object.assign(locationFromUrl(url, state), { source: 'pop' })
       );
     },
@@ -25,6 +25,7 @@ export function createTestHistory(initialUrl, cb) {
       .startWith(
         Object.assign(locationFromUrl(initialUrl), { source: 'init' })
       )
-      .shareReplay(1),
+      .publishReplay(1)
+      .refCount(),
   };
 }

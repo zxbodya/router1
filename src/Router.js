@@ -1,4 +1,4 @@
-import { Observable, Subject } from 'rx';
+import { Observable, Subject } from 'rxjs';
 import {
   parse as parseQuery,
   generate as generateQuery,
@@ -31,7 +31,7 @@ export class Router {
         let redirectCount = 0;
         const forward = (redirectUrl) => {
           if (redirectCount > 20) {
-            observer.onError(Error('To many redirects!'));
+            observer.error(Error('To many redirects!'));
           }
 
           this.history.replace(redirectUrl);
@@ -40,7 +40,7 @@ export class Router {
 
           if (this.currentLocation.pathname === location.pathname && this.currentLocation.search === location.search) {
             if (this.currentLocation.hash === location.hash) {
-              observer.onError(Error('Redirect to the same location!'));
+              observer.error(Error('Redirect to the same location!'));
             }
             this.activeRoute[2].hashChange(location);
             this.currentLocation = location;
@@ -48,7 +48,7 @@ export class Router {
             this.currentLocation = location;
 
             redirectCount += 1;
-            observer.onNext({
+            observer.next({
               location,
               router: this,
               redirectCount,
@@ -56,7 +56,7 @@ export class Router {
             });
           }
         };
-        return observer.onNext({
+        return observer.next({
           location: toLocation,
           router: this,
           redirectCount,
@@ -139,7 +139,7 @@ export class Router {
           }
         )
       )
-      .flatMapLatest(transition => {
+      .switchMap(transition => {
         const loadRoute = (routes, index) => {
           if (index >= routes.length) {
             return this.createHandler(
@@ -151,9 +151,9 @@ export class Router {
           const handler = this.createHandler(
             Object.assign({ route: route[0], params: route[1] }, transition)
           );
-          return handler.flatMapLatest(loadResult => (
+          return handler.switchMap(loadResult => (
             loadResult
-              ? Observable.return([route[0].name, route[1], loadResult])
+              ? Observable.of([route[0].name, route[1], loadResult])
               : loadRoute(routes, index + 1)
           ));
         };
@@ -163,7 +163,7 @@ export class Router {
       .do(([route, params, handler]) => {
         this.activeRoute = [route, params, handler];
       })
-      .flatMapLatest(() => this.activeRoute[2].render())
+      .switchMap(() => this.activeRoute[2].render())
       .subscribe(
         this.renderResult$
       );
@@ -171,7 +171,7 @@ export class Router {
 
   stop() {
     if (this.resultsSubscription) {
-      this.resultsSubscription.dispose();
+      this.resultsSubscription.unsubscribe();
     }
   }
 
@@ -218,7 +218,7 @@ export class Router {
   }
 
   navigateToUrl(url, state = {}) {
-    this.navigate$.onNext({ url, state, source: 'push' });
+    this.navigate$.next({ url, state, source: 'push' });
   }
 
 }

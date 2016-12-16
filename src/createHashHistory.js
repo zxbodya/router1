@@ -1,4 +1,4 @@
-import { Observable } from 'rx';
+import { Observable } from 'rxjs';
 import { locationFromUrl } from './utils/locationFromUrl';
 
 import { splitUrl } from './utils/splitUrl';
@@ -20,11 +20,11 @@ export function createHashHistory() {
   let replace;
 
   if ('onpopstate' in window) {
-    location = Observable
-      .fromEvent(window, 'popstate')
+    location = Observable.fromEvent(window, 'popstate')
       .map(() => currentLocation('pop'))
       .startWith(currentLocation('init'))
-      .shareReplay(1);
+      .publishReplay(1)
+      .refCount();
 
     push = (url, state = null, title = null) => {
       window.history.pushState(state, title, url);
@@ -43,7 +43,8 @@ export function createHashHistory() {
     location = Observable.fromEvent(window, 'hashchange')
       .map(() => currentLocation('pop'))
       .startWith(currentLocation('init'))
-      .shareReplay(1);
+      .publishReplay(1)
+      .refCount();
   }
 
   return {

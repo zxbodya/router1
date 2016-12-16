@@ -1,15 +1,6 @@
-import { Router } from './Router';
-import { createServerHistory } from './createServerHistory';
-import { createBrowserHistory } from './createBrowserHistory';
-import { createHashHistory } from './createHashHistory';
-import { createTestHistory } from './createTestHistory';
-import { RouteCollection } from './RouteCollection';
-
-export {
-  Router,
-  RouteCollection,
-  createServerHistory,
-  createBrowserHistory,
-  createHashHistory,
-  createTestHistory,
-};
+export { Router } from './Router';
+export { createServerHistory } from './createServerHistory';
+export { createBrowserHistory } from './createBrowserHistory';
+export { createHashHistory } from './createHashHistory';
+export { createTestHistory } from './createTestHistory';
+export { RouteCollection } from './RouteCollection';

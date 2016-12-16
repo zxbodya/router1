@@ -1,9 +1,4 @@
-import { config } from 'rx';
 import { createHashHistory } from './createHashHistory';
-
-if (process.env.NODE_ENV !== 'production') {
-  config.longStackSupport = true;
-}
 
 describe('createHashHistory legacy browsers', () => {
   beforeEach(() => {
