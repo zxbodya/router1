@@ -1,5 +1,10 @@
 # Changelog
 
+##0.6.0  (2016-12-20)
+
+- migrate to RxJS 5
+- improve documentation
+
 ##0.5.0  (2016-08-15)
 
 - `createHandler` in route configuration instead of `render` to offer possibility of adding state hooks, and to better resolve conflicting routes
