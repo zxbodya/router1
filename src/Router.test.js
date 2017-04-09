@@ -1,4 +1,6 @@
-import { Observable } from 'rxjs';
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/observable/of';
+
 import { noop } from 'rxjs/util/noop';
 
 import { Router } from './Router';

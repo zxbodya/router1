@@ -1,3 +1,6 @@
+import 'rxjs/Observable';
+import 'rxjs/add/operator/take';
+
 import { createTestHistory } from './createTestHistory';
 
 describe('createTestHistory', () => {

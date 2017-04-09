@@ -1,4 +1,13 @@
-import { Observable } from 'rxjs';
+import { Observable } from 'rxjs/Observable';
+
+import 'rxjs/add/observable/fromEvent';
+import 'rxjs/add/observable/of';
+import 'rxjs/add/operator/first';
+import 'rxjs/add/operator/take';
+import 'rxjs/add/operator/startWith';
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/publishReplay';
+
 import { locationFromUrl } from './utils/locationFromUrl';
 
 export function createBrowserHistory() {

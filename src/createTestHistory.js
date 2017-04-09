@@ -1,4 +1,8 @@
-import { Subject } from 'rxjs';
+import { Subject } from 'rxjs/Subject';
+import 'rxjs/add/operator/startWith';
+import 'rxjs/add/operator/publishReplay';
+
+
 import { locationFromUrl } from './utils/locationFromUrl';
 
 export function createTestHistory(initialUrl, cb) {

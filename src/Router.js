@@ -1,4 +1,14 @@
-import { Observable, Subject } from 'rxjs';
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/observable/merge';
+import 'rxjs/add/observable/of';
+import 'rxjs/add/operator/first';
+import 'rxjs/add/operator/take';
+import 'rxjs/add/operator/mergeMap';
+import 'rxjs/add/operator/switchMap';
+import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/do';
+
+import { Subject } from 'rxjs/Subject';
 import {
   parse as parseQuery,
   generate as generateQuery,
@@ -66,7 +76,7 @@ export class Router {
 
     const historyTransition$ = this.history
       .location
-      .flatMap(location => {
+      .mergeMap(location => {
         if (this.currentLocation.pathname === location.pathname && this.currentLocation.search === location.search) {
           this.activeRoute[2].hashChange(location);
           this.currentLocation = location;
@@ -94,7 +104,7 @@ export class Router {
 
 
     const navigateTransition$ = this.navigate$
-      .flatMap(({ url, state, source }) => {
+      .mergeMap(({ url, state, source }) => {
         const location = Object.assign(
           this.history.parseUrl(url),
           { source, state }
@@ -125,7 +135,7 @@ export class Router {
       historyTransition$,
       navigateTransition$
     )
-      .flatMap(transitionFromLocation)
+      .mergeMap(transitionFromLocation)
       // transition handling
       .map(transition =>
         Object.assign(

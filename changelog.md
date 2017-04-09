@@ -1,5 +1,9 @@
 # Changelog
 
+##0.6.1  (2017-04-9)
+
+- use RxJS in modular way(reducing resulting bundle size)
+
 ##0.6.0  (2016-12-20)
 
 - migrate to RxJS 5
