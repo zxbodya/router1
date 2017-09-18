@@ -25,11 +25,11 @@ export function generate(params, keys = Object.keys(params)) {
     .map((name) => {
       const value = params[name];
       if (!value && value !== '') return '';
-      return encodeURIComponent(name) +
-        (value !== true
-            ? `=${encodeURIComponent(value)}`
-            : ''
-        );
+      return encodeURIComponent(name) + (
+        value !== true
+          ? `=${encodeURIComponent(value)}`
+          : ''
+      );
     })
     .filter(part => part.length > 0)
     .join('&');

@@ -84,6 +84,7 @@ export class Router {
         }
 
         const beforeUnload = this.onBeforeUnload();
+        // eslint-disable-next-line no-restricted-globals,no-alert
         const cancelTransition = beforeUnload && !confirm(beforeUnload);
         if (cancelTransition) {
           // todo: find better way to revert location change
@@ -118,6 +119,7 @@ export class Router {
         }
 
         const beforeUnload = this.onBeforeUnload();
+        // eslint-disable-next-line no-restricted-globals,no-alert
         const cancelTransition = beforeUnload && !confirm(beforeUnload);
 
         if (cancelTransition) {
@@ -147,20 +149,18 @@ export class Router {
               parseQuery(transition.location.search)
             ),
           }
-        )
-      )
+        ))
       .switchMap(transition => {
         const loadRoute = (routes, index) => {
           if (index >= routes.length) {
-            return this.createHandler(
-              Object.assign({ route: { name: null, handlers: [] }, params: {} }, transition)
-            ).map(v => [null, {}, v]);
+            return this.createHandler(Object.assign(
+              { route: { name: null, handlers: [] }, params: {} },
+              transition
+            )).map(v => [null, {}, v]);
           }
 
           const route = routes[index];
-          const handler = this.createHandler(
-            Object.assign({ route: route[0], params: route[1] }, transition)
-          );
+          const handler = this.createHandler(Object.assign({ route: route[0], params: route[1] }, transition));
           return handler.switchMap(loadResult => (
             loadResult
               ? Observable.of([route[0].name, route[1], loadResult])
@@ -174,9 +174,7 @@ export class Router {
         this.activeRoute = [route, params, handler];
       })
       .switchMap(() => this.activeRoute[2].render())
-      .subscribe(
-        this.renderResult$
-      );
+      .subscribe(this.renderResult$);
   }
 
   stop() {
@@ -216,6 +214,7 @@ export class Router {
       return this.history.createUrl(pathname, search, hash);
     }
     if (process.env.NODE_ENV !== 'production') {
+      // eslint-disable-next-line no-console
       console.error(`Route "${name}" not found`);
       return `#route-${name}-not-found`;
     }
@@ -230,5 +229,4 @@ export class Router {
   navigateToUrl(url, state = {}) {
     this.navigate$.next({ url, state, source: 'push' });
   }
-
 }

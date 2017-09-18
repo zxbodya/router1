@@ -1,5 +1,9 @@
 # Changelog
 
+##0.7.0 (2017-09-18)
+
+Start using rollup to bundle library for distribution
+
 ##0.6.1  (2017-04-9)
 
 - use RxJS in modular way(reducing resulting bundle size)

@@ -33,7 +33,9 @@ describe('createTestHistory', () => {
   it('returns location from passedUrl', (done) => {
     const h = createTestHistory('/abc?qwe#123');
     h.location.subscribe(location => {
-      expect(location).toEqual({ pathname: '/abc', search: 'qwe', hash: '123', state: {}, source: 'init' });
+      expect(location).toEqual({
+        pathname: '/abc', search: 'qwe', hash: '123', state: {}, source: 'init',
+      });
       done();
     });
   });
@@ -41,7 +43,9 @@ describe('createTestHistory', () => {
   it('has working parseUrl method', () => {
     const h = createTestHistory('/abc?qwe#123');
     const location = h.parseUrl('/abc?qwe#123');
-    expect(location).toEqual({ pathname: '/abc', search: 'qwe', hash: '123', state: {} });
+    expect(location).toEqual({
+      pathname: '/abc', search: 'qwe', hash: '123', state: {},
+    });
   });
 
   it('has working parseUrl method', () => {
@@ -55,10 +59,14 @@ describe('createTestHistory', () => {
     let count = 0;
     h.location.take(2).subscribe(location => {
       if (count === 0) {
-        expect(location).toEqual({ pathname: '/abc', search: 'qwe', hash: '123', state: {}, source: 'init' });
+        expect(location).toEqual({
+          pathname: '/abc', search: 'qwe', hash: '123', state: {}, source: 'init',
+        });
       }
       if (count === 1) {
-        expect(location).toEqual({ pathname: '/cba', search: 'ewq', hash: '321', state: {}, source: 'pop' });
+        expect(location).toEqual({
+          pathname: '/cba', search: 'ewq', hash: '321', state: {}, source: 'pop',
+        });
       }
       count += 1;
     }, undefined, () => {

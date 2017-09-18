@@ -18,9 +18,7 @@ export function createServerHistory(initialUrl) {
     replace() {
       throw new Error('navigation not supported');
     },
-    location: Observable.of(
-        Object.assign(locationFromUrl(initialUrl), { source: 'init' })
-      )
+    location: Observable.of(Object.assign(locationFromUrl(initialUrl), { source: 'init' }))
       .publishReplay(1)
       .refCount(),
   };
