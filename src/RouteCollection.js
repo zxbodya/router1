@@ -1,7 +1,5 @@
 import { compileRoutes } from './compileRoutes';
-import {
-  pickValues as pickQueryValues,
-} from './utils/queryString';
+import { pickValues as pickQueryValues } from './utils/queryString';
 
 export class RouteCollection {
   constructor(routes) {
@@ -11,11 +9,10 @@ export class RouteCollection {
   }
 
   addRoutes(routeDefs) {
-    compileRoutes(routeDefs)
-      .forEach(route => {
-        this.routes.push(route);
-        this.routesByName[route.name] = route;
-      });
+    compileRoutes(routeDefs).forEach(route => {
+      this.routes.push(route);
+      this.routesByName[route.name] = route;
+    });
   }
 
   match(pathname, queryData) {
@@ -27,10 +24,8 @@ export class RouteCollection {
       if (params) {
         matched.push([
           route,
-          Object.assign(
-            params,
-            pickQueryValues(queryData, route.searchParams)
-          )]);
+          Object.assign(params, pickQueryValues(queryData, route.searchParams)),
+        ]);
       }
     }
     return matched;

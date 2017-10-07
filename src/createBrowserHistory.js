@@ -40,10 +40,10 @@ export function createBrowserHistory() {
     };
   } else {
     // todo: do not reassign location when only hash changed
-    replace = (url) => {
+    replace = url => {
       window.location.replace(url);
     };
-    push = (url) => {
+    push = url => {
       window.location.assign(url);
     };
     // todo: on hashchange
@@ -53,8 +53,8 @@ export function createBrowserHistory() {
   }
 
   return {
-    createUrl(pathname, search, hash) {
-      return `${pathname}${search ? `?${search}` : ''}${hash ? `#${hash}` : ''}`;
+    createUrl(path, search, hash) {
+      return `${path}${search ? `?${search}` : ''}${hash ? `#${hash}` : ''}`;
     },
     parseUrl(url) {
       return locationFromUrl(url);

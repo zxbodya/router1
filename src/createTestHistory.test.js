@@ -4,7 +4,7 @@ import 'rxjs/add/operator/take';
 import { createTestHistory } from './createTestHistory';
 
 describe('createTestHistory', () => {
-  it('callback on push', (done) => {
+  it('callback on push', done => {
     const h = createTestHistory('/abc?qwe#123', (action, location) => {
       expect(action).toEqual('push');
       expect(location).toEqual({
@@ -17,7 +17,7 @@ describe('createTestHistory', () => {
     h.push('/bca?ewq#321', { a: true });
   });
 
-  it('callback on replace', (done) => {
+  it('callback on replace', done => {
     const h = createTestHistory('/abc?qwe#123', (action, location) => {
       expect(action).toEqual('replace');
       expect(location).toEqual({
@@ -30,11 +30,15 @@ describe('createTestHistory', () => {
     h.replace('/bca?ewq#321', { a: true });
   });
 
-  it('returns location from passedUrl', (done) => {
+  it('returns location from passedUrl', done => {
     const h = createTestHistory('/abc?qwe#123');
     h.location.subscribe(location => {
       expect(location).toEqual({
-        pathname: '/abc', search: 'qwe', hash: '123', state: {}, source: 'init',
+        pathname: '/abc',
+        search: 'qwe',
+        hash: '123',
+        state: {},
+        source: 'init',
       });
       done();
     });
@@ -44,7 +48,10 @@ describe('createTestHistory', () => {
     const h = createTestHistory('/abc?qwe#123');
     const location = h.parseUrl('/abc?qwe#123');
     expect(location).toEqual({
-      pathname: '/abc', search: 'qwe', hash: '123', state: {},
+      pathname: '/abc',
+      search: 'qwe',
+      hash: '123',
+      state: {},
     });
   });
 
@@ -60,16 +67,26 @@ describe('createTestHistory', () => {
     h.location.take(2).subscribe(location => {
       if (count === 0) {
         expect(location).toEqual({
-          pathname: '/abc', search: 'qwe', hash: '123', state: {}, source: 'init',
+          pathname: '/abc',
+          search: 'qwe',
+          hash: '123',
+          state: {},
+          source: 'init',
         });
       }
       if (count === 1) {
         expect(location).toEqual({
-          pathname: '/cba', search: 'ewq', hash: '321', state: {}, source: 'pop',
+          pathname: '/cba',
+          search: 'ewq',
+          hash: '321',
+          state: {},
+          source: 'pop',
         });
       }
       count += 1;
-    }, undefined, () => {
+    },
+    undefined,
+    () => {
       done();
     });
 

@@ -14,7 +14,9 @@ import { splitUrl } from './utils/splitUrl';
 
 export function createHashHistory() {
   function currentLocation(source) {
-    const parts = splitUrl(window.location.hash && window.location.hash.substr(1));
+    const parts = splitUrl(
+      window.location.hash && window.location.hash.substr(1)
+    );
     return {
       pathname: parts[0] || '/',
       search: parts[1] && `${parts[1]}`,
@@ -42,10 +44,10 @@ export function createHashHistory() {
       window.history.replaceState(state, title, url);
     };
   } else {
-    replace = (url) => {
+    replace = url => {
       window.location.replace(url);
     };
-    push = (url) => {
+    push = url => {
       window.location.assign(url);
     };
 
@@ -57,8 +59,8 @@ export function createHashHistory() {
   }
 
   return {
-    createUrl(pathname, search, hash) {
-      return `#${pathname}${search ? `?${search}` : ''}${hash ? `#${hash}` : ''}`;
+    createUrl(path, search, hash) {
+      return `#${path}${search ? `?${search}` : ''}${hash ? `#${hash}` : ''}`;
     },
     parseUrl(url) {
       const parts = splitUrl(url);

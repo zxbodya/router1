@@ -29,7 +29,9 @@ export function compile(expression) {
       if (part) {
         if (process.env.NODE_ENV !== 'production') {
           if (/\([^?]/.test(part)) {
-            throw new Error(`syntax error in expression "${expression}", param regexp ${part} contain capture groups`);
+            throw new Error(
+              `syntax error in expression "${expression}", param regexp ${part} contain capture groups`
+            );
           }
         }
 
@@ -41,4 +43,3 @@ export function compile(expression) {
   }
   return [matcher.join(''), generateParts, paramNames];
 }
-

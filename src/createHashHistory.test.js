@@ -29,23 +29,31 @@ describe('createHashHistory legacy browsers', () => {
     };
   });
 
-  it('has correct initial location', (done) => {
+  it('has correct initial location', done => {
     const h = createHashHistory();
     h.location.first().subscribe(location => {
       expect(location).toEqual({
-        pathname: '/abc', search: 'qwe', hash: '123', source: 'init', state: {},
+        pathname: '/abc',
+        search: 'qwe',
+        hash: '123',
+        source: 'init',
+        state: {},
       });
       done();
     });
   });
 
-  it('uses assign and replace to update location', (done) => {
+  it('uses assign and replace to update location', done => {
     const h = createHashHistory();
     let count = 0;
     h.location.take(2).subscribe(location => {
       if (count === 0) {
         expect(location).toEqual({
-          pathname: '/abc', search: 'qwe', hash: '123', source: 'init', state: {},
+          pathname: '/abc',
+          search: 'qwe',
+          hash: '123',
+          source: 'init',
+          state: {},
         });
       }
       if (count === 1) {
@@ -68,7 +76,10 @@ describe('createHashHistory legacy browsers', () => {
     const h = createHashHistory();
     const location = h.parseUrl('#/abc?qwe#123');
     expect(location).toEqual({
-      pathname: '/abc', search: 'qwe', hash: '123', state: {},
+      pathname: '/abc',
+      search: 'qwe',
+      hash: '123',
+      state: {},
     });
   });
 
@@ -109,17 +120,21 @@ describe('createHashHistory modern browsers', () => {
     };
   });
 
-  it('has correct initial location', (done) => {
+  it('has correct initial location', done => {
     const h = createHashHistory();
     h.location.first().subscribe(location => {
       expect(location).toEqual({
-        pathname: '/abc', search: 'qwe', hash: '123', source: 'init', state: {},
+        pathname: '/abc',
+        search: 'qwe',
+        hash: '123',
+        source: 'init',
+        state: {},
       });
       done();
     });
   });
 
-  it('uses assign and replace to update location, emits correct events', (done) => {
+  it('uses assign and replace to update location, emits correct events', done => {
     const { window } = global;
     const h = createHashHistory();
 
@@ -127,7 +142,11 @@ describe('createHashHistory modern browsers', () => {
     h.location.take(2).subscribe(location => {
       if (count === 0) {
         expect(location).toEqual({
-          pathname: '/abc', search: 'qwe', hash: '123', source: 'init', state: {},
+          pathname: '/abc',
+          search: 'qwe',
+          hash: '123',
+          source: 'init',
+          state: {},
         });
       }
       if (count === 1) {
@@ -150,7 +169,10 @@ describe('createHashHistory modern browsers', () => {
     const h = createHashHistory();
     const location = h.parseUrl('#/abc?qwe#123');
     expect(location).toEqual({
-      pathname: '/abc', search: 'qwe', hash: '123', state: {},
+      pathname: '/abc',
+      search: 'qwe',
+      hash: '123',
+      state: {},
     });
   });
 

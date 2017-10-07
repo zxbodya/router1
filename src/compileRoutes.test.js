@@ -94,15 +94,15 @@ describe('Router, compiling route collection', () => {
   });
 
   it('throws when route handler is missing', () => {
-    expect(() => compileRoutes([
-      { name: 'aaa' },
-    ])).toThrow();
+    expect(() => compileRoutes([{ name: 'aaa' }])).toThrow();
   });
   it('throws when route names are not uniq', () => {
-    expect(() => compileRoutes([
-      { name: 'aaa', handler: '1' },
-      { name: 'aaa', handler: '2' },
-    ])).toThrow();
+    expect(() =>
+      compileRoutes([
+        { name: 'aaa', handler: '1' },
+        { name: 'aaa', handler: '2' },
+      ])
+    ).toThrow();
   });
 
   it('allows to pass array of handlers', () => {
@@ -121,9 +121,7 @@ describe('Router, compiling route collection', () => {
       {
         name: 'a2',
         handler: '2',
-        routes: [
-          { name: 'a1', handlers: ['0', '1'] },
-        ],
+        routes: [{ name: 'a1', handlers: ['0', '1'] }],
       },
     ]);
 
@@ -136,9 +134,7 @@ describe('Router, compiling route collection', () => {
       {
         name: 'a3',
         handlers: ['0', '1'],
-        routes: [
-          { name: 'a1', handler: '2' },
-        ],
+        routes: [{ name: 'a1', handler: '2' }],
       },
     ]);
 
@@ -151,9 +147,7 @@ describe('Router, compiling route collection', () => {
       {
         name: 'a3',
         handlers: ['0', '1'],
-        routes: [
-          { name: 'a1', handlers: ['0', '1'] },
-        ],
+        routes: [{ name: 'a1', handlers: ['0', '1'] }],
       },
     ]);
 

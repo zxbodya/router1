@@ -52,7 +52,8 @@ function parseRoutes(routeDefs) {
     } else {
       rawRoutes.push({
         names: [routeDef.name],
-        handlers: routeDef.handlers || (routeDef.handler ? [routeDef.handler] : []),
+        handlers:
+          routeDef.handlers || (routeDef.handler ? [routeDef.handler] : []),
         pathExpressions: [pathExpression],
         searchParams,
       });

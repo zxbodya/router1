@@ -3,7 +3,7 @@ export function createMatcher(info) {
   const paramNames = info[2];
   const matcherExp = new RegExp(`^${matcher}$`);
 
-  return (path) => {
+  return path => {
     const matches = path.match(matcherExp);
     let res = false;
     if (matches) {

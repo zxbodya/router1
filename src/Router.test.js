@@ -8,23 +8,22 @@ import { RouteCollection } from './RouteCollection';
 
 import { createTestHistory } from './createTestHistory';
 
-const createTestHandler = (options = {}) =>
-  (transition) =>
-    Observable.of({
-      hashChange: options.hashChange || noop,
-      onBeforeUnload: options.onBeforeUnload || (() => ''),
-      render() {
-        return Observable.of({
-          route: transition.route.name,
-          handlers: transition.route.handlers,
-          params: transition.params,
-          location: transition.location,
-        });
-      },
-    });
+const createTestHandler = (options = {}) => transition =>
+  Observable.of({
+    hashChange: options.hashChange || noop,
+    onBeforeUnload: options.onBeforeUnload || (() => ''),
+    render() {
+      return Observable.of({
+        route: transition.route.name,
+        handlers: transition.route.handlers,
+        params: transition.params,
+        location: transition.location,
+      });
+    },
+  });
 
 describe('Router', () => {
-  it('works with empty route collection', (done) => {
+  it('works with empty route collection', done => {
     const history = createTestHistory('/');
     const router = new Router({
       routeCollection: new RouteCollection([]),
@@ -41,33 +40,45 @@ describe('Router', () => {
 
     expect(router.isActive('main')).toEqual(false);
 
-    router.renderResult().first().subscribe(renderResult => {
-      expect(renderResult.route).toEqual(null);
-      expect(renderResult.params).toEqual({});
-      expect(renderResult.handlers).toEqual([]);
-      expect(renderResult.location).toEqual({
-        pathname: '/', search: '', hash: '', state: {}, source: 'init',
-      });
+    router
+      .renderResult()
+      .first()
+      .subscribe(
+        renderResult => {
+          expect(renderResult.route).toEqual(null);
+          expect(renderResult.params).toEqual({});
+          expect(renderResult.handlers).toEqual([]);
+          expect(renderResult.location).toEqual({
+            pathname: '/',
+            search: '',
+            hash: '',
+            state: {},
+            source: 'init',
+          });
 
-      expect(router.isActive('main')).toEqual(false);
-      expect(router.activeRoute[0]).toEqual(null);
-      expect(router.activeRoute[1]).toEqual({});
-    }, () => {
-    }, () => {
-      router.stop();
-      done();
-    });
+          expect(router.isActive('main')).toEqual(false);
+          expect(router.activeRoute[0]).toEqual(null);
+          expect(router.activeRoute[1]).toEqual({});
+        },
+        () => {},
+        () => {
+          router.stop();
+          done();
+        }
+      );
     router.start();
   });
 
-  it('matches route', (done) => {
+  it('matches route', done => {
     const history = createTestHistory('/');
     const router = new Router({
-      routeCollection: new RouteCollection([{
-        name: 'main',
-        handler: 'main',
-        url: '/',
-      }]),
+      routeCollection: new RouteCollection([
+        {
+          name: 'main',
+          handler: 'main',
+          url: '/',
+        },
+      ]),
       history,
       createHandler: createTestHandler(),
     });
@@ -75,94 +86,136 @@ describe('Router', () => {
     expect(router.createUrl('main', {}, '')).toEqual('/');
     expect(router.createUrl('main2', {}, '')).toEqual('#route-main2-not-found');
 
-    router.renderResult().first().subscribe(renderResult => {
-      expect(renderResult.route).toEqual('main');
-      expect(renderResult.params).toEqual({});
-      expect(renderResult.handlers).toEqual(['main']);
-      expect(renderResult.location).toEqual({
-        pathname: '/', search: '', hash: '', state: {}, source: 'init',
-      });
-    }, () => {
-    }, () => {
-      expect(router.isActive('main')).toEqual(true);
-      router.stop();
-      done();
-    });
+    router
+      .renderResult()
+      .first()
+      .subscribe(
+        renderResult => {
+          expect(renderResult.route).toEqual('main');
+          expect(renderResult.params).toEqual({});
+          expect(renderResult.handlers).toEqual(['main']);
+          expect(renderResult.location).toEqual({
+            pathname: '/',
+            search: '',
+            hash: '',
+            state: {},
+            source: 'init',
+          });
+        },
+        () => {},
+        () => {
+          expect(router.isActive('main')).toEqual(true);
+          router.stop();
+          done();
+        }
+      );
     router.start();
   });
 
-  it('matches route with params', (done) => {
+  it('matches route with params', done => {
     const history = createTestHistory('/123');
     const router = new Router({
-      routeCollection: new RouteCollection([{
-        name: 'main',
-        handler: 'main',
-        url: '/<page:\\d+>',
-      }]),
+      routeCollection: new RouteCollection([
+        {
+          name: 'main',
+          handler: 'main',
+          url: '/<page:\\d+>',
+        },
+      ]),
       history,
       createHandler: createTestHandler(),
     });
 
     expect(router.createUrl('main', { page: 1000 }, '')).toEqual('/1000');
 
-    router.renderResult().first().subscribe(renderResult => {
-      expect(renderResult.route).toEqual('main');
-      expect(renderResult.params).toEqual({ page: '123' });
-      expect(renderResult.handlers).toEqual(['main']);
-      expect(renderResult.location).toEqual({
-        pathname: '/123', search: '', hash: '', state: {}, source: 'init',
-      });
-    }, () => {
-    }, () => {
-      expect(router.isActive('main')).toEqual(true);
-      expect(router.isActive('main', { page: '123' })).toEqual(true);
-      expect(router.isActive('main', { page: '321' })).toEqual(false);
-      router.stop();
-      done();
-    });
+    router
+      .renderResult()
+      .first()
+      .subscribe(
+        renderResult => {
+          expect(renderResult.route).toEqual('main');
+          expect(renderResult.params).toEqual({ page: '123' });
+          expect(renderResult.handlers).toEqual(['main']);
+          expect(renderResult.location).toEqual({
+            pathname: '/123',
+            search: '',
+            hash: '',
+            state: {},
+            source: 'init',
+          });
+        },
+        () => {},
+        () => {
+          expect(router.isActive('main')).toEqual(true);
+          expect(router.isActive('main', { page: '123' })).toEqual(true);
+          expect(router.isActive('main', { page: '321' })).toEqual(false);
+          router.stop();
+          done();
+        }
+      );
     router.start();
   });
 
-  it('matches route with params and search query and hash', (done) => {
+  it('matches route with params and search query and hash', done => {
     const history = createTestHistory('/123?q=text#anchor');
     const router = new Router({
-      routeCollection: new RouteCollection([{
-        name: 'main',
-        handler: 'main',
-        url: '/<page:\\d+>?q',
-      }]),
+      routeCollection: new RouteCollection([
+        {
+          name: 'main',
+          handler: 'main',
+          url: '/<page:\\d+>?q',
+        },
+      ]),
       history,
       createHandler: createTestHandler(),
     });
 
-    expect(router.createUrl('main', { page: 1000, q: 1234 }, '')).toEqual('/1000?q=1234');
-    expect(router.createUrl('main', { page: 1000, q: 1234 }, 'anchor')).toEqual('/1000?q=1234#anchor');
+    expect(router.createUrl('main', { page: 1000, q: 1234 }, '')).toEqual(
+      '/1000?q=1234'
+    );
+    expect(router.createUrl('main', { page: 1000, q: 1234 }, 'anchor')).toEqual(
+      '/1000?q=1234#anchor'
+    );
 
-    router.renderResult().first().subscribe(renderResult => {
-      expect(renderResult.route).toEqual('main');
-      expect(renderResult.params).toEqual({ page: '123', q: 'text' });
-      expect(renderResult.handlers).toEqual(['main']);
-      expect(renderResult.location).toEqual({
-        pathname: '/123',
-        search: 'q=text',
-        hash: 'anchor',
-        state: {},
-        source: 'init',
-      });
-    }, () => {
-    }, () => {
-      expect(router.isActive('main')).toEqual(true);
-      expect(router.isActive('main', { page: '123', q: 'text' })).toEqual(true);
-      expect(router.isActive('main', { page: '123', q: 'text' })).toEqual(true);
-      expect(router.isActive('main', { page: '123', q: 'tex' })).toEqual(false);
-      expect(router.isActive('main', { page: '12', q: 'text' })).toEqual(false);
-      router.stop();
-      done();
-    });
+    router
+      .renderResult()
+      .first()
+      .subscribe(
+        renderResult => {
+          expect(renderResult.route).toEqual('main');
+          expect(renderResult.params).toEqual({ page: '123', q: 'text' });
+          expect(renderResult.handlers).toEqual(['main']);
+          expect(renderResult.location).toEqual({
+            pathname: '/123',
+            search: 'q=text',
+            hash: 'anchor',
+            state: {},
+            source: 'init',
+          });
+        },
+        () => {},
+        () => {
+          expect(router.isActive('main')).toEqual(true);
+          expect(router.isActive('main', { page: '123', q: 'text' })).toEqual(
+            true
+          );
+          expect(router.isActive('main', { page: '123', q: 'text' })).toEqual(
+            true
+          );
+          expect(router.isActive('main', { page: '123', q: 'tex' })).toEqual(
+            false
+          );
+          expect(router.isActive('main', { page: '12', q: 'text' })).toEqual(
+            false
+          );
+          router.stop();
+          done();
+        }
+      );
     router.start();
   });
 
-  it('navigates', (done) => {
+  it('navigates', done => {
     const history = createTestHistory('/123?q=text#anchor');
 
     let hashChangeCount = 0;
@@ -185,13 +238,21 @@ describe('Router', () => {
           if (hashChangeCount === 0) {
             // router.navigate
             expect(location).toEqual({
-              pathname: '/123', search: 'q=text', hash: 'anc', state: {}, source: 'push',
+              pathname: '/123',
+              search: 'q=text',
+              hash: 'anc',
+              state: {},
+              source: 'push',
             });
           }
           if (hashChangeCount === 1) {
             // onpopstate
             expect(location).toEqual({
-              pathname: '/123', search: 'q=text', hash: 'anc2', state: {}, source: 'pop',
+              pathname: '/123',
+              search: 'q=text',
+              hash: 'anc2',
+              state: {},
+              source: 'pop',
             });
           }
           hashChangeCount += 1;
@@ -201,66 +262,96 @@ describe('Router', () => {
 
     let count = 0;
 
-    router.renderResult().take(3).subscribe(renderResult => {
-      if (count === 0) {
-        expect(renderResult.route).toEqual('main');
-        expect(renderResult.params).toEqual({ page: '123', q: 'text' });
-        expect(renderResult.handlers).toEqual(['main']);
-        expect(renderResult.location).toEqual({
-          pathname: '/123',
-          search: 'q=text',
-          hash: 'anchor',
-          state: {},
-          source: 'init',
-        });
+    router
+      .renderResult()
+      .take(3)
+      .subscribe(
+        renderResult => {
+          if (count === 0) {
+            expect(renderResult.route).toEqual('main');
+            expect(renderResult.params).toEqual({ page: '123', q: 'text' });
+            expect(renderResult.handlers).toEqual(['main']);
+            expect(renderResult.location).toEqual({
+              pathname: '/123',
+              search: 'q=text',
+              hash: 'anchor',
+              state: {},
+              source: 'init',
+            });
 
+            expect(router.isActive('main')).toEqual(true);
+            expect(router.isActive('main', { page: '123', q: 'text' })).toEqual(
+              true
+            );
+            expect(router.isActive('main', { page: '123', q: 'text' })).toEqual(
+              true
+            );
+            expect(router.isActive('main', { page: '123', q: 'tex' })).toEqual(
+              false
+            );
+            expect(router.isActive('main', { page: '12', q: 'text' })).toEqual(
+              false
+            );
+          }
 
-        expect(router.isActive('main')).toEqual(true);
-        expect(router.isActive('main', { page: '123', q: 'text' })).toEqual(true);
-        expect(router.isActive('main', { page: '123', q: 'text' })).toEqual(true);
-        expect(router.isActive('main', { page: '123', q: 'tex' })).toEqual(false);
-        expect(router.isActive('main', { page: '12', q: 'text' })).toEqual(false);
-      }
+          if (count === 1) {
+            expect(renderResult.route).toEqual('main1');
+            expect(renderResult.params).toEqual({ page: '123', q: false });
+            expect(renderResult.handlers).toEqual(['main1']);
+            expect(renderResult.location).toEqual({
+              pathname: '/m2/123',
+              search: '',
+              hash: '',
+              state: {},
+              source: 'push',
+            });
 
-      if (count === 1) {
-        expect(renderResult.route).toEqual('main1');
-        expect(renderResult.params).toEqual({ page: '123', q: false });
-        expect(renderResult.handlers).toEqual(['main1']);
-        expect(renderResult.location).toEqual({
-          pathname: '/m2/123', search: '', hash: '', state: {}, source: 'push',
-        });
+            expect(router.isActive('main1')).toEqual(true);
+            expect(router.isActive('main1', { page: '123' })).toEqual(true);
+            expect(router.isActive('main1', { page: '123', q: false })).toEqual(
+              true
+            );
+            expect(router.isActive('main1', { page: '123', q: 'tex' })).toEqual(
+              false
+            );
+            expect(router.isActive('main1', { page: '12', q: 'text' })).toEqual(
+              false
+            );
+          }
+          if (count === 2) {
+            expect(renderResult.route).toEqual('main');
+            expect(renderResult.params).toEqual({ page: '123', q: 'text' });
+            expect(renderResult.handlers).toEqual(['main']);
+            expect(renderResult.location).toEqual({
+              pathname: '/123',
+              search: 'q=text',
+              hash: 'anc',
+              state: { a: true },
+              source: 'push',
+            });
 
-        expect(router.isActive('main1')).toEqual(true);
-        expect(router.isActive('main1', { page: '123' })).toEqual(true);
-        expect(router.isActive('main1', { page: '123', q: false })).toEqual(true);
-        expect(router.isActive('main1', { page: '123', q: 'tex' })).toEqual(false);
-        expect(router.isActive('main1', { page: '12', q: 'text' })).toEqual(false);
-      }
-      if (count === 2) {
-        expect(renderResult.route).toEqual('main');
-        expect(renderResult.params).toEqual({ page: '123', q: 'text' });
-        expect(renderResult.handlers).toEqual(['main']);
-        expect(renderResult.location).toEqual({
-          pathname: '/123',
-          search: 'q=text',
-          hash: 'anc',
-          state: { a: true },
-          source: 'push',
-        });
-
-
-        expect(router.isActive('main')).toEqual(true);
-        expect(router.isActive('main', { page: '123', q: 'text' })).toEqual(true);
-        expect(router.isActive('main', { page: '123', q: 'text' })).toEqual(true);
-        expect(router.isActive('main', { page: '123', q: 'tex' })).toEqual(false);
-        expect(router.isActive('main', { page: '12', q: 'text' })).toEqual(false);
-      }
-      count += 1;
-    }, () => {
-    }, () => {
-      router.stop();
-      done();
-    });
+            expect(router.isActive('main')).toEqual(true);
+            expect(router.isActive('main', { page: '123', q: 'text' })).toEqual(
+              true
+            );
+            expect(router.isActive('main', { page: '123', q: 'text' })).toEqual(
+              true
+            );
+            expect(router.isActive('main', { page: '123', q: 'tex' })).toEqual(
+              false
+            );
+            expect(router.isActive('main', { page: '12', q: 'text' })).toEqual(
+              false
+            );
+          }
+          count += 1;
+        },
+        () => {},
+        () => {
+          router.stop();
+          done();
+        }
+      );
     setTimeout(() => {
       router.navigate('main', { page: '123', q: 'text' }, 'anc');
       history.navigate('/123?q=text#anc2', {});
@@ -271,8 +362,7 @@ describe('Router', () => {
     router.start();
   });
 
-
-  it('uses onBeforeUnload', (done) => {
+  it('uses onBeforeUnload', done => {
     const history = createTestHistory('/');
 
     global.confirm = txt => txt === 'yes';
@@ -283,15 +373,18 @@ describe('Router', () => {
       onBeforeUnload: () => answer,
     };
     const router = new Router({
-      routeCollection: new RouteCollection([{
-        name: 'main',
-        handler: 'main',
-        url: '/',
-      }, {
-        name: 'main2',
-        handler: 'main2',
-        url: '/2',
-      }]),
+      routeCollection: new RouteCollection([
+        {
+          name: 'main',
+          handler: 'main',
+          url: '/',
+        },
+        {
+          name: 'main2',
+          handler: 'main2',
+          url: '/2',
+        },
+      ]),
       history,
       createHandler: createTestHandler(testHandlerOptions),
     });
@@ -328,10 +421,10 @@ describe('Router', () => {
     }, 40);
   });
 
-  it('handles transition.forward calls', (done) => {
+  it('handles transition.forward calls', done => {
     const history = createTestHistory('/');
 
-    const createHandler = (transition) =>
+    const createHandler = transition =>
       Observable.of({
         hashChange: noop,
         onBeforeUnload: () => '',
@@ -386,10 +479,10 @@ describe('Router', () => {
     router.start();
   });
 
-  it('crashes when transition.forward navigates to same page', (done) => {
+  it('crashes when transition.forward navigates to same page', done => {
     const history = createTestHistory('/');
 
-    const createHandler = (transition) =>
+    const createHandler = transition =>
       Observable.of({
         hashChange: noop,
         onBeforeUnload: () => '',
@@ -433,11 +526,10 @@ describe('Router', () => {
     router.start();
   });
 
-
-  it('crashes when transition.forward calls cause redirect loop', (done) => {
+  it('crashes when transition.forward calls cause redirect loop', done => {
     const history = createTestHistory('/');
 
-    const createHandler = (transition) =>
+    const createHandler = transition =>
       Observable.of({
         hashChange: noop,
         onBeforeUnload: () => '',

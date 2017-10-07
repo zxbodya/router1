@@ -1,19 +1,22 @@
 {
-  "extends": "airbnb-base",
+  "extends": [
+    "airbnb-base",
+    "prettier"
+  ],
   "env": {
     "es6": true,
     "browser": true,
-    "jasmine": true,
+    "jest": true,
     "node": true
   },
+  "plugins": [
+    "prettier"
+  ],
   "rules": {
+    "prettier/prettier": "error",
     "import/prefer-default-export": 0,
     "import/no-extraneous-dependencies": 0,
     "prefer-template": 1,
-    "max-len": [
-      "error",
-      120
-    ],
     "no-restricted-syntax": 0,
     "arrow-parens": 0,
     "comma-dangle": [

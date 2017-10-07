@@ -34,21 +34,26 @@ export class Router {
     return this.activeRoute[2] ? this.activeRoute[2].onBeforeUnload() : '';
   }
 
-
   start() {
-    const transitionFromLocation = (toLocation) =>
+    const transitionFromLocation = toLocation =>
       Observable.create(observer => {
         let redirectCount = 0;
-        const forward = (redirectUrl) => {
+        const forward = redirectUrl => {
           if (redirectCount > 20) {
             observer.error(Error('To many redirects!'));
           }
 
           this.history.replace(redirectUrl);
 
-          const location = Object.assign(this.history.parseUrl(redirectUrl), { source: 'replace', state: {} });
+          const location = Object.assign(this.history.parseUrl(redirectUrl), {
+            source: 'replace',
+            state: {},
+          });
 
-          if (this.currentLocation.pathname === location.pathname && this.currentLocation.search === location.search) {
+          if (
+            this.currentLocation.pathname === location.pathname &&
+            this.currentLocation.search === location.search
+          ) {
             if (this.currentLocation.hash === location.hash) {
               observer.error(Error('Redirect to the same location!'));
             }
@@ -74,44 +79,47 @@ export class Router {
         });
       });
 
-    const historyTransition$ = this.history
-      .location
-      .mergeMap(location => {
-        if (this.currentLocation.pathname === location.pathname && this.currentLocation.search === location.search) {
-          this.activeRoute[2].hashChange(location);
-          this.currentLocation = location;
-          return [];
-        }
-
-        const beforeUnload = this.onBeforeUnload();
-        // eslint-disable-next-line no-restricted-globals,no-alert
-        const cancelTransition = beforeUnload && !confirm(beforeUnload);
-        if (cancelTransition) {
-          // todo: find better way to revert location change
-          this.history.push(
-            this.history.createUrl(
-              this.currentLocation.pathname,
-              this.currentLocation.search,
-              this.currentLocation.hash
-            ),
-            this.currentLocation.state
-          );
-          return [];
-        }
-
+    const historyTransition$ = this.history.location.mergeMap(location => {
+      if (
+        this.currentLocation.pathname === location.pathname &&
+        this.currentLocation.search === location.search
+      ) {
+        this.activeRoute[2].hashChange(location);
         this.currentLocation = location;
-        return [location];
-      });
+        return [];
+      }
 
-
-    const navigateTransition$ = this.navigate$
-      .mergeMap(({ url, state, source }) => {
-        const location = Object.assign(
-          this.history.parseUrl(url),
-          { source, state }
+      const beforeUnload = this.onBeforeUnload();
+      // eslint-disable-next-line no-restricted-globals,no-alert
+      const cancelTransition = beforeUnload && !confirm(beforeUnload);
+      if (cancelTransition) {
+        // todo: find better way to revert location change
+        this.history.push(
+          this.history.createUrl(
+            this.currentLocation.pathname,
+            this.currentLocation.search,
+            this.currentLocation.hash
+          ),
+          this.currentLocation.state
         );
+        return [];
+      }
 
-        if (this.currentLocation.pathname === location.pathname && this.currentLocation.search === location.search) {
+      this.currentLocation = location;
+      return [location];
+    });
+
+    const navigateTransition$ = this.navigate$.mergeMap(
+      ({ url, state, source }) => {
+        const location = Object.assign(this.history.parseUrl(url), {
+          source,
+          state,
+        });
+
+        if (
+          this.currentLocation.pathname === location.pathname &&
+          this.currentLocation.search === location.search
+        ) {
           this.activeRoute[2].hashChange(location);
           this.currentLocation = location;
           this.history.push(url, state);
@@ -130,8 +138,8 @@ export class Router {
         this.history.push(url, state);
 
         return [location];
-      });
-
+      }
+    );
 
     this.resultsSubscription = Observable.merge(
       historyTransition$,
@@ -140,32 +148,34 @@ export class Router {
       .mergeMap(transitionFromLocation)
       // transition handling
       .map(transition =>
-        Object.assign(
-          {},
-          transition,
-          {
-            routes: this.routeCollection.match(
-              transition.location.pathname,
-              parseQuery(transition.location.search)
-            ),
-          }
-        ))
+        Object.assign({}, transition, {
+          routes: this.routeCollection.match(
+            transition.location.pathname,
+            parseQuery(transition.location.search)
+          ),
+        })
+      )
       .switchMap(transition => {
         const loadRoute = (routes, index) => {
           if (index >= routes.length) {
-            return this.createHandler(Object.assign(
-              { route: { name: null, handlers: [] }, params: {} },
-              transition
-            )).map(v => [null, {}, v]);
+            return this.createHandler(
+              Object.assign(
+                { route: { name: null, handlers: [] }, params: {} },
+                transition
+              )
+            ).map(v => [null, {}, v]);
           }
 
           const route = routes[index];
-          const handler = this.createHandler(Object.assign({ route: route[0], params: route[1] }, transition));
-          return handler.switchMap(loadResult => (
-            loadResult
-              ? Observable.of([route[0].name, route[1], loadResult])
-              : loadRoute(routes, index + 1)
-          ));
+          const handler = this.createHandler(
+            Object.assign({ route: route[0], params: route[1] }, transition)
+          );
+          return handler.switchMap(
+            loadResult =>
+              loadResult
+                ? Observable.of([route[0].name, route[1], loadResult])
+                : loadRoute(routes, index + 1)
+          );
         };
 
         return loadRoute(transition.routes, 0);
@@ -199,7 +209,10 @@ export class Router {
     const has = Object.prototype.hasOwnProperty;
 
     for (paramName in params) {
-      if (has.call(params, paramName) && `${params[paramName]}` !== `${activeRouteParams[paramName]}`) {
+      if (
+        has.call(params, paramName) &&
+        `${params[paramName]}` !== `${activeRouteParams[paramName]}`
+      ) {
         return false;
       }
     }
@@ -209,7 +222,9 @@ export class Router {
   createUrl(name, params = {}, hash = '') {
     const route = this.routeCollection.getByName(name);
     if (route) {
-      const pathname = route.generatePath(Object.assign({}, this.activeRoute[1], params));
+      const pathname = route.generatePath(
+        Object.assign({}, this.activeRoute[1], params)
+      );
       const search = generateQuery(params, route.searchParams);
       return this.history.createUrl(pathname, search, hash);
     }
