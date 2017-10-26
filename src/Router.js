@@ -187,7 +187,18 @@ export class Router {
         this.activeRoute = [route, params, handler];
       })
       .switchMap(() => this.activeRoute[2].render())
-      .subscribe(this.renderResult$);
+      .subscribe({
+        next: v => {
+          this.renderResult$.next(v);
+        },
+        error: e => {
+          if (this.renderResult$.observers.length) this.renderResult$.error(e);
+          else throw e;
+        },
+        complete: v => {
+          this.renderResult$.complete(v);
+        },
+      });
   }
 
   stop() {

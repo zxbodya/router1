@@ -5,6 +5,7 @@
 Bugfix release:
 
 - fixed possible incorrect subscription order(resulting in subscription to previous render result), when redirecting.
+- rethrow unhandled exceptions if no external subscription for render results (instead of silently ignoring them)
 
 Chore:
 
