@@ -38,7 +38,10 @@ export class Router {
     const transitionFromLocation = toLocation =>
       Observable.create(observer => {
         let redirectCount = 0;
-        const forward = redirectUrl => {
+        let forwardInt;
+        // defer redirect to new state to prevent subscription new render() result before old in edge cases
+        const forward = redirectUrl => setTimeout(forwardInt, 0, redirectUrl);
+        forwardInt = redirectUrl => {
           if (redirectCount > 20) {
             observer.error(Error('To many redirects!'));
           }

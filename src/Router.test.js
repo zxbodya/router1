@@ -574,7 +574,7 @@ describe('Router', () => {
       expect(hasError).toEqual(true);
       router.stop();
       done();
-    }, 30);
+    }, 50);
     router.start();
   });
 });
