@@ -1,19 +1,20 @@
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/of';
+import { of } from 'rxjs/observable/of';
+import { take } from 'rxjs/operators/take';
+import { first } from 'rxjs/operators/first';
 
 import { noop } from 'rxjs/util/noop';
 
 import { Router } from './Router';
 import { RouteCollection } from './RouteCollection';
 
-import { createTestHistory } from './createTestHistory';
+import { createTestHistory } from './history/createTestHistory';
 
 const createTestHandler = (options = {}) => transition =>
-  Observable.of({
+  of({
     hashChange: options.hashChange || noop,
     onBeforeUnload: options.onBeforeUnload || (() => ''),
     render() {
-      return Observable.of({
+      return of({
         route: transition.route.name,
         handlers: transition.route.handlers,
         params: transition.params,
@@ -42,7 +43,7 @@ describe('Router', () => {
 
     router
       .renderResult()
-      .first()
+      .pipe(first())
       .subscribe(
         renderResult => {
           expect(renderResult.route).toEqual(null);
@@ -60,7 +61,7 @@ describe('Router', () => {
           expect(router.activeRoute[0]).toEqual(null);
           expect(router.activeRoute[1]).toEqual({});
         },
-        () => {},
+        undefined,
         () => {
           router.stop();
           done();
@@ -88,7 +89,7 @@ describe('Router', () => {
 
     router
       .renderResult()
-      .first()
+      .pipe(first())
       .subscribe(
         renderResult => {
           expect(renderResult.route).toEqual('main');
@@ -102,7 +103,7 @@ describe('Router', () => {
             source: 'init',
           });
         },
-        () => {},
+        undefined,
         () => {
           expect(router.isActive('main')).toEqual(true);
           router.stop();
@@ -130,7 +131,7 @@ describe('Router', () => {
 
     router
       .renderResult()
-      .first()
+      .pipe(first())
       .subscribe(
         renderResult => {
           expect(renderResult.route).toEqual('main');
@@ -144,7 +145,7 @@ describe('Router', () => {
             source: 'init',
           });
         },
-        () => {},
+        undefined,
         () => {
           expect(router.isActive('main')).toEqual(true);
           expect(router.isActive('main', { page: '123' })).toEqual(true);
@@ -179,7 +180,7 @@ describe('Router', () => {
 
     router
       .renderResult()
-      .first()
+      .pipe(first())
       .subscribe(
         renderResult => {
           expect(renderResult.route).toEqual('main');
@@ -193,7 +194,7 @@ describe('Router', () => {
             source: 'init',
           });
         },
-        () => {},
+        undefined,
         () => {
           expect(router.isActive('main')).toEqual(true);
           expect(router.isActive('main', { page: '123', q: 'text' })).toEqual(
@@ -264,7 +265,7 @@ describe('Router', () => {
 
     router
       .renderResult()
-      .take(3)
+      .pipe(take(3))
       .subscribe(
         renderResult => {
           if (count === 0) {
@@ -346,7 +347,7 @@ describe('Router', () => {
           }
           count += 1;
         },
-        () => {},
+        undefined,
         () => {
           router.stop();
           done();
@@ -425,11 +426,11 @@ describe('Router', () => {
     const history = createTestHistory('/');
 
     const createHandler = transition =>
-      Observable.of({
+      of({
         hashChange: noop,
         onBeforeUnload: () => '',
         render() {
-          return Observable.of(transition.route.handlers[0](transition));
+          return of(transition.route.handlers[0](transition));
         },
       });
 
@@ -483,11 +484,11 @@ describe('Router', () => {
     const history = createTestHistory('/');
 
     const createHandler = transition =>
-      Observable.of({
+      of({
         hashChange: noop,
         onBeforeUnload: () => '',
         render() {
-          return Observable.of(transition.route.handlers[0](transition));
+          return of(transition.route.handlers[0](transition));
         },
       });
 
@@ -530,11 +531,11 @@ describe('Router', () => {
     const history = createTestHistory('/');
 
     const createHandler = transition =>
-      Observable.of({
+      of({
         hashChange: noop,
         onBeforeUnload: () => '',
         render() {
-          return Observable.of(transition.route.handlers[0](transition));
+          return of(transition.route.handlers[0](transition));
         },
       });
 

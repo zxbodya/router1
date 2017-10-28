@@ -1,14 +1,12 @@
-import { Observable } from 'rxjs/Observable';
+import { fromEvent } from 'rxjs/observable/fromEvent';
+import { of } from 'rxjs/observable/of';
 
-import 'rxjs/add/observable/fromEvent';
-import 'rxjs/add/observable/of';
-import 'rxjs/add/operator/first';
-import 'rxjs/add/operator/take';
-import 'rxjs/add/operator/startWith';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/publishReplay';
+import { startWith } from 'rxjs/operators/startWith';
+import { map } from 'rxjs/operators/map';
+import { publishReplay } from 'rxjs/operators/publishReplay';
+import { refCount } from 'rxjs/operators/refCount';
 
-import { locationFromUrl } from './utils/locationFromUrl';
+import { locationFromUrl } from '../utils/locationFromUrl';
 
 export function createBrowserHistory() {
   function currentLocation(source) {
@@ -26,11 +24,12 @@ export function createBrowserHistory() {
   let replace;
 
   if ('onpopstate' in window) {
-    location = Observable.fromEvent(window, 'popstate')
-      .map(() => currentLocation('pop'))
-      .startWith(currentLocation('init'))
-      .publishReplay(1)
-      .refCount();
+    location = fromEvent(window, 'popstate').pipe(
+      map(() => currentLocation('pop')),
+      startWith(currentLocation('init')),
+      publishReplay(1),
+      refCount()
+    );
 
     push = (url, state = null, title = null) => {
       window.history.pushState(state, title, url);
@@ -47,9 +46,7 @@ export function createBrowserHistory() {
       window.location.assign(url);
     };
     // todo: on hashchange
-    location = Observable.of(currentLocation('init'))
-      .publishReplay(1)
-      .refCount();
+    location = of(currentLocation('init')).pipe(publishReplay(1), refCount());
   }
 
   return {

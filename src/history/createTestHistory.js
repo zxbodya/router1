@@ -1,8 +1,9 @@
 import { Subject } from 'rxjs/Subject';
-import 'rxjs/add/operator/startWith';
-import 'rxjs/add/operator/publishReplay';
+import { startWith } from 'rxjs/operators/startWith';
+import { publishReplay } from 'rxjs/operators/publishReplay';
+import { refCount } from 'rxjs/operators/refCount';
 
-import { locationFromUrl } from './utils/locationFromUrl';
+import { locationFromUrl } from '../utils/locationFromUrl';
 
 export function createTestHistory(initialUrl, cb) {
   const location$ = new Subject();
@@ -24,9 +25,10 @@ export function createTestHistory(initialUrl, cb) {
         Object.assign(locationFromUrl(url, state), { source: 'pop' })
       );
     },
-    location: location$
-      .startWith(Object.assign(locationFromUrl(initialUrl), { source: 'init' }))
-      .publishReplay(1)
-      .refCount(),
+    location: location$.pipe(
+      startWith(Object.assign(locationFromUrl(initialUrl), { source: 'init' })),
+      publishReplay(1),
+      refCount()
+    ),
   };
 }

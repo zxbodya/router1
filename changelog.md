@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.8.0 (2017-10-28)
+
+Start using RxJS lettable operators.
+
 ## 0.7.1 (2017-10-26)
 
 Bugfix release:

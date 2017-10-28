@@ -1,3 +1,5 @@
+import { take } from 'rxjs/operators/take';
+import { first } from 'rxjs/operators/first';
 import { createBrowserHistory } from './createBrowserHistory';
 
 describe('createBrowserHistory legacy browsers', () => {
@@ -24,7 +26,7 @@ describe('createBrowserHistory legacy browsers', () => {
 
   it('has correct initial location', done => {
     const h = createBrowserHistory();
-    h.location.first().subscribe(location => {
+    h.location.pipe(first()).subscribe(location => {
       expect(location).toEqual({
         pathname: '/abc',
         search: 'qwe',
@@ -112,7 +114,7 @@ describe('createBrowserHistory modern browsers', () => {
 
   it('has correct initial location', done => {
     const h = createBrowserHistory();
-    h.location.first().subscribe(location => {
+    h.location.pipe(first()).subscribe(location => {
       expect(location).toEqual({
         pathname: '/abc',
         search: 'qwe',
@@ -129,7 +131,7 @@ describe('createBrowserHistory modern browsers', () => {
     const h = createBrowserHistory();
 
     let count = 0;
-    h.location.take(2).subscribe(location => {
+    h.location.pipe(take(2)).subscribe(location => {
       if (count === 0) {
         expect(location).toEqual({
           pathname: '/abc',

@@ -1,3 +1,6 @@
+import { take } from 'rxjs/operators/take';
+import { first } from 'rxjs/operators/first';
+
 import { createHashHistory } from './createHashHistory';
 
 describe('createHashHistory legacy browsers', () => {
@@ -31,7 +34,7 @@ describe('createHashHistory legacy browsers', () => {
 
   it('has correct initial location', done => {
     const h = createHashHistory();
-    h.location.first().subscribe(location => {
+    h.location.pipe(first()).subscribe(location => {
       expect(location).toEqual({
         pathname: '/abc',
         search: 'qwe',
@@ -46,7 +49,7 @@ describe('createHashHistory legacy browsers', () => {
   it('uses assign and replace to update location', done => {
     const h = createHashHistory();
     let count = 0;
-    h.location.take(2).subscribe(location => {
+    h.location.pipe(take(2)).subscribe(location => {
       if (count === 0) {
         expect(location).toEqual({
           pathname: '/abc',
@@ -122,7 +125,7 @@ describe('createHashHistory modern browsers', () => {
 
   it('has correct initial location', done => {
     const h = createHashHistory();
-    h.location.first().subscribe(location => {
+    h.location.pipe(first()).subscribe(location => {
       expect(location).toEqual({
         pathname: '/abc',
         search: 'qwe',
@@ -139,7 +142,7 @@ describe('createHashHistory modern browsers', () => {
     const h = createHashHistory();
 
     let count = 0;
-    h.location.take(2).subscribe(location => {
+    h.location.pipe(take(2)).subscribe(location => {
       if (count === 0) {
         expect(location).toEqual({
           pathname: '/abc',

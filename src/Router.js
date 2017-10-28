@@ -1,14 +1,13 @@
 import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/merge';
-import 'rxjs/add/observable/of';
-import 'rxjs/add/operator/first';
-import 'rxjs/add/operator/take';
-import 'rxjs/add/operator/mergeMap';
-import 'rxjs/add/operator/switchMap';
-import 'rxjs/add/operator/map';
-import 'rxjs/add/operator/do';
-
 import { Subject } from 'rxjs/Subject';
+import { merge as mergeStatic } from 'rxjs/observable/merge';
+import { of } from 'rxjs/observable/of';
+
+import { mergeMap } from 'rxjs/operators/mergeMap';
+import { switchMap } from 'rxjs/operators/switchMap';
+import { map } from 'rxjs/operators/map';
+import { tap } from 'rxjs/operators/tap';
+
 import {
   parse as parseQuery,
   generate as generateQuery,
@@ -82,38 +81,40 @@ export class Router {
         });
       });
 
-    const historyTransition$ = this.history.location.mergeMap(location => {
-      if (
-        this.currentLocation.pathname === location.pathname &&
-        this.currentLocation.search === location.search
-      ) {
-        this.activeRoute[2].hashChange(location);
+    const historyTransition$ = this.history.location.pipe(
+      mergeMap(location => {
+        if (
+          this.currentLocation.pathname === location.pathname &&
+          this.currentLocation.search === location.search
+        ) {
+          this.activeRoute[2].hashChange(location);
+          this.currentLocation = location;
+          return [];
+        }
+
+        const beforeUnload = this.onBeforeUnload();
+        // eslint-disable-next-line no-restricted-globals,no-alert
+        const cancelTransition = beforeUnload && !confirm(beforeUnload);
+        if (cancelTransition) {
+          // todo: find better way to revert location change
+          this.history.push(
+            this.history.createUrl(
+              this.currentLocation.pathname,
+              this.currentLocation.search,
+              this.currentLocation.hash
+            ),
+            this.currentLocation.state
+          );
+          return [];
+        }
+
         this.currentLocation = location;
-        return [];
-      }
+        return [location];
+      })
+    );
 
-      const beforeUnload = this.onBeforeUnload();
-      // eslint-disable-next-line no-restricted-globals,no-alert
-      const cancelTransition = beforeUnload && !confirm(beforeUnload);
-      if (cancelTransition) {
-        // todo: find better way to revert location change
-        this.history.push(
-          this.history.createUrl(
-            this.currentLocation.pathname,
-            this.currentLocation.search,
-            this.currentLocation.hash
-          ),
-          this.currentLocation.state
-        );
-        return [];
-      }
-
-      this.currentLocation = location;
-      return [location];
-    });
-
-    const navigateTransition$ = this.navigate$.mergeMap(
-      ({ url, state, source }) => {
+    const navigateTransition$ = this.navigate$.pipe(
+      mergeMap(({ url, state, source }) => {
         const location = Object.assign(this.history.parseUrl(url), {
           source,
           state,
@@ -141,52 +142,56 @@ export class Router {
         this.history.push(url, state);
 
         return [location];
-      }
+      })
     );
 
-    this.resultsSubscription = Observable.merge(
+    this.resultsSubscription = mergeStatic(
       historyTransition$,
       navigateTransition$
     )
-      .mergeMap(transitionFromLocation)
-      // transition handling
-      .map(transition =>
-        Object.assign({}, transition, {
-          routes: this.routeCollection.match(
-            transition.location.pathname,
-            parseQuery(transition.location.search)
-          ),
-        })
-      )
-      .switchMap(transition => {
-        const loadRoute = (routes, index) => {
-          if (index >= routes.length) {
-            return this.createHandler(
-              Object.assign(
-                { route: { name: null, handlers: [] }, params: {} },
-                transition
+      .pipe(
+        mergeMap(transitionFromLocation),
+        // transition handling
+        map(transition =>
+          Object.assign({}, transition, {
+            routes: this.routeCollection.match(
+              transition.location.pathname,
+              parseQuery(transition.location.search)
+            ),
+          })
+        ),
+        switchMap(transition => {
+          const loadRoute = (routes, index) => {
+            if (index >= routes.length) {
+              return this.createHandler(
+                Object.assign(
+                  { route: { name: null, handlers: [] }, params: {} },
+                  transition
+                )
+              ).pipe(map(v => [null, {}, v]));
+            }
+
+            const route = routes[index];
+            const handler = this.createHandler(
+              Object.assign({ route: route[0], params: route[1] }, transition)
+            );
+            return handler.pipe(
+              switchMap(
+                loadResult =>
+                  loadResult
+                    ? of([route[0].name, route[1], loadResult])
+                    : loadRoute(routes, index + 1)
               )
-            ).map(v => [null, {}, v]);
-          }
+            );
+          };
 
-          const route = routes[index];
-          const handler = this.createHandler(
-            Object.assign({ route: route[0], params: route[1] }, transition)
-          );
-          return handler.switchMap(
-            loadResult =>
-              loadResult
-                ? Observable.of([route[0].name, route[1], loadResult])
-                : loadRoute(routes, index + 1)
-          );
-        };
-
-        return loadRoute(transition.routes, 0);
-      })
-      .do(([route, params, handler]) => {
-        this.activeRoute = [route, params, handler];
-      })
-      .switchMap(() => this.activeRoute[2].render())
+          return loadRoute(transition.routes, 0);
+        }),
+        tap(([route, params, handler]) => {
+          this.activeRoute = [route, params, handler];
+        }),
+        switchMap(() => this.activeRoute[2].render())
+      )
       .subscribe({
         next: v => {
           this.renderResult$.next(v);

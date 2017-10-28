@@ -1,6 +1,6 @@
 {
   "name": "router1",
-  "version": "0.7.1",
+  "version": "0.8.0",
   "description": "Reactive routing library for universal(isomorphic) web applications",
   "main": "dist/router1.cjs.js",
   "module": "dist/router1.esm.js",
@@ -50,11 +50,11 @@
     "rimraf": "^2.6.1",
     "rollup": "^0.50.0",
     "rollup-plugin-babel": "^3.0.2",
-    "rxjs": "^5.4.3"
+    "rxjs": "^5.5.2"
   },
   "peerDependencies": {
     "babel-runtime": "^6.23.0",
-    "rxjs": "^5.0.3"
+    "rxjs": "^5.5.2"
   },
   "prettier": {
     "singleQuote": true,

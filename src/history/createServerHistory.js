@@ -1,8 +1,9 @@
-import { Observable } from 'rxjs/Observable';
-import 'rxjs/add/observable/of';
-import 'rxjs/add/operator/publishReplay';
+import { of } from 'rxjs/observable/of';
 
-import { locationFromUrl } from './utils/locationFromUrl';
+import { publishReplay } from 'rxjs/operators/publishReplay';
+import { refCount } from 'rxjs/operators/refCount';
+
+import { locationFromUrl } from '../utils/locationFromUrl';
 
 export function createServerHistory(initialUrl) {
   return {
@@ -18,10 +19,8 @@ export function createServerHistory(initialUrl) {
     replace() {
       throw new Error('navigation not supported');
     },
-    location: Observable.of(
+    location: of(
       Object.assign(locationFromUrl(initialUrl), { source: 'init' })
-    )
-      .publishReplay(1)
-      .refCount(),
+    ).pipe(publishReplay(1), refCount()),
   };
 }

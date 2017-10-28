@@ -1,5 +1,4 @@
-import 'rxjs/Observable';
-import 'rxjs/add/operator/take';
+import { take } from 'rxjs/operators/take';
 
 import { createTestHistory } from './createTestHistory';
 
@@ -64,7 +63,7 @@ describe('createTestHistory', () => {
   it('has working navigate method', done => {
     const h = createTestHistory('/abc?qwe#123');
     let count = 0;
-    h.location.take(2).subscribe(location => {
+    h.location.pipe(take(2)).subscribe(location => {
       if (count === 0) {
         expect(location).toEqual({
           pathname: '/abc',
