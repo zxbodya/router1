@@ -7,14 +7,24 @@ import { mergeMap } from 'rxjs/operators/mergeMap';
 import { switchMap } from 'rxjs/operators/switchMap';
 import { map } from 'rxjs/operators/map';
 import { tap } from 'rxjs/operators/tap';
+import { noop } from 'rxjs/util/noop';
 
 import {
   parse as parseQuery,
   generate as generateQuery,
 } from './utils/queryString';
 
+import { StateHandler } from './StateHandler';
+
 export class Router {
-  constructor({ history, routeCollection, createHandler }) {
+  constructor({
+    history,
+    routeCollection,
+    loadState,
+    onHashChange,
+    renderState,
+    afterRender,
+  }) {
     this.history = history;
     this.routeCollection = routeCollection;
 
@@ -24,9 +34,19 @@ export class Router {
     this.resultsSubscription = null;
     this.renderResult$ = new Subject();
 
-    this.createHandler = createHandler;
+    this.loadState = loadState;
+    this.onHashChange = onHashChange || noop;
+    this.renderState = renderState;
+    this.afterRender = afterRender || noop;
 
     this.navigate$ = new Subject();
+  }
+
+  createHandler(transition) {
+    const state$ = this.loadState(transition);
+    return state$.pipe(
+      map(state => state && new StateHandler(state, transition))
+    );
   }
 
   onBeforeUnload() {
@@ -59,7 +79,7 @@ export class Router {
             if (this.currentLocation.hash === location.hash) {
               observer.error(Error('Redirect to the same location!'));
             }
-            this.activeRoute[2].hashChange(location);
+            this.activeRoute[2].onHashChange(location);
             this.currentLocation = location;
           } else {
             this.currentLocation = location;
@@ -87,7 +107,7 @@ export class Router {
           this.currentLocation.pathname === location.pathname &&
           this.currentLocation.search === location.search
         ) {
-          this.activeRoute[2].hashChange(location);
+          this.activeRoute[2].onHashChange(location);
           this.currentLocation = location;
           return [];
         }
@@ -124,7 +144,7 @@ export class Router {
           this.currentLocation.pathname === location.pathname &&
           this.currentLocation.search === location.search
         ) {
-          this.activeRoute[2].hashChange(location);
+          this.activeRoute[2].onHashChange(location);
           this.currentLocation = location;
           this.history.push(url, state);
           return [];

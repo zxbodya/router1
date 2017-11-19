@@ -9,28 +9,35 @@ import { RouteCollection } from './RouteCollection';
 
 import { createTestHistory } from './history/createTestHistory';
 
-const createTestHandler = (options = {}) => transition =>
-  of({
-    hashChange: options.hashChange || noop,
-    onBeforeUnload: options.onBeforeUnload || (() => ''),
-    render() {
-      return of({
-        route: transition.route.name,
-        handlers: transition.route.handlers,
-        params: transition.params,
-        location: transition.location,
-      });
-    },
-  });
+const createTestConfig = (options = {}) => ({
+  loadState() {
+    return of({
+      onHashChange: options.onHashChange || noop,
+      onBeforeUnload: options.onBeforeUnload || (() => ''),
+    });
+  },
+  renderState(state, transition) {
+    return of({
+      route: transition.route.name,
+      handlers: transition.route.handlers,
+      params: transition.params,
+      location: transition.location,
+    });
+  },
+});
 
 describe('Router', () => {
   it('works with empty route collection', done => {
     const history = createTestHistory('/');
-    const router = new Router({
-      routeCollection: new RouteCollection([]),
-      history,
-      createHandler: createTestHandler(),
-    });
+    const router = new Router(
+      Object.assign(
+        {
+          routeCollection: new RouteCollection([]),
+          history,
+        },
+        createTestConfig()
+      )
+    );
 
     const t = process.env.NODE_ENV;
     process.env.NODE_ENV = 'development';
@@ -72,17 +79,21 @@ describe('Router', () => {
 
   it('matches route', done => {
     const history = createTestHistory('/');
-    const router = new Router({
-      routeCollection: new RouteCollection([
+    const router = new Router(
+      Object.assign(
         {
-          name: 'main',
-          handler: 'main',
-          url: '/',
+          routeCollection: new RouteCollection([
+            {
+              name: 'main',
+              handler: 'main',
+              url: '/',
+            },
+          ]),
+          history,
         },
-      ]),
-      history,
-      createHandler: createTestHandler(),
-    });
+        createTestConfig()
+      )
+    );
 
     expect(router.createUrl('main', {}, '')).toEqual('/');
     expect(router.createUrl('main2', {}, '')).toEqual('#route-main2-not-found');
@@ -115,17 +126,21 @@ describe('Router', () => {
 
   it('matches route with params', done => {
     const history = createTestHistory('/123');
-    const router = new Router({
-      routeCollection: new RouteCollection([
+    const router = new Router(
+      Object.assign(
         {
-          name: 'main',
-          handler: 'main',
-          url: '/<page:\\d+>',
+          routeCollection: new RouteCollection([
+            {
+              name: 'main',
+              handler: 'main',
+              url: '/<page:\\d+>',
+            },
+          ]),
+          history,
         },
-      ]),
-      history,
-      createHandler: createTestHandler(),
-    });
+        createTestConfig()
+      )
+    );
 
     expect(router.createUrl('main', { page: 1000 }, '')).toEqual('/1000');
 
@@ -159,17 +174,21 @@ describe('Router', () => {
 
   it('matches route with params and search query and hash', done => {
     const history = createTestHistory('/123?q=text#anchor');
-    const router = new Router({
-      routeCollection: new RouteCollection([
+    const router = new Router(
+      Object.assign(
         {
-          name: 'main',
-          handler: 'main',
-          url: '/<page:\\d+>?q',
+          routeCollection: new RouteCollection([
+            {
+              name: 'main',
+              handler: 'main',
+              url: '/<page:\\d+>?q',
+            },
+          ]),
+          history,
         },
-      ]),
-      history,
-      createHandler: createTestHandler(),
-    });
+        createTestConfig()
+      )
+    );
 
     expect(router.createUrl('main', { page: 1000, q: 1234 }, '')).toEqual(
       '/1000?q=1234'
@@ -220,46 +239,50 @@ describe('Router', () => {
     const history = createTestHistory('/123?q=text#anchor');
 
     let hashChangeCount = 0;
-    const router = new Router({
-      routeCollection: new RouteCollection([
+    const router = new Router(
+      Object.assign(
         {
-          name: 'main',
-          handler: 'main',
-          url: '/<page:\\d+>?q',
+          routeCollection: new RouteCollection([
+            {
+              name: 'main',
+              handler: 'main',
+              url: '/<page:\\d+>?q',
+            },
+            {
+              name: 'main1',
+              handler: 'main1',
+              url: '/m2/<page:\\d+>?q',
+            },
+          ]),
+          history,
         },
-        {
-          name: 'main1',
-          handler: 'main1',
-          url: '/m2/<page:\\d+>?q',
-        },
-      ]),
-      history,
-      createHandler: createTestHandler({
-        hashChange(location) {
-          if (hashChangeCount === 0) {
-            // router.navigate
-            expect(location).toEqual({
-              pathname: '/123',
-              search: 'q=text',
-              hash: 'anc',
-              state: {},
-              source: 'push',
-            });
-          }
-          if (hashChangeCount === 1) {
-            // onpopstate
-            expect(location).toEqual({
-              pathname: '/123',
-              search: 'q=text',
-              hash: 'anc2',
-              state: {},
-              source: 'pop',
-            });
-          }
-          hashChangeCount += 1;
-        },
-      }),
-    });
+        createTestConfig({
+          onHashChange(location) {
+            if (hashChangeCount === 0) {
+              // router.navigate
+              expect(location).toEqual({
+                pathname: '/123',
+                search: 'q=text',
+                hash: 'anc',
+                state: {},
+                source: 'push',
+              });
+            }
+            if (hashChangeCount === 1) {
+              // onpopstate
+              expect(location).toEqual({
+                pathname: '/123',
+                search: 'q=text',
+                hash: 'anc2',
+                state: {},
+                source: 'pop',
+              });
+            }
+            hashChangeCount += 1;
+          },
+        })
+      )
+    );
 
     let count = 0;
 
@@ -373,22 +396,26 @@ describe('Router', () => {
     const testHandlerOptions = {
       onBeforeUnload: () => answer,
     };
-    const router = new Router({
-      routeCollection: new RouteCollection([
+    const router = new Router(
+      Object.assign(
         {
-          name: 'main',
-          handler: 'main',
-          url: '/',
+          routeCollection: new RouteCollection([
+            {
+              name: 'main',
+              handler: 'main',
+              url: '/',
+            },
+            {
+              name: 'main2',
+              handler: 'main2',
+              url: '/2',
+            },
+          ]),
+          history,
         },
-        {
-          name: 'main2',
-          handler: 'main2',
-          url: '/2',
-        },
-      ]),
-      history,
-      createHandler: createTestHandler(testHandlerOptions),
-    });
+        createTestConfig(testHandlerOptions)
+      )
+    );
 
     router.start();
 
@@ -425,15 +452,6 @@ describe('Router', () => {
   it('handles transition.forward calls', done => {
     const history = createTestHistory('/');
 
-    const createHandler = transition =>
-      of({
-        hashChange: noop,
-        onBeforeUnload: () => '',
-        render() {
-          return of(transition.route.handlers[0](transition));
-        },
-      });
-
     const router = new Router({
       routeCollection: new RouteCollection([
         {
@@ -458,7 +476,15 @@ describe('Router', () => {
         },
       ]),
       history,
-      createHandler,
+      loadState() {
+        return of({
+          onHashChange: noop,
+          onBeforeUnload: () => '',
+        });
+      },
+      renderState(state, transition) {
+        return of(transition.route.handlers[0](transition));
+      },
     });
     setTimeout(() => {
       expect(router.isActive('main')).toEqual(true);
@@ -483,15 +509,6 @@ describe('Router', () => {
   it('crashes when transition.forward navigates to same page', done => {
     const history = createTestHistory('/');
 
-    const createHandler = transition =>
-      of({
-        hashChange: noop,
-        onBeforeUnload: () => '',
-        render() {
-          return of(transition.route.handlers[0](transition));
-        },
-      });
-
     const router = new Router({
       routeCollection: new RouteCollection([
         {
@@ -506,7 +523,15 @@ describe('Router', () => {
         },
       ]),
       history,
-      createHandler,
+      loadState() {
+        return of({
+          onHashChange: noop,
+          onBeforeUnload: () => '',
+        });
+      },
+      renderState(state, transition) {
+        return of(transition.route.handlers[0](transition));
+      },
     });
 
     let hasError = false;
@@ -530,15 +555,6 @@ describe('Router', () => {
   it('crashes when transition.forward calls cause redirect loop', done => {
     const history = createTestHistory('/');
 
-    const createHandler = transition =>
-      of({
-        hashChange: noop,
-        onBeforeUnload: () => '',
-        render() {
-          return of(transition.route.handlers[0](transition));
-        },
-      });
-
     const router = new Router({
       routeCollection: new RouteCollection([
         {
@@ -558,7 +574,15 @@ describe('Router', () => {
         },
       ]),
       history,
-      createHandler,
+      loadState() {
+        return of({
+          onHashChange: noop,
+          onBeforeUnload: () => '',
+        });
+      },
+      renderState(state, transition) {
+        return of(transition.route.handlers[0](transition));
+      },
     });
 
     let hasError = false;

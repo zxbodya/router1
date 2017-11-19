@@ -1,6 +1,6 @@
 {
   "name": "router1",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "description": "Reactive routing library for universal(isomorphic) web applications",
   "main": "dist/router1.cjs.js",
   "module": "dist/router1.esm.js",
@@ -8,7 +8,7 @@
     "lint": "eslint ./src/",
     "cover": "jest --coverage",
     "test": "jest",
-    "build": "rimraf dist && rollup -c",
+    "build": "rollup -c",
     "watch": "rollup -c -w",
     "prepublish": "npm run build"
   },
@@ -47,8 +47,7 @@
     "eslint-plugin-prettier": "^2.3.1",
     "jest": "^21.0.2",
     "prettier": "^1.7.4",
-    "rimraf": "^2.6.1",
-    "rollup": "^0.50.0",
+    "rollup": "^0.51.7",
     "rollup-plugin-babel": "^3.0.2",
     "rxjs": "^5.5.2"
   },

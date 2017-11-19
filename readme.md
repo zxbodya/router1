@@ -153,10 +153,13 @@ Handlers in route declaration can be anything you like, that would be enough for
 
 ### Router
 
-Router has few dependencies `history`, `routeCollection` and `createHandler`.
-
-`createHandler` is a function responsible creating a handler for a new state before transition starts.
-It is the place where you define how state and transitions are handled. 
+Router has following options:
+ - `history`
+ - `routeCollection`
+ - `loadState(transition):Observable` loads matched state associated with transition object, if needed data not found and next matching route should be used - should emit false
+ - `renderState(state, transition):Observable` - render loaded state, and returns Observable with rendering result
+ - `afterRender(stateHandler, {state, transition, renderResult})` called after new state was rendered (to be used effects like scroll to anchor)
+ - `onHashChange` hash change callback to be used by default (since in typical case it is the same for all pages)
 
 As argument, it takes transition description object which has following properties:
  
@@ -170,12 +173,8 @@ As argument, it takes transition description object which has following properti
 
 In case when no matching route was found `route` would be set to `{name: null, handlers:[]}`)
 
-`createHandler` function should return an Observable which emits value when state is loaded and can be rendered:
-
-- `false` if handler can not render this state - for example required data not found and next matching route should be used
-- state handler object, when data was loaded and can be rendered, it has following methods:
-   - `render()` - render state, and returns Observable with rendering results (which would be passed to `router.renderResult` mentioned below)
-   - `hashChange({pathname, search, hash, state})` - method would be called when location hash was changed after rendring (not triggered on first render)
+- `stateHandler` passed to `afterRender` object, represents currently active state handler, has two methods that can be reassigned:
+   - `onHashChange({pathname, search, hash, state})` - method would be called when location hash was changed after rendring (not triggered on first render)
    - `onBeforeUnload()` - callback, that would be called before transition from state or user trying to close the page.
      - should return text message to be displayed in confirm dialogue,
      - or empty string when no confirmation is required 
@@ -186,10 +185,10 @@ Router can be created as following:
 const router = new Router({
   history,
   routeCollection,
-  createHandler: (transition) => {
-    // combine matched route handlers
-    // returns observable with state handler ready to to be displayed
-  },          
+  loadState,
+  renderState,
+  afterRender,
+  onHashChange,          
 });
 ```
 

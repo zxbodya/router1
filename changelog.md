@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.9.0 (2017-11-19)
+
+*Breaking changes:*
+
+move common logic that was expected to be `createHandler` to Router, replace it with more granular config 
+
+ - `loadState(transition):Observable` loads matched state associated with transition object, if needed data not found and next matching route should be used - should emit false
+ - `renderState(state, transition):Observable` - render loaded state, and returns Observable with rendering result
+ - `afterRender(stateHandler, {state, transition, renderResult})` called after new state was rendered (to be used effects like scroll to anchor)
+ - `onHashChange` hash change callback to be used by default (since in typical case it is the same for all pages)
+
 ## 0.8.0 (2017-10-28)
 
 Start using RxJS lettable operators.
