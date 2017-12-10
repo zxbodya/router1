@@ -9,7 +9,7 @@ import { RouteCollection } from './RouteCollection';
 
 import { createTestHistory } from './history/createTestHistory';
 
-const createTestConfig = (options = {}) => ({
+const createTestConfig = (config, options = {}) => ({
   loadState() {
     return of({
       onHashChange: options.onHashChange || noop,
@@ -24,19 +24,17 @@ const createTestConfig = (options = {}) => ({
       location: transition.location,
     });
   },
+  ...config,
 });
 
 describe('Router', () => {
   it('works with empty route collection', done => {
     const history = createTestHistory('/');
     const router = new Router(
-      Object.assign(
-        {
-          routeCollection: new RouteCollection([]),
-          history,
-        },
-        createTestConfig()
-      )
+      createTestConfig({
+        routeCollection: new RouteCollection([]),
+        history,
+      })
     );
 
     const t = process.env.NODE_ENV;
@@ -80,19 +78,16 @@ describe('Router', () => {
   it('matches route', done => {
     const history = createTestHistory('/');
     const router = new Router(
-      Object.assign(
-        {
-          routeCollection: new RouteCollection([
-            {
-              name: 'main',
-              handler: 'main',
-              url: '/',
-            },
-          ]),
-          history,
-        },
-        createTestConfig()
-      )
+      createTestConfig({
+        routeCollection: new RouteCollection([
+          {
+            name: 'main',
+            handler: 'main',
+            url: '/',
+          },
+        ]),
+        history,
+      })
     );
 
     expect(router.createUrl('main', {}, '')).toEqual('/');
@@ -127,19 +122,16 @@ describe('Router', () => {
   it('matches route with params', done => {
     const history = createTestHistory('/123');
     const router = new Router(
-      Object.assign(
-        {
-          routeCollection: new RouteCollection([
-            {
-              name: 'main',
-              handler: 'main',
-              url: '/<page:\\d+>',
-            },
-          ]),
-          history,
-        },
-        createTestConfig()
-      )
+      createTestConfig({
+        routeCollection: new RouteCollection([
+          {
+            name: 'main',
+            handler: 'main',
+            url: '/<page:\\d+>',
+          },
+        ]),
+        history,
+      })
     );
 
     expect(router.createUrl('main', { page: 1000 }, '')).toEqual('/1000');
@@ -175,19 +167,16 @@ describe('Router', () => {
   it('matches route with params and search query and hash', done => {
     const history = createTestHistory('/123?q=text#anchor');
     const router = new Router(
-      Object.assign(
-        {
-          routeCollection: new RouteCollection([
-            {
-              name: 'main',
-              handler: 'main',
-              url: '/<page:\\d+>?q',
-            },
-          ]),
-          history,
-        },
-        createTestConfig()
-      )
+      createTestConfig({
+        routeCollection: new RouteCollection([
+          {
+            name: 'main',
+            handler: 'main',
+            url: '/<page:\\d+>?q',
+          },
+        ]),
+        history,
+      })
     );
 
     expect(router.createUrl('main', { page: 1000, q: 1234 }, '')).toEqual(
@@ -240,7 +229,7 @@ describe('Router', () => {
 
     let hashChangeCount = 0;
     const router = new Router(
-      Object.assign(
+      createTestConfig(
         {
           routeCollection: new RouteCollection([
             {
@@ -256,7 +245,7 @@ describe('Router', () => {
           ]),
           history,
         },
-        createTestConfig({
+        {
           onHashChange(location) {
             if (hashChangeCount === 0) {
               // router.navigate
@@ -280,7 +269,7 @@ describe('Router', () => {
             }
             hashChangeCount += 1;
           },
-        })
+        }
       )
     );
 
@@ -397,7 +386,7 @@ describe('Router', () => {
       onBeforeUnload: () => answer,
     };
     const router = new Router(
-      Object.assign(
+      createTestConfig(
         {
           routeCollection: new RouteCollection([
             {
@@ -413,7 +402,7 @@ describe('Router', () => {
           ]),
           history,
         },
-        createTestConfig(testHandlerOptions)
+        testHandlerOptions
       )
     );
 

@@ -30,9 +30,7 @@ export function compile(expression) {
         if (process.env.NODE_ENV !== 'production') {
           if (/\([^?]/.test(part)) {
             throw new Error(
-              `syntax error in expression "${expression}", param regexp ${
-                part
-              } contain capture groups`
+              `syntax error in expression "${expression}", param regexp ${part} contain capture groups`
             );
           }
         }

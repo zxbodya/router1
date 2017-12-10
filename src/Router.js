@@ -93,7 +93,7 @@ export class Router {
             });
           }
         };
-        return observer.next({
+        observer.next({
           location: toLocation,
           router: this,
           redirectCount,
