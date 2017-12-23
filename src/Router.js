@@ -212,18 +212,15 @@ export class Router {
         }),
         switchMap(() => this.activeRoute[2].render())
       )
-      .subscribe({
-        next: v => {
+      .subscribe(
+        v => {
           this.renderResult$.next(v);
         },
-        error: e => {
+        e => {
           if (this.renderResult$.observers.length) this.renderResult$.error(e);
           else throw e;
-        },
-        complete: v => {
-          this.renderResult$.complete(v);
-        },
-      });
+        }
+      );
   }
 
   stop() {
@@ -267,6 +264,7 @@ export class Router {
       const search = generateQuery(params, route.searchParams);
       return this.history.createUrl(pathname, search, hash);
     }
+    /* istanbul ignore else */
     if (process.env.NODE_ENV !== 'production') {
       // eslint-disable-next-line no-console
       console.error(`Route "${name}" not found`);

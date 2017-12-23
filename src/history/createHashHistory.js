@@ -59,11 +59,14 @@ export function createHashHistory() {
 
   return {
     createUrl(path, search, hash) {
-      return `#${path}${search ? `?${search}` : ''}${hash ? `#${hash}` : ''}`;
+      const url = `#${path}${search ? `?${search}` : ''}${
+        hash ? `#${hash}` : ''
+      }`;
+      return url === '#/' ? '' : url;
     },
     parseUrl(url) {
       const parts = splitUrl(url);
-      return locationFromUrl(parts[2]);
+      return locationFromUrl(parts[2] || '/');
     },
     push,
     replace,

@@ -19,7 +19,7 @@ describe('createBrowserHistory legacy browsers', () => {
         },
       },
       history: {
-        state: {},
+        state: null,
       },
     };
   });
@@ -168,9 +168,11 @@ describe('createBrowserHistory modern browsers', () => {
     });
   });
 
-  it('has working parseUrl method', () => {
+  it('has working createUrl method', () => {
     const h = createBrowserHistory();
-    const url = h.createUrl('/abc', 'qwe', '123');
-    expect(url).toEqual('/abc?qwe#123');
+    expect(h.createUrl('/abc', 'qwe', '123')).toEqual('/abc?qwe#123');
+    expect(h.createUrl('/abc', '', '123')).toEqual('/abc#123');
+    expect(h.createUrl('/abc', '123', '')).toEqual('/abc?123');
+    expect(h.createUrl('/abc', '', '')).toEqual('/abc');
   });
 });

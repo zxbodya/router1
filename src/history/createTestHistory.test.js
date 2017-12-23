@@ -16,6 +16,19 @@ describe('createTestHistory', () => {
     h.push('/bca?ewq#321', { a: true });
   });
 
+  it('callback on push', done => {
+    const h = createTestHistory('/abc?qwe#123', (action, location) => {
+      expect(action).toEqual('push');
+      expect(location).toEqual({
+        url: '/bca?ewq#321',
+        title: null,
+        state: null,
+      });
+      done();
+    });
+    h.push('/bca?ewq#321');
+  });
+
   it('callback on replace', done => {
     const h = createTestHistory('/abc?qwe#123', (action, location) => {
       expect(action).toEqual('replace');

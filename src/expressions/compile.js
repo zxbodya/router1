@@ -13,6 +13,7 @@ export function compile(expression) {
       matcher.push(part.replace(/[[\]{}()*+?.\\^$|]/g, '\\$&'));
       generateParts.push(part);
 
+      /* istanbul ignore else */
       if (process.env.NODE_ENV !== 'production') {
         // url part contains unmathced params
         if (/[<>]/.test(part)) {
@@ -27,6 +28,7 @@ export function compile(expression) {
     if (i % 3 === 2) {
       // todo: verify expression if it has captures - throw an error
       if (part) {
+        /* istanbul ignore else */
         if (process.env.NODE_ENV !== 'production') {
           if (/\([^?]/.test(part)) {
             throw new Error(

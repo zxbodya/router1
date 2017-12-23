@@ -42,6 +42,8 @@ describe('Router', () => {
     expect(router.createUrl('main', {}, '')).toEqual('#route-main-not-found');
     process.env.NODE_ENV = 'production';
     expect(router.createUrl('main', {}, '')).toEqual('#');
+    expect(router.createUrl('main', {})).toEqual('#');
+    expect(router.createUrl('main')).toEqual('#');
     process.env.NODE_ENV = t;
 
     expect(router.isActive('main')).toEqual(false);
@@ -357,6 +359,20 @@ describe('Router', () => {
               false
             );
           }
+          if (count === 3) {
+            expect(renderResult.route).toEqual('main');
+            expect(renderResult.params).toEqual({ page: '123', q: 'text' });
+            expect(renderResult.handlers).toEqual(['main']);
+            expect(renderResult.location).toEqual({
+              pathname: '/123',
+              search: '',
+              hash: '',
+              state: {},
+              source: 'push',
+            });
+
+            expect(router.isActive('main')).toEqual(true);
+          }
           count += 1;
         },
         undefined,
@@ -370,15 +386,23 @@ describe('Router', () => {
       history.navigate('/123?q=text#anc2', {});
       router.navigate('main1', { page: '123' });
       router.navigate('main', { page: '123', q: 'text' }, 'anc', { a: true });
+      router.navigateToUrl('/123');
     }, 10);
 
     router.start();
   });
 
   it('uses onBeforeUnload', done => {
-    const history = createTestHistory('/');
+    let historyChange;
+    const history = createTestHistory('/', (...v) => {
+      historyChange = v;
+    });
 
-    global.confirm = txt => txt === 'yes';
+    let count = 0;
+    global.confirm = txt => {
+      count += 1;
+      return txt === 'yes';
+    };
 
     let answer = 'no';
 
@@ -401,6 +425,14 @@ describe('Router', () => {
             },
           ]),
           history,
+          afterRender(stateHandler, { state }) {
+            // after state was rendered
+            if (state.onBeforeUnload) {
+              // if state provides before unload hook - replace default with it
+              // eslint-disable-next-line no-param-reassign
+              stateHandler.onBeforeUnload = state.onBeforeUnload;
+            }
+          },
         },
         testHandlerOptions
       )
@@ -409,33 +441,46 @@ describe('Router', () => {
     router.start();
 
     setTimeout(() => {
+      expect(count).toEqual(0);
       answer = 'no';
-      router.navigate('main2', {});
-    }, 5);
-
-    setTimeout(() => {
-      expect(router.isActive('main')).toEqual(true);
-      answer = 'no';
-      history.navigate('/2');
-    }, 10);
-
-    setTimeout(() => {
-      expect(router.isActive('main')).toEqual(true);
-      answer = 'yes';
-      history.navigate('/2');
+      router.navigate('main2');
     }, 20);
 
     setTimeout(() => {
-      expect(router.isActive('main2')).toEqual(true);
-      answer = 'yes';
-      router.navigate('main', {});
-    }, 30);
+      expect(router.isActive('main')).toEqual(true);
+      expect(count).toEqual(1);
+      answer = 'no';
+      history.navigate('/2');
+    }, 40);
 
     setTimeout(() => {
       expect(router.isActive('main')).toEqual(true);
+      expect(count).toEqual(2);
+      expect(historyChange).toEqual([
+        'push',
+        { url: '/', state: {}, title: null },
+      ]);
+      answer = 'yes';
+      history.navigate('/2');
+    }, 60);
+
+    setTimeout(() => {
+      expect(router.isActive('main2')).toEqual(true);
+      expect(count).toEqual(3);
+      answer = 'yes';
+      router.navigate('main', {});
+    }, 80);
+
+    setTimeout(() => {
+      expect(router.isActive('main')).toEqual(true);
+      expect(count).toEqual(4);
+      expect(historyChange).toEqual([
+        'push',
+        { url: '/', state: {}, title: null },
+      ]);
       router.stop();
       done();
-    }, 40);
+    }, 100);
   });
 
   it('handles transition.forward calls', done => {
@@ -590,5 +635,113 @@ describe('Router', () => {
       done();
     }, 50);
     router.start();
+  });
+
+  it('pass render exception to observer', done => {
+    const history = createTestHistory('/');
+
+    const router = new Router({
+      routeCollection: new RouteCollection([
+        {
+          name: 'main',
+          handler: () => 'main',
+          url: '/',
+        },
+      ]),
+      history,
+      loadState() {
+        return of({
+          onHashChange: noop,
+          onBeforeUnload: () => '',
+        });
+      },
+      renderState() {
+        throw new Error('state rendering failed');
+      },
+    });
+
+    let hasError = false;
+    router.renderResult().subscribe(null, () => {
+      hasError = true;
+    });
+
+    setTimeout(() => {
+      expect(hasError).toEqual(true);
+      router.stop();
+      done();
+    }, 50);
+    router.start();
+  });
+
+  it('throws exception if not observer for it', () => {
+    const history = createTestHistory('/');
+
+    const router = new Router({
+      routeCollection: new RouteCollection([
+        {
+          name: 'main',
+          handler: () => 'main',
+          url: '/',
+        },
+      ]),
+      history,
+      loadState() {
+        return of({
+          onHashChange: noop,
+          onBeforeUnload: () => '',
+        });
+      },
+      renderState() {
+        throw new Error('state rendering failed');
+      },
+    });
+
+    expect(() => {
+      router.start();
+    }).toThrow();
+
+    router.stop();
+  });
+
+  it('loads next matched route if first is not loaded', () => {
+    const history = createTestHistory('/');
+
+    const router = new Router({
+      routeCollection: new RouteCollection([
+        {
+          name: 'main1',
+          handler: () => false,
+          url: '/',
+        },
+        {
+          name: 'main2',
+          handler: () => false,
+          url: '/',
+        },
+        {
+          name: 'main3',
+          handler: () => 'main',
+          url: '/',
+        },
+      ]),
+      history,
+      loadState(transition) {
+        return of(
+          transition.route.handlers[0]()
+            ? {
+                onHashChange: noop,
+                onBeforeUnload: () => '',
+              }
+            : false
+        );
+      },
+      renderState() {
+        return of({});
+      },
+    });
+
+    router.start();
+    expect(router.isActive('main3')).toEqual(true);
+    router.stop();
   });
 });

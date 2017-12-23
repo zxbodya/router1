@@ -1,8 +1,11 @@
 export function createGenerator(info) {
   const generateParts = info[1];
   const paramNames = info[2];
+  const partsCount = generateParts.length;
+  const paramsCount = paramNames.length;
 
   return (params = {}) => {
+    /* istanbul ignore else */
     if (process.env.NODE_ENV !== 'production') {
       const missingParams = paramNames.filter(
         paramName => !(paramName in params)
@@ -14,15 +17,11 @@ export function createGenerator(info) {
     }
 
     const res = [];
-    for (
-      let i = 0, l = generateParts.length, pn = 0, pl = paramNames.length;
-      i < l;
-      i += 1
-    ) {
+    for (let i = 0, pn = 0; i < partsCount; i += 1) {
       const g = generateParts[i];
       if (g !== null) {
         res.push(g);
-      } else if (pn < pl) {
+      } else {
         res.push(params[paramNames[pn]]);
         pn += 1;
       }

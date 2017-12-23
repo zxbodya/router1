@@ -28,6 +28,14 @@ describe('Router, generator from expression', () => {
     expect(generator({ a: 321, b: 444 })).toBe('aaaaa321-444');
   });
 
+  it('it generates strings with few params', () => {
+    const expression = compile('aaaaa<a:\\d+><b:\\w+>');
+    const generator = createGenerator(expression);
+
+    expect(generator({ a: 321, b: 'a' })).toBe('aaaaa321a');
+    expect(generator({ a: 321, b: 'b' })).toBe('aaaaa321b');
+  });
+
   it('throws when parameters are missing', () => {
     const expression = compile('aaaaa<a>-<b>');
     const generator = createGenerator(expression);

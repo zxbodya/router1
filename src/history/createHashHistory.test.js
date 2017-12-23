@@ -27,7 +27,7 @@ describe('createHashHistory legacy browsers', () => {
         },
       },
       history: {
-        state: {},
+        state: null,
       },
     };
   });
@@ -177,11 +177,37 @@ describe('createHashHistory modern browsers', () => {
       hash: '123',
       state: {},
     });
+
+    const location1 = h.parseUrl('');
+    expect(location1).toEqual({
+      pathname: '/',
+      search: '',
+      hash: '',
+      state: {},
+    });
   });
 
   it('has working parseUrl method', () => {
     const h = createHashHistory();
-    const url = h.createUrl('/abc', 'qwe', '123');
-    expect(url).toEqual('#/abc?qwe#123');
+    expect(h.createUrl('/abc', 'qwe', '123')).toEqual('#/abc?qwe#123');
+    expect(h.createUrl('/abc', '', '123')).toEqual('#/abc#123');
+    expect(h.createUrl('/abc', '123', '')).toEqual('#/abc?123');
+    expect(h.createUrl('/abc', '', '')).toEqual('#/abc');
+    expect(h.createUrl('/', '', '')).toEqual('');
+  });
+
+  it('has correct initial location when hash is empty', done => {
+    global.window.location.hash = '';
+    const h = createHashHistory();
+    h.location.pipe(first()).subscribe(location => {
+      expect(location).toEqual({
+        pathname: '/',
+        search: '',
+        hash: '',
+        source: 'init',
+        state: {},
+      });
+      done();
+    });
   });
 });

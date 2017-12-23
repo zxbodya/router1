@@ -5,6 +5,7 @@ import { createMatcher } from './expressions/createMatcher';
 import { concat } from './expressions/concat';
 
 function parseRoutes(routeDefs) {
+  /* istanbul ignore else */
   if (process.env.NODE_ENV !== 'production') {
     const usedNames = new Set();
     for (let i = 0, l = routeDefs.length; i < l; i += 1) {
@@ -66,6 +67,7 @@ export function compileRoutes(routeDefs) {
   return parseRoutes(routeDefs).map(routeDef => {
     const name = routeDef.names.filter(v => v).join('.');
 
+    /* istanbul ignore else */
     if (process.env.NODE_ENV !== 'production') {
       if (routeDef.handlers.length === 0) {
         throw new Error(`route "${name}"should have at least one handler`);

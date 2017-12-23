@@ -63,8 +63,7 @@ describe('Router, compiling route collection', () => {
         url: 'ccc<param2>',
         routes: [
           {
-            name: 'c',
-            handler: {},
+            name: '',
             url: 'ddd',
             routes: [
               {
@@ -86,10 +85,10 @@ describe('Router, compiling route collection', () => {
     expect(compiled[0].name).toEqual('a');
     expect(compiled[0].searchParams).toEqual([]);
 
-    expect(compiled[1].name).toEqual('b.c.d');
+    expect(compiled[1].name).toEqual('b.d');
     expect(compiled[1].searchParams).toEqual(['a']);
 
-    expect(compiled[2].name).toEqual('b.c.e');
+    expect(compiled[2].name).toEqual('b.e');
     expect(compiled[2].searchParams).toEqual(['a', 'b']);
   });
 
