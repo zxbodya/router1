@@ -21,12 +21,10 @@ export function createTestHistory(initialUrl, cb) {
       if (cb) cb('replace', { url, state, title });
     },
     navigate(url, state) {
-      location$.next(
-        Object.assign(locationFromUrl(url, state), { source: 'pop' })
-      );
+      location$.next({ ...locationFromUrl(url, state), source: 'pop' });
     },
     location: location$.pipe(
-      startWith(Object.assign(locationFromUrl(initialUrl), { source: 'init' })),
+      startWith({ ...locationFromUrl(initialUrl), source: 'init' }),
       publishReplay(1),
       refCount()
     ),

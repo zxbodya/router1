@@ -2,7 +2,6 @@ export function createGenerator(info) {
   const generateParts = info[1];
   const paramNames = info[2];
   const partsCount = generateParts.length;
-  const paramsCount = paramNames.length;
 
   return (params = {}) => {
     /* istanbul ignore else */

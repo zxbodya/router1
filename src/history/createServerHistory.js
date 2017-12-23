@@ -19,8 +19,9 @@ export function createServerHistory(initialUrl) {
     replace() {
       throw new Error('navigation not supported');
     },
-    location: of(
-      Object.assign(locationFromUrl(initialUrl), { source: 'init' })
-    ).pipe(publishReplay(1), refCount()),
+    location: of({ ...locationFromUrl(initialUrl), source: 'init' }).pipe(
+      publishReplay(1),
+      refCount()
+    ),
   };
 }

@@ -7,9 +7,9 @@ describe('Router, matcher from expression', () => {
     const matcher = createMatcher(expression);
 
     expect(matcher('aaaaa')).toEqual({});
-    expect(matcher('aaaaaa')).toEqual(false);
-    expect(matcher('/aaaaa')).toEqual(false);
-    expect(matcher('aaaaa/')).toEqual(false);
+    expect(matcher('aaaaaa')).toEqual(null);
+    expect(matcher('/aaaaa')).toEqual(null);
+    expect(matcher('aaaaa/')).toEqual(null);
   });
 
   it('it matches strings with one param', () => {
@@ -19,7 +19,7 @@ describe('Router, matcher from expression', () => {
     expect(matcher('aaaaa123')).toEqual({ a: '123' });
     expect(matcher('aaaaa321')).toEqual({ a: '321' });
     expect(matcher('aaaaaa')).toEqual({ a: 'a' });
-    expect(matcher('1aaaaaa')).toEqual(false);
+    expect(matcher('1aaaaaa')).toEqual(null);
   });
 
   it('it generates strings with few params', () => {
@@ -31,7 +31,7 @@ describe('Router, matcher from expression', () => {
     expect(matcher('aaaaa321-')).toEqual({ a: '321', b: '' });
     expect(matcher('aaaaa-444')).toEqual({ a: '', b: '444' });
     expect(matcher('aaaaa-')).toEqual({ a: '', b: '' });
-    expect(matcher('aaaaa')).toEqual(false);
+    expect(matcher('aaaaa')).toEqual(null);
   });
 
   it('it matches strings with param regexp', () => {
@@ -40,7 +40,7 @@ describe('Router, matcher from expression', () => {
 
     expect(matcher('aaaaa123')).toEqual({ a: '123' });
     expect(matcher('aaaaa321')).toEqual({ a: '321' });
-    expect(matcher('aaaaaa')).toEqual(false);
-    expect(matcher('aaaaa123a')).toEqual(false);
+    expect(matcher('aaaaaa')).toEqual(null);
+    expect(matcher('aaaaa123a')).toEqual(null);
   });
 });

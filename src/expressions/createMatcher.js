@@ -5,7 +5,7 @@ export function createMatcher(info) {
 
   return path => {
     const matches = path.match(matcherExp);
-    let res = false;
+    let res = null;
     if (matches) {
       res = {};
       for (let i = 0, l = paramNames.length; i < l; i += 1) {

@@ -6,7 +6,6 @@ import { of } from 'rxjs/observable/of';
 import { mergeMap } from 'rxjs/operators/mergeMap';
 import { switchMap } from 'rxjs/operators/switchMap';
 import { map } from 'rxjs/operators/map';
-import { tap } from 'rxjs/operators/tap';
 import { noop } from 'rxjs/util/noop';
 
 import {
@@ -28,7 +27,7 @@ export class Router {
     this.history = history;
     this.routeCollection = routeCollection;
 
-    this.activeRoute = [null, {}, null];
+    this.activeRoute = ['', {}, null];
     this.currentLocation = {};
 
     this.resultsSubscription = null;
@@ -45,7 +44,7 @@ export class Router {
   createHandler(transition) {
     const state$ = this.loadState(transition);
     return state$.pipe(
-      map(state => state && new StateHandler(state, transition))
+      map(state => !!state && new StateHandler(state, transition))
     );
   }
 
@@ -59,7 +58,9 @@ export class Router {
         let redirectCount = 0;
         let forwardInt;
         // defer redirect to new state to prevent subscription new render() result before old in edge cases
-        const forward = redirectUrl => setTimeout(forwardInt, 0, redirectUrl);
+        const forward = redirectUrl => {
+          setTimeout(forwardInt, 0, redirectUrl);
+        };
         forwardInt = redirectUrl => {
           if (redirectCount > 20) {
             observer.error(Error('To many redirects!'));
@@ -67,10 +68,11 @@ export class Router {
 
           this.history.replace(redirectUrl);
 
-          const location = Object.assign(this.history.parseUrl(redirectUrl), {
+          const location = {
+            ...this.history.parseUrl(redirectUrl),
             source: 'replace',
             state: {},
-          });
+          };
 
           if (
             this.currentLocation.pathname === location.pathname &&
@@ -135,10 +137,11 @@ export class Router {
 
     const navigateTransition$ = this.navigate$.pipe(
       mergeMap(({ url, state, source }) => {
-        const location = Object.assign(this.history.parseUrl(url), {
+        const location = {
+          ...this.history.parseUrl(url),
           source,
           state,
-        });
+        };
 
         if (
           this.currentLocation.pathname === location.pathname &&
@@ -172,29 +175,32 @@ export class Router {
       .pipe(
         mergeMap(transitionFromLocation),
         // transition handling
-        map(transition =>
-          Object.assign({}, transition, {
-            routes: this.routeCollection.match(
-              transition.location.pathname,
-              parseQuery(transition.location.search)
-            ),
-          })
-        ),
+        map(transition => ({
+          ...transition,
+          routes: this.routeCollection.match(
+            transition.location.pathname,
+            parseQuery(transition.location.search)
+          ),
+        })),
         switchMap(transition => {
           const loadRoute = (routes, index) => {
             if (index >= routes.length) {
-              return this.createHandler(
-                Object.assign(
-                  { route: { name: null, handlers: [] }, params: {} },
-                  transition
-                )
-              ).pipe(map(v => [null, {}, v]));
+              return this.createHandler({
+                route: {
+                  name: null,
+                  handlers: [],
+                },
+                params: {},
+                ...transition,
+              }).pipe(map(v => [null, {}, v]));
             }
 
             const route = routes[index];
-            const handler = this.createHandler(
-              Object.assign({ route: route[0], params: route[1] }, transition)
-            );
+            const handler = this.createHandler({
+              route: route[0],
+              params: route[1],
+              ...transition,
+            });
             return handler.pipe(
               switchMap(
                 loadResult =>
@@ -207,10 +213,10 @@ export class Router {
 
           return loadRoute(transition.routes, 0);
         }),
-        tap(([route, params, handler]) => {
+        switchMap(([route, params, handler]) => {
           this.activeRoute = [route, params, handler];
-        }),
-        switchMap(() => this.activeRoute[2].render())
+          return this.activeRoute[2].render();
+        })
       )
       .subscribe(
         v => {
@@ -233,7 +239,7 @@ export class Router {
     return this.renderResult$;
   }
 
-  isActive(route, params) {
+  isActive(route, params = {}) {
     const activeRoute = this.activeRoute[0];
     if (!activeRoute || activeRoute.substr(0, route.length) !== route) {
       return false;
@@ -258,9 +264,10 @@ export class Router {
   createUrl(name, params = {}, hash = '') {
     const route = this.routeCollection.getByName(name);
     if (route) {
-      const pathname = route.generatePath(
-        Object.assign({}, this.activeRoute[1], params)
-      );
+      const pathname = route.generatePath({
+        ...this.activeRoute[1],
+        ...params,
+      });
       const search = generateQuery(params, route.searchParams);
       return this.history.createUrl(pathname, search, hash);
     }

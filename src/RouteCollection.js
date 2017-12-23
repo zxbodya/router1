@@ -24,7 +24,7 @@ export class RouteCollection {
       if (params) {
         matched.push([
           route,
-          Object.assign(params, pickQueryValues(queryData, route.searchParams)),
+          { ...params, ...pickQueryValues(queryData, route.searchParams) },
         ]);
       }
     }
