@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.10.0 (2017-12-23)
+
+- added more warnings in development build
+- added `hashchange` support for old browsers in `createBroswerHistory`
+- improved test coverage
+- updated dev tooling migrated to babel preset env
+
 ## 0.9.0 (2017-11-19)
 
 *Breaking changes:*
