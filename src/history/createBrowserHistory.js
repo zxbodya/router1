@@ -1,5 +1,4 @@
 import { fromEvent } from 'rxjs/observable/fromEvent';
-import { of } from 'rxjs/observable/of';
 
 import { startWith } from 'rxjs/operators/startWith';
 import { map } from 'rxjs/operators/map';
@@ -7,6 +6,7 @@ import { publishReplay } from 'rxjs/operators/publishReplay';
 import { refCount } from 'rxjs/operators/refCount';
 
 import { locationFromUrl } from '../utils/locationFromUrl';
+import { splitUrl } from '../utils/splitUrl';
 
 export function createBrowserHistory() {
   function currentLocation(source) {
@@ -38,15 +38,31 @@ export function createBrowserHistory() {
       window.history.replaceState(state, title, url);
     };
   } else {
-    // todo: do not reassign location when only hash changed
+    const justUpdateHash = url => {
+      const [path, query, hash] = splitUrl(url);
+      const cl = currentLocation();
+      if (cl.pathname === path || cl.search === query) {
+        window.location.hash = `#${hash}`;
+        return true;
+      }
+      return false;
+    };
     replace = url => {
-      window.location.replace(url);
+      if (!justUpdateHash(url)) {
+        window.location.replace(url);
+      }
     };
     push = url => {
-      window.location.assign(url);
+      if (!justUpdateHash(url)) {
+        window.location.assign(url);
+      }
     };
-    // todo: on hashchange
-    location = of(currentLocation('init')).pipe(publishReplay(1), refCount());
+    location = fromEvent(window, 'hashchange').pipe(
+      map(() => currentLocation('pop')),
+      startWith(currentLocation('init')),
+      publishReplay(1),
+      refCount()
+    );
   }
 
   return {

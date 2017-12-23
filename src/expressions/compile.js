@@ -1,6 +1,4 @@
 export function compile(expression) {
-  // todo: if syntax is not valid show messages about typical errors
-
   // http://stackoverflow.com/questions/8844256/split-string-including-regular-expression-match
   const textParts = expression.split(/<([^>:]+?)(?::([^>]+))?>/);
   const matcher = [];
@@ -26,10 +24,10 @@ export function compile(expression) {
       generateParts.push(null);
     }
     if (i % 3 === 2) {
-      // todo: verify expression if it has captures - throw an error
       if (part) {
         /* istanbul ignore else */
         if (process.env.NODE_ENV !== 'production') {
+          // verify expression if it has captures - throw an error
           if (/\([^?]/.test(part)) {
             throw new Error(
               `syntax error in expression "${expression}", param regexp ${part} contain capture groups`

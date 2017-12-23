@@ -1,10 +1,18 @@
 import { take } from 'rxjs/operators/take';
 import { first } from 'rxjs/operators/first';
+
 import { createBrowserHistory } from './createBrowserHistory';
 
 describe('createBrowserHistory legacy browsers', () => {
   beforeEach(() => {
     global.window = {
+      onhashchange: undefined,
+      addListener(e, l) {
+        this.onhashchange = l;
+      },
+      removeListener() {
+        this.onhashchange = undefined;
+      },
       location: {
         pathname: '/abc',
         search: '?qwe',
@@ -35,6 +43,38 @@ describe('createBrowserHistory legacy browsers', () => {
         state: {},
       });
       done();
+    });
+  });
+
+  it('location updated on hash change', done => {
+    const h = createBrowserHistory();
+    let count = 0;
+    h.location.pipe(take(2)).subscribe(location => {
+      if (count === 0) {
+        expect(location).toEqual({
+          pathname: '/abc',
+          search: 'qwe',
+          hash: '123',
+          source: 'init',
+          state: {},
+        });
+      }
+      if (count === 1) {
+        expect(location).toEqual({
+          pathname: '/abc',
+          search: 'qwe',
+          hash: '125',
+          source: 'pop',
+          state: {},
+        });
+        done();
+      }
+      count += 1;
+    });
+
+    setTimeout(() => {
+      global.window.location.hash = '#125';
+      global.window.onhashchange();
     });
   });
 
@@ -79,6 +119,16 @@ describe('createBrowserHistory legacy browsers', () => {
     const h = createBrowserHistory();
     const url = h.createUrl('/abc', 'qwe', '123');
     expect(url).toEqual('/abc?qwe#123');
+  });
+
+  it('updates hash if path and searh are not changed', () => {
+    const h = createBrowserHistory();
+    h.push('/abc?qwe#124');
+    expect(global.window.location.hash).toEqual('#124');
+    expect(global.window.location.assignCallCount).toEqual(0);
+    h.replace('/abc?qwe#125');
+    expect(global.window.location.hash).toEqual('#125');
+    expect(global.window.location.assignCallCount).toEqual(0);
   });
 });
 

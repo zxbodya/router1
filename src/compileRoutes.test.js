@@ -92,18 +92,54 @@ describe('Router, compiling route collection', () => {
     expect(compiled[2].searchParams).toEqual(['a', 'b']);
   });
 
-  it('throws when route handler is missing', () => {
-    expect(() => compileRoutes([{ name: 'aaa' }])).toThrow();
-  });
-  it('throws when route names are not uniq', () => {
-    expect(() =>
+  describe('warnings', () => {
+    const { warn } = console;
+    let lastWarnMessage;
+    beforeAll(() => {
+      // eslint-disable-next-line no-console
+      console.warn = (...args) => {
+        lastWarnMessage = args;
+      };
+    });
+    afterAll(() => {
+      // eslint-disable-next-line no-console
+      console.warn = warn;
+    });
+    beforeEach(() => {
+      lastWarnMessage = null;
+    });
+    it('when route handler is missing', () => {
+      compileRoutes([{ name: 'aaa' }]);
+      expect(lastWarnMessage).toMatchSnapshot();
+    });
+    it('when route names are not uniq', () => {
       compileRoutes([
         { name: 'aaa', handler: '1' },
         { name: 'aaa', handler: '2' },
-      ])
-    ).toThrow();
+      ]);
+      expect(lastWarnMessage).toMatchSnapshot();
+    });
+    it('when path param is duplicated', () => {
+      compileRoutes([{ name: 'aaa', url: '<a><a>' }]);
+      expect(lastWarnMessage).toMatchSnapshot();
+    });
+    it('when path param is overridden by search', () => {
+      compileRoutes([{ name: 'aaa', url: '<a>?a' }]);
+      expect(lastWarnMessage).toMatchSnapshot();
+    });
+    it('generating not properly matched url', () => {
+      const [{ generatePath }] = compileRoutes([
+        { name: 'aaa', url: '<a:\\w+><b>' },
+      ]);
+      generatePath({ a: '1', b: '2' });
+      expect(lastWarnMessage).toMatchSnapshot();
+    });
+    it('generating not matched url', () => {
+      const [{ generatePath }] = compileRoutes([{ name: 'aaa', url: '<a:1>' }]);
+      generatePath({ a: '2' });
+      expect(lastWarnMessage).toMatchSnapshot();
+    });
   });
-
   it('allows to pass array of handlers', () => {
     const compiled = compileRoutes([
       {

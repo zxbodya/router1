@@ -118,7 +118,7 @@ export class Router {
         // eslint-disable-next-line no-restricted-globals,no-alert
         const cancelTransition = beforeUnload && !confirm(beforeUnload);
         if (cancelTransition) {
-          // todo: find better way to revert location change
+          // case when user navigates back or forward, but transition was canceled
           this.history.push(
             this.history.createUrl(
               this.currentLocation.pathname,

@@ -3,7 +3,7 @@ export function createGenerator(info) {
   const paramNames = info[2];
   const partsCount = generateParts.length;
 
-  return (params = {}) => {
+  return params => {
     /* istanbul ignore else */
     if (process.env.NODE_ENV !== 'production') {
       const missingParams = paramNames.filter(
@@ -25,7 +25,6 @@ export function createGenerator(info) {
         pn += 1;
       }
     }
-    // todo: test if matcher can match the result, and throw if it can not
     return res.join('');
   };
 }

@@ -1,0 +1,37 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Router, compiling route collection warnings generating not matched url 1`] = `
+Array [
+  "path \\"2\\" generated for route \\"aaa\\" with params {\\"a\\":\\"2\\"}, is not matched by same route",
+]
+`;
+
+exports[`Router, compiling route collection warnings generating not properly matched url 1`] = `
+Array [
+  "path \\"12\\" generated for route \\"aaa\\" with params {\\"a\\":\\"1\\",\\"b\\":\\"2\\"}, is matched by same route with different params {\\"a\\":\\"12\\",\\"b\\":\\"\\"}",
+]
+`;
+
+exports[`Router, compiling route collection warnings when path param is duplicated 1`] = `
+Array [
+  "path param \\"a\\" in route \\"aaa\\" is duplicated",
+]
+`;
+
+exports[`Router, compiling route collection warnings when path param is overridden by search 1`] = `
+Array [
+  "path param \\"a\\" in route \\"aaa\\" is overridden by search params",
+]
+`;
+
+exports[`Router, compiling route collection warnings when route handler is missing 1`] = `
+Array [
+  "route \\"aaa\\" have no handlers",
+]
+`;
+
+exports[`Router, compiling route collection warnings when route names are not uniq 1`] = `
+Array [
+  "\\"aaa\\" is dublicated, route names should be uniq",
+]
+`;

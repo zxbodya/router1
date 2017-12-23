@@ -6,7 +6,6 @@ describe('Router, generator from expression', () => {
     const expression = compile('aaaaa');
     const generator = createGenerator(expression);
 
-    expect(generator()).toBe('aaaaa');
     expect(generator({})).toBe('aaaaa');
     expect(generator({ a: 123, b: 321 })).toBe('aaaaa');
   });
