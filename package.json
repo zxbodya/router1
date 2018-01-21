@@ -49,7 +49,7 @@
     "eslint-plugin-prettier": "^2.4.0",
     "jest": "^22.0.4",
     "prettier": "^1.9.2",
-    "rollup": "^0.53.0",
+    "rollup": "^0.54.1",
     "rollup-plugin-babel": "^3.0.3",
     "rxjs": "^5.5.6"
   },

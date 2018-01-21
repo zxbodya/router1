@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.10.1 (2018-01-21)
+
+- fixed route params comparison when checking active route - properly normalize params before comparison, not changing booleans in search params (strings `true` or `false` passed in search params might be not properly checked)
+- refactoring to simplify router code, fixes to make flow happier about some edge cases
+
 ## 0.10.0 (2017-12-23)
 
 - added more warnings in development build

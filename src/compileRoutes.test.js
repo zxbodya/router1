@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { compileRoutes } from './compileRoutes';
 
 describe('Router, compiling route collection', () => {
@@ -96,13 +97,11 @@ describe('Router, compiling route collection', () => {
     const { warn } = console;
     let lastWarnMessage;
     beforeAll(() => {
-      // eslint-disable-next-line no-console
       console.warn = (...args) => {
         lastWarnMessage = args;
       };
     });
     afterAll(() => {
-      // eslint-disable-next-line no-console
       console.warn = warn;
     });
     beforeEach(() => {

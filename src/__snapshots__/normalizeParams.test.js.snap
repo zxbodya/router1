@@ -1,0 +1,19 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`normalizeParams converts path params to string 1`] = `
+Object {
+  "a": "1",
+  "b": "[object Object]",
+  "c": "false",
+  "d": "true",
+}
+`;
+
+exports[`normalizeParams preserves boolean values in search params 1`] = `
+Object {
+  "a": "1",
+  "b": "[object Object]",
+  "c": false,
+  "d": true,
+}
+`;

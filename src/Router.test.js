@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-vars */
+
 import { of } from 'rxjs/observable/of';
 import { take } from 'rxjs/operators/take';
 import { first } from 'rxjs/operators/first';
@@ -53,7 +55,7 @@ describe('Router', () => {
       .pipe(first())
       .subscribe(
         renderResult => {
-          expect(renderResult.route).toEqual(null);
+          expect(renderResult.route).toEqual('');
           expect(renderResult.params).toEqual({});
           expect(renderResult.handlers).toEqual([]);
           expect(renderResult.location).toEqual({
@@ -65,7 +67,7 @@ describe('Router', () => {
           });
 
           expect(router.isActive('main')).toEqual(false);
-          expect(router.activeRoute[0]).toEqual(null);
+          expect(router.activeRoute[0]).toEqual('');
           expect(router.activeRoute[1]).toEqual({});
         },
         undefined,
@@ -136,7 +138,7 @@ describe('Router', () => {
       })
     );
 
-    expect(router.createUrl('main', { page: 1000 }, '')).toEqual('/1000');
+    expect(router.createUrl('main', { page: '1000' }, '')).toEqual('/1000');
 
     router
       .renderResult()
@@ -181,12 +183,12 @@ describe('Router', () => {
       })
     );
 
-    expect(router.createUrl('main', { page: 1000, q: 1234 }, '')).toEqual(
+    expect(router.createUrl('main', { page: '1000', q: '1234' }, '')).toEqual(
       '/1000?q=1234'
     );
-    expect(router.createUrl('main', { page: 1000, q: 1234 }, 'anchor')).toEqual(
-      '/1000?q=1234#anchor'
-    );
+    expect(
+      router.createUrl('main', { page: '1000', q: '1234' }, 'anchor')
+    ).toEqual('/1000?q=1234#anchor');
 
     router
       .renderResult()
@@ -490,7 +492,7 @@ describe('Router', () => {
       routeCollection: new RouteCollection([
         {
           name: 'main',
-          handler: () => 'main',
+          handler: t => 'main',
           url: '/',
         },
         {
@@ -500,7 +502,7 @@ describe('Router', () => {
         },
         {
           name: 'main3',
-          handler: () => 'main3',
+          handler: t => 'main3',
           url: '/3',
         },
         {
@@ -547,12 +549,12 @@ describe('Router', () => {
       routeCollection: new RouteCollection([
         {
           name: 'main',
-          handler: () => 'main',
+          handler: t => 'main',
           url: '/',
         },
         {
           name: 'main2',
-          handler: t => t.forward('/2'),
+          handler: t => t.forward('/2') || '',
           url: '/2',
         },
       ]),
@@ -593,7 +595,7 @@ describe('Router', () => {
       routeCollection: new RouteCollection([
         {
           name: 'main',
-          handler: () => 'main',
+          handler: t => 'main',
           url: '/',
         },
         {

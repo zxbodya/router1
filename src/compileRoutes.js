@@ -4,6 +4,7 @@ import { createGenerator } from './expressions/createGenerator';
 import { createMatcher } from './expressions/createMatcher';
 
 import { concat } from './expressions/concat';
+import { normalizeParams } from './normalizeParams';
 
 function parseRoutes(routeDefs) {
   const rawRoutes = [];
@@ -111,8 +112,9 @@ export function compileRoutes(routeDefs) {
     /* istanbul ignore else */
     if (process.env.NODE_ENV !== 'production') {
       const generatePathOriginal = generatePath;
-      // test if matcher can match the result, and throw if it can not
+      // test if matcher can match the result, and warn if not
       generatePath = params => {
+        const normalizedParams = normalizeParams(rawRoute.searchParams, params);
         const path = generatePathOriginal(params);
         const match = matchPath(path);
         if (!match) {
@@ -123,7 +125,7 @@ export function compileRoutes(routeDefs) {
           );
         } else if (
           Object.keys(match).reduce(
-            (acc, k) => acc || `${params[k]}` !== `${match[k]}`,
+            (acc, k) => acc || normalizedParams[k] !== match[k],
             false
           )
         ) {

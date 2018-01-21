@@ -14,29 +14,28 @@ import {
 } from './utils/queryString';
 
 import { StateHandler } from './StateHandler';
+import { normalizeParams } from './normalizeParams';
 
 export class Router {
-  constructor({
-    history,
-    routeCollection,
-    loadState,
-    onHashChange,
-    renderState,
-    afterRender,
-  }) {
-    this.history = history;
-    this.routeCollection = routeCollection;
+  constructor(config) {
+    this.history = config.history;
+    this.routeCollection = config.routeCollection;
 
     this.activeRoute = ['', {}, null];
-    this.currentLocation = {};
+    this.currentLocation = {
+      pathname: '',
+      search: '',
+      hash: '',
+      state: null,
+    };
 
     this.resultsSubscription = null;
     this.renderResult$ = new Subject();
 
-    this.loadState = loadState;
-    this.onHashChange = onHashChange || noop;
-    this.renderState = renderState;
-    this.afterRender = afterRender || noop;
+    this.loadState = config.loadState;
+    this.onHashChange = config.onHashChange || noop;
+    this.renderState = config.renderState;
+    this.afterRender = config.afterRender || noop;
 
     this.navigate$ = new Subject();
   }
@@ -44,7 +43,24 @@ export class Router {
   createHandler(transition) {
     const state$ = this.loadState(transition);
     return state$.pipe(
-      map(state => !!state && new StateHandler(state, transition))
+      map(state => (state ? new StateHandler(state, transition) : null))
+    );
+  }
+
+  createNotFoundHandler(transition) {
+    const notFoundTransition = {
+      // todo: better typing, to separate matched route
+      route: {
+        name: '',
+        handlers: [],
+      },
+      params: {},
+      ...transition,
+      router: this,
+    };
+    const state$ = this.loadState(notFoundTransition);
+    return state$.pipe(
+      map(state => new StateHandler(state, notFoundTransition))
     );
   }
 
@@ -81,7 +97,7 @@ export class Router {
             if (this.currentLocation.hash === location.hash) {
               observer.error(Error('Redirect to the same location!'));
             }
-            this.activeRoute[2].onHashChange(location);
+            if (this.activeRoute[2]) this.activeRoute[2].onHashChange(location);
             this.currentLocation = location;
           } else {
             this.currentLocation = location;
@@ -109,7 +125,7 @@ export class Router {
           this.currentLocation.pathname === location.pathname &&
           this.currentLocation.search === location.search
         ) {
-          this.activeRoute[2].onHashChange(location);
+          if (this.activeRoute[2]) this.activeRoute[2].onHashChange(location);
           this.currentLocation = location;
           return [];
         }
@@ -147,7 +163,7 @@ export class Router {
           this.currentLocation.pathname === location.pathname &&
           this.currentLocation.search === location.search
         ) {
-          this.activeRoute[2].onHashChange(location);
+          if (this.activeRoute[2]) this.activeRoute[2].onHashChange(location);
           this.currentLocation = location;
           this.history.push(url, state);
           return [];
@@ -167,56 +183,64 @@ export class Router {
         return [location];
       })
     );
+    const matchRoutes = transition => ({
+      ...transition,
+      routes: this.routeCollection.match(
+        transition.location.pathname,
+        parseQuery(transition.location.search)
+      ),
+    });
+
+    const loadMatched = transition => {
+      const loadRoute = (routes, index) => {
+        if (index >= routes.length) {
+          // not found
+          return of(['', {}, null]);
+        }
+
+        const route = routes[index];
+        const handler = this.createHandler({
+          route: route[0],
+          params: route[1],
+          ...transition,
+        });
+        return handler.pipe(
+          switchMap(
+            loadResult =>
+              loadResult
+                ? of([route[0].name, route[1], loadResult])
+                : loadRoute(routes, index + 1)
+          )
+        );
+      };
+
+      return loadRoute(transition.routes, 0).pipe(
+        mergeMap(
+          ([routeName, routeParams, handler]) =>
+            handler
+              ? of([routeName, routeParams, handler])
+              : this.createNotFoundHandler(transition).pipe(
+                  map(v => [routeName, routeParams, v])
+                )
+        )
+      );
+    };
+
+    const activateLoaded = ([route, params, handler]) => {
+      this.activeRoute = [route, params, handler];
+      return this.activeRoute[2].render();
+    };
 
     this.resultsSubscription = mergeStatic(
       historyTransition$,
       navigateTransition$
     )
       .pipe(
-        mergeMap(transitionFromLocation),
+        switchMap(transitionFromLocation),
         // transition handling
-        map(transition => ({
-          ...transition,
-          routes: this.routeCollection.match(
-            transition.location.pathname,
-            parseQuery(transition.location.search)
-          ),
-        })),
-        switchMap(transition => {
-          const loadRoute = (routes, index) => {
-            if (index >= routes.length) {
-              return this.createHandler({
-                route: {
-                  name: null,
-                  handlers: [],
-                },
-                params: {},
-                ...transition,
-              }).pipe(map(v => [null, {}, v]));
-            }
-
-            const route = routes[index];
-            const handler = this.createHandler({
-              route: route[0],
-              params: route[1],
-              ...transition,
-            });
-            return handler.pipe(
-              switchMap(
-                loadResult =>
-                  loadResult
-                    ? of([route[0].name, route[1], loadResult])
-                    : loadRoute(routes, index + 1)
-              )
-            );
-          };
-
-          return loadRoute(transition.routes, 0);
-        }),
-        switchMap(([route, params, handler]) => {
-          this.activeRoute = [route, params, handler];
-          return this.activeRoute[2].render();
-        })
+        map(matchRoutes),
+        switchMap(loadMatched),
+        switchMap(activateLoaded)
       )
       .subscribe(
         v => {
@@ -250,10 +274,14 @@ export class Router {
     let paramName;
     const has = Object.prototype.hasOwnProperty;
 
-    for (paramName in params) {
+    const normalizedParams = normalizeParams(
+      this.routeCollection.getByName(this.activeRoute[0]).searchParams,
+      params
+    );
+    for (paramName in normalizedParams) {
       if (
-        has.call(params, paramName) &&
-        `${params[paramName]}` !== `${activeRouteParams[paramName]}`
+        has.call(normalizedParams, paramName) &&
+        normalizedParams[paramName] !== activeRouteParams[paramName]
       ) {
         return false;
       }

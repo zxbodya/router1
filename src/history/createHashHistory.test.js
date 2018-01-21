@@ -71,7 +71,7 @@ describe('createHashHistory legacy browsers', () => {
     setTimeout(() => {
       h.push('/');
       h.replace('/');
-      window.onhashchange();
+      global.window.onhashchange();
     });
   });
 
@@ -138,7 +138,6 @@ describe('createHashHistory modern browsers', () => {
   });
 
   it('uses assign and replace to update location, emits correct events', done => {
-    const { window } = global;
     const h = createHashHistory();
 
     let count = 0;
@@ -164,7 +163,7 @@ describe('createHashHistory modern browsers', () => {
     setTimeout(() => {
       h.push('/');
       h.replace('/');
-      window.onpopstate();
+      global.window.onpopstate();
     });
   });
 
