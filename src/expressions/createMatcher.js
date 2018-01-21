@@ -4,7 +4,9 @@ export function createMatcher(info) {
   const matcherExp = new RegExp(`^${matcher}$`);
 
   return path => {
-    const matches = path.match(matcherExp);
+    const matches = decodeURI(path)
+      .replace(/(?:%3F|%23)/g, c => ({ '%3F': '?', '%23': '#' }[c]))
+      .match(matcherExp);
     let res = null;
     if (matches) {
       res = {};

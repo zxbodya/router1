@@ -2,7 +2,7 @@ import { compile } from './compile';
 import { createMatcher } from './createMatcher';
 
 describe('Router, matcher from expression', () => {
-  it('it matches strings without params', () => {
+  it('matches strings without params', () => {
     const expression = compile('aaaaa');
     const matcher = createMatcher(expression);
 
@@ -12,7 +12,7 @@ describe('Router, matcher from expression', () => {
     expect(matcher('aaaaa/')).toEqual(null);
   });
 
-  it('it matches strings with one param', () => {
+  it('matches strings with one param', () => {
     const expression = compile('aaaaa<a>');
     const matcher = createMatcher(expression);
 
@@ -22,7 +22,7 @@ describe('Router, matcher from expression', () => {
     expect(matcher('1aaaaaa')).toEqual(null);
   });
 
-  it('it generates strings with few params', () => {
+  it('generates strings with few params', () => {
     const expression = compile('aaaaa<a>-<b>');
     const matcher = createMatcher(expression);
 
@@ -34,7 +34,7 @@ describe('Router, matcher from expression', () => {
     expect(matcher('aaaaa')).toEqual(null);
   });
 
-  it('it matches strings with param regexp', () => {
+  it('matches strings with param regexp', () => {
     const expression = compile('aaaaa<a:\\d+>');
     const matcher = createMatcher(expression);
 
@@ -42,5 +42,15 @@ describe('Router, matcher from expression', () => {
     expect(matcher('aaaaa321')).toEqual({ a: '321' });
     expect(matcher('aaaaaa')).toEqual(null);
     expect(matcher('aaaaa123a')).toEqual(null);
+  });
+
+  it('decodes path before matching', () => {
+    const expression = compile('<a>/<b>');
+    const matcher = createMatcher(expression);
+    expect(
+      matcher(
+        "%D0%BF%D1%80%D0%B8%D0%B2%D1%96%D1%82/%3F%23aZ09.-_~!$&%5C'()*+,;=:@"
+      )
+    ).toMatchSnapshot();
   });
 });

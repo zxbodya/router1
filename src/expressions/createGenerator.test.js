@@ -44,4 +44,13 @@ describe('Router, generator from expression', () => {
     expect(() => generator({ b: 1 })).toThrow();
     expect(() => generator({})).toThrow();
   });
+
+  it('encodes uri', () => {
+    const expression = compile('<a>/<b>');
+    const generator = createGenerator(expression);
+
+    expect(
+      generator({ a: 'привіт', b: "?#aZ09.-_~!$&\\'()*+,;=:@" })
+    ).toMatchSnapshot();
+  });
 });

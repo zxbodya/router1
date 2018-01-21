@@ -1,0 +1,8 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Router, matcher from expression decodes path before matching 1`] = `
+Object {
+  "a": "привіт",
+  "b": "?#aZ09.-_~!$&\\\\'()*+,;=:@",
+}
+`;

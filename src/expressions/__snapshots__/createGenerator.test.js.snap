@@ -1,0 +1,3 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Router, generator from expression encodes uri 1`] = `"%D0%BF%D1%80%D0%B8%D0%B2%D1%96%D1%82/%3F%23aZ09.-_~!$&%5C'()*+,;=:@"`;

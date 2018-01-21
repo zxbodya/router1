@@ -25,6 +25,9 @@ export function createGenerator(info) {
         pn += 1;
       }
     }
-    return res.join('');
+    return encodeURI(res.join('')).replace(
+      /[?#]/g,
+      c => ({ '?': '%3F', '#': '%23' }[c])
+    );
   };
 }
