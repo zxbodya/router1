@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.12.0 (xxxx-xx-xx)
+## 0.12.0 (2018-04-26)
 
 - rxjs v6
 
