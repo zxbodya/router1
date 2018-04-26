@@ -1,5 +1,4 @@
-import { take } from 'rxjs/operators/take';
-import { first } from 'rxjs/operators/first';
+import { take, first } from 'rxjs/operators';
 
 import { createHashHistory } from './createHashHistory';
 

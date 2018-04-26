@@ -1,0 +1,3 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Router logs exception if not observer for it 1`] = `[Error: state rendering failed]`;

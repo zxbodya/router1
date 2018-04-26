@@ -1,4 +1,4 @@
-import { tap } from 'rxjs/operators/tap';
+import { tap } from 'rxjs/operators';
 
 export class StateHandler {
   constructor(state, transition) {

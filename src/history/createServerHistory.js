@@ -1,7 +1,6 @@
-import { of } from 'rxjs/observable/of';
+import { of } from 'rxjs';
 
-import { publishReplay } from 'rxjs/operators/publishReplay';
-import { refCount } from 'rxjs/operators/refCount';
+import { publishReplay, refCount } from 'rxjs/operators';
 
 import { locationFromUrl } from '../utils/locationFromUrl';
 

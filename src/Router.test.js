@@ -1,10 +1,8 @@
+/* eslint-disable no-console */
 /* eslint-disable no-unused-vars */
 
-import { of } from 'rxjs/observable/of';
-import { take } from 'rxjs/operators/take';
-import { first } from 'rxjs/operators/first';
-
-import { noop } from 'rxjs/util/noop';
+import { of, noop } from 'rxjs';
+import { take, first } from 'rxjs/operators';
 
 import { Router } from './Router';
 import { RouteCollection } from './RouteCollection';
@@ -675,7 +673,7 @@ describe('Router', () => {
     router.start();
   });
 
-  it('throws exception if not observer for it', () => {
+  it('logs exception if not observer for it', done => {
     const history = createTestHistory('/');
 
     const router = new Router({
@@ -698,11 +696,14 @@ describe('Router', () => {
       },
     });
 
-    expect(() => {
-      router.start();
-    }).toThrow();
-
-    router.stop();
+    const bak = console.error;
+    console.error = v => {
+      expect(v).toMatchSnapshot();
+      console.error = bak;
+      router.stop();
+      done();
+    };
+    router.start();
   });
 
   it('loads next matched route if first is not loaded', () => {

@@ -1,9 +1,5 @@
-import { fromEvent } from 'rxjs/observable/fromEvent';
-
-import { startWith } from 'rxjs/operators/startWith';
-import { map } from 'rxjs/operators/map';
-import { publishReplay } from 'rxjs/operators/publishReplay';
-import { refCount } from 'rxjs/operators/refCount';
+import { fromEvent } from 'rxjs';
+import { startWith, map, publishReplay, refCount } from 'rxjs/operators';
 
 import { locationFromUrl } from '../utils/locationFromUrl';
 import { splitUrl } from '../utils/splitUrl';

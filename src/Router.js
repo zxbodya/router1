@@ -1,12 +1,6 @@
-import { Observable } from 'rxjs/Observable';
-import { Subject } from 'rxjs/Subject';
-import { merge as mergeStatic } from 'rxjs/observable/merge';
-import { of } from 'rxjs/observable/of';
+import { Observable, Subject, merge, of, noop } from 'rxjs';
 
-import { mergeMap } from 'rxjs/operators/mergeMap';
-import { switchMap } from 'rxjs/operators/switchMap';
-import { map } from 'rxjs/operators/map';
-import { noop } from 'rxjs/util/noop';
+import { mergeMap, switchMap, map } from 'rxjs/operators';
 
 import {
   parse as parseQuery,
@@ -231,10 +225,7 @@ export class Router {
       return this.activeRoute[2].render();
     };
 
-    this.resultsSubscription = mergeStatic(
-      historyTransition$,
-      navigateTransition$
-    )
+    this.resultsSubscription = merge(historyTransition$, navigateTransition$)
       .pipe(
         switchMap(transitionFromLocation),
         // transition handling
@@ -248,7 +239,8 @@ export class Router {
         },
         e => {
           if (this.renderResult$.observers.length) this.renderResult$.error(e);
-          else throw e;
+          // eslint-disable-next-line no-console
+          else console.error(e);
         }
       );
   }

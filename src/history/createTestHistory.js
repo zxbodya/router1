@@ -1,7 +1,5 @@
-import { Subject } from 'rxjs/Subject';
-import { startWith } from 'rxjs/operators/startWith';
-import { publishReplay } from 'rxjs/operators/publishReplay';
-import { refCount } from 'rxjs/operators/refCount';
+import { Subject } from 'rxjs';
+import { startWith, publishReplay, refCount } from 'rxjs/operators';
 
 import { locationFromUrl } from '../utils/locationFromUrl';
 

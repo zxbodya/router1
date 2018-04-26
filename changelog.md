@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.12.0 (xxxx-xx-xx)
+
+- rxjs v6
+
 ## 0.11.0 (2018-01-21)
 
 - fixed route params comparison when checking active route - properly normalize params before comparison, not changing booleans in search params (strings `true` or `false` passed in search params might be not properly checked)

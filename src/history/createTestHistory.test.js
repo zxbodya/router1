@@ -1,4 +1,4 @@
-import { take } from 'rxjs/operators/take';
+import { take } from 'rxjs/operators';
 
 import { createTestHistory } from './createTestHistory';
 
