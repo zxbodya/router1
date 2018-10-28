@@ -1,4 +1,4 @@
-import { Observable, Subject, merge, of, noop } from 'rxjs';
+import { Observable, Subject, merge, of, noop, EMPTY } from 'rxjs';
 
 import { mergeMap, switchMap, map } from 'rxjs/operators';
 
@@ -121,7 +121,7 @@ export class Router {
         ) {
           if (this.activeRoute[2]) this.activeRoute[2].onHashChange(location);
           this.currentLocation = location;
-          return [];
+          return EMPTY;
         }
 
         const beforeUnload = this.onBeforeUnload();
@@ -137,7 +137,7 @@ export class Router {
             ),
             this.currentLocation.state
           );
-          return [];
+          return EMPTY;
         }
 
         this.currentLocation = location;
@@ -160,7 +160,7 @@ export class Router {
           if (this.activeRoute[2]) this.activeRoute[2].onHashChange(location);
           this.currentLocation = location;
           this.history.push(url, state);
-          return [];
+          return EMPTY;
         }
 
         const beforeUnload = this.onBeforeUnload();
@@ -168,7 +168,7 @@ export class Router {
         const cancelTransition = beforeUnload && !confirm(beforeUnload);
 
         if (cancelTransition) {
-          return [];
+          return EMPTY;
         }
 
         this.currentLocation = location;
