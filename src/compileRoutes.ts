@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { compile } from './expressions/compile';
 import { createGenerator } from './expressions/createGenerator';
 import { createMatcher } from './expressions/createMatcher';
@@ -6,7 +5,27 @@ import { createMatcher } from './expressions/createMatcher';
 import { concat } from './expressions/concat';
 import { normalizeParams } from './normalizeParams';
 
-function parseRoutes(routeDefs) {
+import { CompiledExpression } from './expressions/compile';
+import { RouteParams } from './Router';
+
+export interface RouteDef<HandlerPart> {
+  name?: string;
+  url?: string;
+  handler?: HandlerPart;
+  handlers?: HandlerPart[];
+  routes?: Array<RouteDef<HandlerPart>>;
+}
+
+export interface RawRouteDef<HandlerPart> {
+  names: Array<string | null>;
+  handlers: HandlerPart[];
+  pathExpressions: CompiledExpression[];
+  searchParams: string[];
+}
+
+function parseRoutes<HandlerPart>(
+  routeDefs: Array<RouteDef<HandlerPart>>
+): Array<RawRouteDef<HandlerPart>> {
   const rawRoutes = [];
 
   for (let i = 0, l = routeDefs.length; i < l; i += 1) {
@@ -50,11 +69,21 @@ function parseRoutes(routeDefs) {
   return rawRoutes;
 }
 
-function getRouteName(routeDef) {
+function getRouteName<HandlerPart>(routeDef: RawRouteDef<HandlerPart>) {
   return routeDef.names.filter(v => v).join('.');
 }
 
-export function compileRoutes(routeDefs) {
+export interface CompiledRouteDef<HandlerPart> {
+  name: string;
+  handlers: HandlerPart[];
+  matchPath: (path: string) => RouteParams | null;
+  generatePath: (params: RouteParams) => string;
+  searchParams: string[];
+}
+
+export function compileRoutes<HandlerPart>(
+  routeDefs: Array<RouteDef<HandlerPart>>
+): Array<CompiledRouteDef<HandlerPart>> {
   const rawRoutes = parseRoutes(routeDefs);
   /* istanbul ignore else */
   if (process.env.NODE_ENV !== 'production') {
@@ -66,6 +95,7 @@ export function compileRoutes(routeDefs) {
 
       // few routes with same name
       if (usedNames.has(routeName)) {
+        // tslint:disable-next-line no-console
         console.warn(
           `"${routeName}" is dublicated, route names should be uniq`
         );
@@ -74,6 +104,7 @@ export function compileRoutes(routeDefs) {
 
       // no handlers defined
       if (rawRoute.handlers.length === 0) {
+        // tslint:disable-next-line no-console
         console.warn(`route "${routeName}" have no handlers`);
       }
 
@@ -85,6 +116,7 @@ export function compileRoutes(routeDefs) {
       for (let j = 0, sl = pathParams.length; j < sl; j += 1) {
         const paramName = pathParams[j];
         if (pathParamsSet.has(paramName)) {
+          // tslint:disable-next-line no-console
           console.warn(
             `path param "${paramName}" in route "${routeName}" is duplicated`
           );
@@ -96,6 +128,7 @@ export function compileRoutes(routeDefs) {
       for (let j = 0, sl = searchParams.length; j < sl; j += 1) {
         const paramName = searchParams[j];
         if (pathParamsSet.has(paramName)) {
+          // tslint:disable-next-line no-console
           console.warn(
             `path param "${paramName}" in route "${routeName}" is overridden by search params`
           );
@@ -118,6 +151,7 @@ export function compileRoutes(routeDefs) {
         const path = generatePathOriginal(params);
         const match = matchPath(path);
         if (!match) {
+          // tslint:disable-next-line no-console
           console.warn(
             `path "${path}" generated for route "${routeName}" with params ${JSON.stringify(
               params
@@ -129,6 +163,7 @@ export function compileRoutes(routeDefs) {
             false
           )
         ) {
+          // tslint:disable-next-line no-console
           console.warn(
             `path "${path}" generated for route "${routeName}" with params ${JSON.stringify(
               params

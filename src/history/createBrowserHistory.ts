@@ -1,11 +1,13 @@
 import { fromEvent } from 'rxjs';
-import { startWith, map, publishReplay, refCount } from 'rxjs/operators';
+import { map, publishReplay, refCount, startWith } from 'rxjs/operators';
 
 import { locationFromUrl } from '../utils/locationFromUrl';
 import { splitUrl } from '../utils/splitUrl';
 
-export function createBrowserHistory() {
-  function currentLocation(source) {
+import { History, Location, LocationSource } from './history';
+
+export function createBrowserHistory(): History {
+  function currentLocation(source?: LocationSource): Location {
     return {
       pathname: window.location.pathname,
       search: window.location.search && window.location.search.substr(1),
@@ -27,14 +29,14 @@ export function createBrowserHistory() {
       refCount()
     );
 
-    push = (url, state = null, title = '') => {
+    push = (url: string, state: object = null, title = '') => {
       window.history.pushState(state, title, url);
     };
-    replace = (url, state = null, title = '') => {
+    replace = (url: string, state: object = null, title = '') => {
       window.history.replaceState(state, title, url);
     };
   } else {
-    const justUpdateHash = url => {
+    const justUpdateHash = (url: string) => {
       const [path, query, hash] = splitUrl(url);
       const cl = currentLocation();
       if (cl.pathname === path || cl.search === query) {
@@ -43,12 +45,12 @@ export function createBrowserHistory() {
       }
       return false;
     };
-    replace = url => {
+    replace = (url: string) => {
       if (!justUpdateHash(url)) {
         window.location.replace(url);
       }
     };
-    push = url => {
+    push = (url: string) => {
       if (!justUpdateHash(url)) {
         window.location.assign(url);
       }

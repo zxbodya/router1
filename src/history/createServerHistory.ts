@@ -1,10 +1,12 @@
-import { of } from 'rxjs';
+import { Observable, of } from 'rxjs';
 
 import { publishReplay, refCount } from 'rxjs/operators';
 
 import { locationFromUrl } from '../utils/locationFromUrl';
 
-export function createServerHistory(initialUrl) {
+import { History } from './history';
+
+export function createServerHistory(initialUrl: string): History {
   return {
     createUrl(path, search, hash) {
       return `${path}${search ? `?${search}` : ''}${hash ? `#${hash}` : ''}`;
@@ -21,6 +23,6 @@ export function createServerHistory(initialUrl) {
     location: of({ ...locationFromUrl(initialUrl), source: 'init' }).pipe(
       publishReplay(1),
       refCount()
-    ),
+    ) as Observable<Location>,
   };
 }

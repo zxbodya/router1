@@ -1,22 +1,40 @@
-/* eslint-disable no-console */
-/* eslint-disable no-unused-vars */
+/* tslint:disable no-console */
+/* tslint:disable no-unused-vars */
+import { Observable } from 'rxjs';
 
-import { of, noop } from 'rxjs';
-import { take, first } from 'rxjs/operators';
+import { noop, of } from 'rxjs';
+import { first, take } from 'rxjs/operators';
 
-import { Router } from './Router';
 import { RouteCollection } from './RouteCollection';
+import { Router } from './Router';
 
+import { CompiledRouteDef } from './compileRoutes';
 import { createTestHistory } from './history/createTestHistory';
+import { RouteParams, Transition } from './Router';
 
-const createTestConfig = (config, options = {}) => ({
-  loadState() {
+const createTestConfig = (
+  config: any,
+  options: {
+    onHashChange?: any;
+    onBeforeUnload?: any;
+  } = {}
+) => ({
+  loadState(): Observable<{
+    onHashChange: () => void;
+    onBeforeUnload: () => string;
+  }> {
     return of({
       onHashChange: options.onHashChange || noop,
       onBeforeUnload: options.onBeforeUnload || (() => ''),
     });
   },
-  renderState(state, transition) {
+  renderState(
+    state: any,
+    transition: Transition<any, any, any> & {
+      route: CompiledRouteDef<any>;
+      params: RouteParams;
+    }
+  ): Observable<object> {
     return of({
       route: transition.route.name,
       handlers: transition.route.handlers,
@@ -27,10 +45,11 @@ const createTestConfig = (config, options = {}) => ({
   ...config,
 });
 
+type TestRouter = Router<any, { [a: string]: any }, any>;
 describe('Router', () => {
   it('works with empty route collection', done => {
     const history = createTestHistory('/');
-    const router = new Router(
+    const router: TestRouter = new Router(
       createTestConfig({
         routeCollection: new RouteCollection([]),
         history,
@@ -79,7 +98,7 @@ describe('Router', () => {
 
   it('matches route', done => {
     const history = createTestHistory('/');
-    const router = new Router(
+    const router: TestRouter = new Router(
       createTestConfig({
         routeCollection: new RouteCollection([
           {
@@ -123,7 +142,7 @@ describe('Router', () => {
 
   it('matches route with params', done => {
     const history = createTestHistory('/123');
-    const router = new Router(
+    const router: TestRouter = new Router(
       createTestConfig({
         routeCollection: new RouteCollection([
           {
@@ -168,7 +187,7 @@ describe('Router', () => {
 
   it('matches route with params and search query and hash', done => {
     const history = createTestHistory('/123?q=text#anchor');
-    const router = new Router(
+    const router: TestRouter = new Router(
       createTestConfig({
         routeCollection: new RouteCollection([
           {
@@ -230,7 +249,7 @@ describe('Router', () => {
     const history = createTestHistory('/123?q=text#anchor');
 
     let hashChangeCount = 0;
-    const router = new Router(
+    const router: TestRouter = new Router(
       createTestConfig(
         {
           routeCollection: new RouteCollection([
@@ -248,7 +267,7 @@ describe('Router', () => {
           history,
         },
         {
-          onHashChange(location) {
+          onHashChange(location: Location) {
             if (hashChangeCount === 0) {
               // router.navigate
               expect(location).toEqual({
@@ -393,12 +412,13 @@ describe('Router', () => {
   });
 
   it('uses onBeforeUnload', done => {
-    let historyChange;
+    let historyChange: any;
     const history = createTestHistory('/', (...v) => {
       historyChange = v;
     });
 
     let count = 0;
+    // @ts-ignore
     global.confirm = txt => {
       count += 1;
       return txt === 'yes';
@@ -409,7 +429,7 @@ describe('Router', () => {
     const testHandlerOptions = {
       onBeforeUnload: () => answer,
     };
-    const router = new Router(
+    const router: TestRouter = new Router(
       createTestConfig(
         {
           routeCollection: new RouteCollection([
@@ -425,7 +445,7 @@ describe('Router', () => {
             },
           ]),
           history,
-          afterRender(stateHandler, { state }) {
+          afterRender(stateHandler: any, { state }: any) {
             // after state was rendered
             if (state.onBeforeUnload) {
               // if state provides before unload hook - replace default with it
@@ -486,26 +506,27 @@ describe('Router', () => {
   it('handles transition.forward calls', done => {
     const history = createTestHistory('/');
 
-    const router = new Router({
-      routeCollection: new RouteCollection([
+    const router: TestRouter = new Router({
+      routeCollection: new RouteCollection<any>([
         {
           name: 'main',
-          handler: t => 'main',
+          handler: (t: any) => 'main',
           url: '/',
         },
         {
           name: 'main2',
-          handler: t => t.forward('/3'),
+          handler: (t: any) => t.forward('/3'),
           url: '/2',
         },
         {
           name: 'main3',
-          handler: t => 'main3',
+          handler: (t: any) => 'main3',
           url: '/3',
         },
         {
           name: 'main4',
-          handler: t => (t.location.hash === '' ? t.forward('/4#123') : ''),
+          handler: (t: any) =>
+            t.location.hash === '' ? t.forward('/4#123') : '',
           url: '/4',
         },
       ]),
@@ -543,16 +564,16 @@ describe('Router', () => {
   it('crashes when transition.forward navigates to same page', done => {
     const history = createTestHistory('/');
 
-    const router = new Router({
-      routeCollection: new RouteCollection([
+    const router: TestRouter = new Router({
+      routeCollection: new RouteCollection<any>([
         {
           name: 'main',
-          handler: t => 'main',
+          handler: (t: any) => 'main',
           url: '/',
         },
         {
           name: 'main2',
-          handler: t => t.forward('/2') || '',
+          handler: (t: any) => t.forward('/2') || '',
           url: '/2',
         },
       ]),
@@ -569,7 +590,7 @@ describe('Router', () => {
     });
 
     let hasError = false;
-    router.renderResult().subscribe(null, () => {
+    router.renderResult().subscribe(undefined, () => {
       hasError = true;
     });
 
@@ -589,21 +610,21 @@ describe('Router', () => {
   it('crashes when transition.forward calls cause redirect loop', done => {
     const history = createTestHistory('/');
 
-    const router = new Router({
-      routeCollection: new RouteCollection([
+    const router: TestRouter = new Router({
+      routeCollection: new RouteCollection<any>([
         {
           name: 'main',
-          handler: t => 'main',
+          handler: (t: any) => 'main',
           url: '/',
         },
         {
           name: 'main2',
-          handler: t => t.forward('/3'),
+          handler: (t: any) => t.forward('/3'),
           url: '/2',
         },
         {
           name: 'main3',
-          handler: t => t.forward('/2'),
+          handler: (t: any) => t.forward('/2'),
           url: '/3',
         },
       ]),
@@ -620,7 +641,7 @@ describe('Router', () => {
     });
 
     let hasError = false;
-    router.renderResult().subscribe(null, () => {
+    router.renderResult().subscribe(undefined, () => {
       hasError = true;
     });
 
@@ -640,7 +661,7 @@ describe('Router', () => {
   it('pass render exception to observer', done => {
     const history = createTestHistory('/');
 
-    const router = new Router({
+    const router: TestRouter = new Router({
       routeCollection: new RouteCollection([
         {
           name: 'main',
@@ -661,7 +682,7 @@ describe('Router', () => {
     });
 
     let hasError = false;
-    router.renderResult().subscribe(null, () => {
+    router.renderResult().subscribe(undefined, () => {
       hasError = true;
     });
 
@@ -676,7 +697,7 @@ describe('Router', () => {
   it('logs exception if not observer for it', done => {
     const history = createTestHistory('/');
 
-    const router = new Router({
+    const router: TestRouter = new Router({
       routeCollection: new RouteCollection([
         {
           name: 'main',
@@ -697,7 +718,7 @@ describe('Router', () => {
     });
 
     const bak = console.error;
-    console.error = v => {
+    console.error = (v: any) => {
       expect(v).toMatchSnapshot();
       console.error = bak;
       router.stop();
@@ -709,8 +730,8 @@ describe('Router', () => {
   it('loads next matched route if first is not loaded', () => {
     const history = createTestHistory('/');
 
-    const router = new Router({
-      routeCollection: new RouteCollection([
+    const router: TestRouter = new Router({
+      routeCollection: new RouteCollection<any>([
         {
           name: 'main1',
           handler: () => false,

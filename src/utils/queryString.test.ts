@@ -1,4 +1,4 @@
-import { parse, generate } from './queryString';
+import { generate, parse } from './queryString';
 
 describe('Query string utility', () => {
   it('parses empty query string', () => {

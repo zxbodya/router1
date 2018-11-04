@@ -1,12 +1,17 @@
-import { take, first } from 'rxjs/operators';
+import { first, take } from 'rxjs/operators';
 
 import { createHashHistory } from './createHashHistory';
+
+// tslint:disable-next-line no-namespace
+declare namespace global {
+  let window: any;
+}
 
 describe('createHashHistory legacy browsers', () => {
   beforeEach(() => {
     global.window = {
       onhashchange: undefined,
-      addListener(e, l) {
+      addListener(e: any, l: any) {
         this.onhashchange = l;
       },
       removeListener() {
@@ -96,7 +101,7 @@ describe('createHashHistory modern browsers', () => {
   beforeEach(() => {
     global.window = {
       onpopstate: undefined,
-      addListener(e, l) {
+      addListener(e: any, l: any) {
         this.onpopstate = l;
       },
       removeListener() {

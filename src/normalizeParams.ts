@@ -1,8 +1,13 @@
+import { RouteParams } from './Router';
+
 const has = Object.prototype.hasOwnProperty;
 
 // values like would be parsed from generated url
-export function normalizeParams(searchParams, params) {
-  const res = {};
+export function normalizeParams(
+  searchParams: string[],
+  params: { [key: string]: any }
+): RouteParams {
+  const res = {} as RouteParams;
   for (const key in params) {
     /* istanbul ignore else */
     if (has.call(params, key)) {

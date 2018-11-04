@@ -1,12 +1,14 @@
 import { fromEvent } from 'rxjs';
-import { startWith, map, publishReplay, refCount } from 'rxjs/operators';
+import { map, publishReplay, refCount, startWith } from 'rxjs/operators';
 
 import { locationFromUrl } from '../utils/locationFromUrl';
 
 import { splitUrl } from '../utils/splitUrl';
 
-export function createHashHistory() {
-  function currentLocation(source) {
+import { History, Location, LocationSource } from './history';
+
+export function createHashHistory(): History {
+  function currentLocation(source: LocationSource): Location {
     const parts = splitUrl(
       window.location.hash && window.location.hash.substr(1)
     );
@@ -31,17 +33,17 @@ export function createHashHistory() {
       refCount()
     );
 
-    push = (url, state = null, title = null) => {
+    push = (url: string, state: object = null, title: string = null) => {
       window.history.pushState(state, title, url);
     };
-    replace = (url, state = null, title = null) => {
+    replace = (url: string, state: object = null, title: string = null) => {
       window.history.replaceState(state, title, url);
     };
   } else {
-    replace = url => {
+    replace = (url: string) => {
       window.location.replace(url);
     };
-    push = url => {
+    push = (url: string) => {
       window.location.assign(url);
     };
 
@@ -54,13 +56,13 @@ export function createHashHistory() {
   }
 
   return {
-    createUrl(path, search, hash) {
+    createUrl(path, search, hash): string {
       const url = `#${path}${search ? `?${search}` : ''}${
         hash ? `#${hash}` : ''
       }`;
       return url === '#/' ? '' : url;
     },
-    parseUrl(url) {
+    parseUrl(url: string): Location {
       const parts = splitUrl(url);
       return locationFromUrl(parts[2] || '/');
     },

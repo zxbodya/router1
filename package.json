@@ -2,11 +2,15 @@
   "name": "router1",
   "version": "0.12.1",
   "description": "Reactive routing library for universal(isomorphic) web applications",
-  "main": "dist/router1.cjs.js",
+  "main": "dist/index.js",
   "module": "dist/router1.esm.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "sideEffects": false,
   "scripts": {
-    "lint": "eslint ./src/",
+    "lint": "tslint --project .",
     "cover": "jest --coverage",
     "test": "jest",
     "build": "rollup -c",
@@ -34,39 +38,31 @@
   },
   "homepage": "https://github.com/zxbodya/router1#readme",
   "devDependencies": {
-    "@babel/core": "^7.0.0",
-    "@babel/plugin-proposal-class-properties": "^7.0.0",
-    "@babel/plugin-proposal-object-rest-spread": "^7.0.0",
-    "@babel/plugin-transform-runtime": "^7.0.0",
-    "@babel/preset-env": "^7.0.0",
-    "@babel/runtime": "^7.0.0",
-    "babel-core": "^7.0.0-bridge.0",
-    "babel-jest": "^23.4.2",
+    "@types/jest": "^23.3.9",
     "codecov.io": "^0.1.6",
     "coveralls": "^3.0.0",
-    "eslint": "^5.5.0",
-    "eslint-config-airbnb-base": "^13.0.0",
-    "eslint-config-prettier": "^3.0.1",
-    "eslint-plugin-import": "^2.11.0",
-    "eslint-plugin-prettier": "^3.0.0",
     "jest": "^23.4.2",
     "prettier": "^1.14.1",
     "rollup": "^0.66.6",
-    "rollup-plugin-babel": "^4.0.3",
-    "rxjs": "^6.3.1"
+    "rollup-plugin-typescript2": "^0.17.2",
+    "rxjs": "^6.3.1",
+    "temp-dir": "^1.0.0",
+    "ts-jest": "^23.10.4",
+    "tslint": "^5.11.0",
+    "tslint-config-prettier": "^1.15.0",
+    "tslint-plugin-prettier": "^2.0.1",
+    "typescript": "^3.1.6"
   },
   "peerDependencies": {
-    "@babel/runtime": "^7.0.0",
-    "rxjs": "^6.0.0"
+    "rxjs": "^6.0.0",
+    "tslib": "^1.9.3"
   },
   "prettier": {
     "singleQuote": true,
     "trailingComma": "es5"
   },
   "jest": {
-    "testEnvironment": "node",
-    "roots": [
-      "src"
-    ]
+    "preset": "ts-jest",
+    "testEnvironment": "node"
   }
 }
