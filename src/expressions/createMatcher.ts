@@ -1,7 +1,7 @@
-import { CompiledExpression } from './compile';
+import { Expresssion } from './compile';
 
 export function createMatcher(
-  info: CompiledExpression
+  info: Expresssion
 ): (path: string) => { [k: string]: string } | null {
   const matcher = info[0];
   const paramNames = info[2];

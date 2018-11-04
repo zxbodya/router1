@@ -4,8 +4,8 @@ import { map, mergeMap, switchMap } from 'rxjs/operators';
 
 import { Subscriber, Subscription } from 'rxjs';
 
-import { CompiledRouteDef } from './compileRoutes';
-import { History, Location, LocationSource } from './history/history';
+import { Route } from './compileRoutes';
+import { History, Location, NavigateSource } from './history/history';
 import { RouteCollection } from './RouteCollection';
 
 import {
@@ -16,10 +16,10 @@ import {
 import { normalizeParams } from './normalizeParams';
 import { OnLocationChange, StateHandler } from './StateHandler';
 
-export interface Transition<State, RenderResult, HandlerPart> {
+export interface Transition<RouteState, RenderResult, RouteHandler> {
   location: Location;
   // eslint-disable-next-line no-use-before-define
-  router: Router<State, RenderResult, HandlerPart>;
+  router: Router<RouteState, RenderResult, RouteHandler>;
   redirectCount: number;
   forward: (redirectUrl: string) => void;
 }
@@ -27,144 +27,171 @@ export interface Transition<State, RenderResult, HandlerPart> {
 export interface RouteParams {
   [key: string]: string | boolean;
 }
-export type RouteTransition<State, RenderResult, HandlerPart> = Transition<
-  State,
+export type RouteTransition<RouteState, RenderResult, HandlerPart> = Transition<
+  RouteState,
   RenderResult,
   HandlerPart
 > & {
-  route: CompiledRouteDef<HandlerPart>;
+  route: Route<HandlerPart>;
   params: RouteParams;
 };
 
-type LoadState<State, RenderResult, HandlerPart> = ((
-  routeTransition: Transition<State, RenderResult, HandlerPart> & { route: any }
-) => Observable<State>);
+type StateLoader<RouteState, RenderResult, HandlerPart> = ((
+  routeTransition: RouteTransition<RouteState, RenderResult, HandlerPart>
+) => Observable<RouteState>);
 
-type AfterRender<State, RenderResult, HandlerPart> = (
-  stateHandler: StateHandler<State, RenderResult, HandlerPart>,
+export type AfterRender<RouteState, RenderResult, HandlerPart> = (
+  stateHandler: StateHandler<RouteState, RenderResult, HandlerPart>,
   pageState: {
-    state: State;
-    transition: Transition<State, RenderResult, HandlerPart>;
+    state: RouteState;
+    transition: Transition<RouteState, RenderResult, HandlerPart>;
     renderResult: RenderResult;
   }
 ) => void;
 
-export interface RouterConfig<State, RenderResult, HandlerPart> {
+export interface RouterConfig<RouteState, RenderResult, HandlerPart> {
   history: History;
   routeCollection: RouteCollection<HandlerPart>;
-  loadState: LoadState<State, RenderResult, HandlerPart>;
+  loadState: StateLoader<RouteState, RenderResult, HandlerPart>;
   onHashChange?: OnLocationChange;
   renderState: (
-    state: State,
-    transition: Transition<State, RenderResult, HandlerPart> & {
-      route: CompiledRouteDef<HandlerPart>;
-      params: object;
-    }
+    state: RouteState,
+    transition: RouteTransition<RouteState, RenderResult, HandlerPart>
   ) => Observable<RenderResult>;
-  afterRender?: AfterRender<State, RenderResult, HandlerPart>;
+  afterRender?: AfterRender<RouteState, RenderResult, HandlerPart>;
 }
 
-type RenderState<State, RenderResult, HandlerPart> = (
-  state: State,
-  routeTransition: RouteTransition<State, RenderResult, HandlerPart>
+type RenderState<RouteState, RenderResult, HandlerPart> = (
+  state: RouteState,
+  routeTransition: RouteTransition<RouteState, RenderResult, HandlerPart>
 ) => Observable<RenderResult>;
 
-export class Router<State, RenderResult, HandlerPart> {
-  public history: History;
+export class Router<RouteState, RenderResult, RouteHandler> {
+  private readonly history: History;
 
-  public routeCollection: RouteCollection<HandlerPart>;
+  private readonly routeCollection: RouteCollection<RouteHandler>;
 
   public activeRoute: [
     string,
     RouteParams,
-    StateHandler<State, RenderResult, HandlerPart> | null
-  ];
+    StateHandler<RouteState, RenderResult, RouteHandler> | null
+  ] = ['', {}, null];
+  public currentLocation: Location = {
+    pathname: '',
+    search: '',
+    hash: '',
+    state: null,
+  };
 
-  public currentLocation: Location;
+  private resultsSubscription?: Subscription = undefined;
 
-  public resultsSubscription?: Subscription;
+  private readonly renderResult$: Subject<RenderResult> = new Subject();
 
-  public renderResult$: Subject<RenderResult>;
+  private readonly loadState: StateLoader<
+    RouteState,
+    RenderResult,
+    RouteHandler
+  >;
 
-  public loadState: LoadState<State, RenderResult, HandlerPart>;
+  private readonly onHashChange: OnLocationChange;
 
-  public onHashChange: OnLocationChange;
+  private readonly renderState: RenderState<
+    RouteState,
+    RenderResult,
+    RouteHandler
+  >;
 
-  public renderState: RenderState<State, RenderResult, HandlerPart>;
+  private readonly afterRender: AfterRender<
+    RouteState,
+    RenderResult,
+    RouteHandler
+  >;
 
-  public afterRender: AfterRender<State, RenderResult, HandlerPart>;
-
-  public navigate$: Subject<{
+  private readonly navigate$: Subject<{
     url: string;
     state?: object;
-    source: LocationSource;
-  }>;
+    source: NavigateSource;
+  }> = new Subject();
 
-  constructor(config: RouterConfig<State, RenderResult, HandlerPart>) {
+  public onBeforeUnload = (e?: BeforeUnloadEvent): string | void => {
+    const returnValue = this.activeRoute[2]
+      ? this.activeRoute[2].onBeforeUnload()
+      : '';
+    if (e && returnValue) {
+      e.returnValue = returnValue;
+    }
+    return returnValue || undefined;
+  };
+
+  constructor(config: RouterConfig<RouteState, RenderResult, RouteHandler>) {
     this.history = config.history;
     this.routeCollection = config.routeCollection;
-
-    this.activeRoute = ['', {}, null];
-    this.currentLocation = {
-      pathname: '',
-      search: '',
-      hash: '',
-      state: null,
-    };
-
-    this.resultsSubscription = null;
-    this.renderResult$ = new Subject();
-
     this.loadState = config.loadState;
     this.onHashChange = config.onHashChange || noop;
     this.renderState = config.renderState;
     this.afterRender = config.afterRender || noop;
-
-    this.navigate$ = new Subject();
   }
 
-  public createHandler(
-    transition: Transition<State, RenderResult, HandlerPart> & {
-      route: CompiledRouteDef<HandlerPart>;
+  private createHandler(
+    transition: Transition<RouteState, RenderResult, RouteHandler> & {
+      route: Route<RouteHandler>;
       params: RouteParams;
     }
-  ): Observable<StateHandler<State, RenderResult, HandlerPart> | null> {
+  ): Observable<StateHandler<RouteState, RenderResult, RouteHandler> | null> {
     const state$ = this.loadState(transition);
     return state$.pipe(
-      map(state => (state ? new StateHandler(state, transition) : null))
+      map(
+        state =>
+          state
+            ? new StateHandler(
+                state,
+                transition,
+                this.onHashChange,
+                this.renderState,
+                this.afterRender
+              )
+            : null
+      )
     );
   }
 
-  public createNotFoundHandler(
-    transition: Transition<State, RenderResult, HandlerPart>
-  ): Observable<StateHandler<State, RenderResult, HandlerPart>> {
+  private createNotFoundHandler(
+    transition: Transition<RouteState, RenderResult, RouteHandler>
+  ): Observable<StateHandler<RouteState, RenderResult, RouteHandler>> {
     const notFoundTransition = {
-      // todo: better typing, to separate matched route
+      // @ts-ignore
       route: {
         name: '',
         handlers: [],
-      } as CompiledRouteDef<HandlerPart>,
+      } as Route<RouteHandler>,
       params: {},
       ...transition,
       router: this,
     };
     const state$ = this.loadState(notFoundTransition);
     return state$.pipe(
-      map(state => new StateHandler(state, notFoundTransition))
+      map(
+        state =>
+          new StateHandler(
+            state,
+            notFoundTransition,
+            this.onHashChange,
+            this.renderState,
+            this.afterRender
+          )
+      )
     );
-  }
-
-  public onBeforeUnload(): string {
-    return this.activeRoute[2] ? this.activeRoute[2].onBeforeUnload() : '';
   }
 
   public start(): void {
     const transitionFromLocation = (
       toLocation: Location
-    ): Observable<Transition<State, RenderResult, HandlerPart>> =>
+    ): Observable<Transition<RouteState, RenderResult, RouteHandler>> =>
       Observable.create(
         (
-          observer: Subscriber<Transition<State, RenderResult, HandlerPart>>
+          observer: Subscriber<
+            Transition<RouteState, RenderResult, RouteHandler>
+          >
         ) => {
           let redirectCount = 0;
           let forwardInt: (url: string) => void;
@@ -286,9 +313,9 @@ export class Router<State, RenderResult, HandlerPart> {
       })
     );
     const matchRoutes = (
-      transition: Transition<State, RenderResult, HandlerPart>
-    ): Transition<State, RenderResult, HandlerPart> & {
-      routes: Array<[CompiledRouteDef<HandlerPart>, RouteParams]>;
+      transition: Transition<RouteState, RenderResult, RouteHandler>
+    ): Transition<RouteState, RenderResult, RouteHandler> & {
+      routes: Array<[Route<RouteHandler>, RouteParams]>;
     } => ({
       ...transition,
       routes: this.routeCollection.match(
@@ -298,20 +325,24 @@ export class Router<State, RenderResult, HandlerPart> {
     });
 
     const loadMatched = (
-      transition: Transition<State, RenderResult, HandlerPart> & {
-        routes: Array<[CompiledRouteDef<HandlerPart>, RouteParams]>;
+      transition: Transition<RouteState, RenderResult, RouteHandler> & {
+        routes: Array<[Route<RouteHandler>, RouteParams]>;
       }
     ): Observable<
-      [string, RouteParams, StateHandler<State, RenderResult, HandlerPart>]
+      [
+        string,
+        RouteParams,
+        StateHandler<RouteState, RenderResult, RouteHandler>
+      ]
     > => {
       const loadRoute = (
-        routes: Array<[CompiledRouteDef<HandlerPart>, RouteParams]>,
+        routes: Array<[Route<RouteHandler>, RouteParams]>,
         index: number
       ): Observable<
         [
           string,
           RouteParams,
-          StateHandler<State, RenderResult, HandlerPart> | null
+          StateHandler<RouteState, RenderResult, RouteHandler> | null
         ]
       > => {
         if (index >= routes.length) {
@@ -320,7 +351,7 @@ export class Router<State, RenderResult, HandlerPart> {
             [
               string,
               RouteParams,
-              StateHandler<State, RenderResult, HandlerPart>
+              StateHandler<RouteState, RenderResult, RouteHandler>
             ]
           >;
         }
@@ -330,7 +361,7 @@ export class Router<State, RenderResult, HandlerPart> {
           route: route[0],
           params: route[1],
           ...transition,
-        } as Transition<State, RenderResult, HandlerPart> & { route: any; params: any });
+        } as Transition<RouteState, RenderResult, RouteHandler> & { route: any; params: any });
         return handler.pipe(
           switchMap(
             loadResult =>
@@ -339,7 +370,11 @@ export class Router<State, RenderResult, HandlerPart> {
                     [
                       string,
                       RouteParams,
-                      StateHandler<State, RenderResult, HandlerPart> | null
+                      StateHandler<
+                        RouteState,
+                        RenderResult,
+                        RouteHandler
+                      > | null
                     ]
                   >)
                 : loadRoute(routes, index + 1)
@@ -358,7 +393,7 @@ export class Router<State, RenderResult, HandlerPart> {
               [
                 string,
                 RouteParams,
-                StateHandler<State, RenderResult, HandlerPart> | null
+                StateHandler<RouteState, RenderResult, RouteHandler>
               ]
             >
         )
@@ -368,9 +403,10 @@ export class Router<State, RenderResult, HandlerPart> {
     const activateLoaded = ([route, params, handler]: [
       string,
       RouteParams,
-      StateHandler<State, RenderResult, HandlerPart>
+      StateHandler<RouteState, RenderResult, RouteHandler>
     ]): Observable<RenderResult> => {
       this.activeRoute = [route, params, handler];
+      // @ts-ignore
       return this.activeRoute[2].render();
     };
 
@@ -404,7 +440,7 @@ export class Router<State, RenderResult, HandlerPart> {
   }
 
   public renderResult(): Observable<RenderResult> {
-    return this.renderResult$;
+    return this.renderResult$.asObservable();
   }
 
   public isActive(route: string, params: RouteParams = {}): boolean {
@@ -460,13 +496,18 @@ export class Router<State, RenderResult, HandlerPart> {
     route: string,
     params: RouteParams = {},
     hash: string = '',
-    state: object = {}
+    state: object = {},
+    source: NavigateSource = 'push'
   ): void {
     const url = this.createUrl(route, params, hash);
-    this.navigateToUrl(url, state);
+    this.navigateToUrl(url, state, source);
   }
 
-  public navigateToUrl(url: string, state: object = {}): void {
-    this.navigate$.next({ url, state, source: 'push' });
+  public navigateToUrl(
+    url: string,
+    state: object = {},
+    source: NavigateSource = 'push'
+  ): void {
+    this.navigate$.next({ url, state, source });
   }
 }

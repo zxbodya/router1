@@ -33,10 +33,14 @@ export function createHashHistory(): History {
       refCount()
     );
 
-    push = (url: string, state: object = null, title: string = null) => {
+    push = (url: string, state: object | null = null, title: string = '') => {
       window.history.pushState(state, title, url);
     };
-    replace = (url: string, state: object = null, title: string = null) => {
+    replace = (
+      url: string,
+      state: object | null = null,
+      title: string = ''
+    ) => {
       window.history.replaceState(state, title, url);
     };
   } else {

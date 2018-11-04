@@ -5,33 +5,37 @@ import { createMatcher } from './expressions/createMatcher';
 import { concat } from './expressions/concat';
 import { normalizeParams } from './normalizeParams';
 
-import { CompiledExpression } from './expressions/compile';
+import { Expresssion } from './expressions/compile';
 import { RouteParams } from './Router';
 
-export interface RouteDef<HandlerPart> {
+export interface RouteDef<RouteHandler> {
   name?: string;
   url?: string;
-  handler?: HandlerPart;
-  handlers?: HandlerPart[];
-  routes?: Array<RouteDef<HandlerPart>>;
+  handler?: RouteHandler;
+  handlers?: RouteHandler[];
+  routes?: Array<RouteDef<RouteHandler>>;
 }
 
-export interface RawRouteDef<HandlerPart> {
-  names: Array<string | null>;
-  handlers: HandlerPart[];
-  pathExpressions: CompiledExpression[];
+interface RawRouteDef<RouteHandler> {
+  names: Array<string | null | void>;
+  handlers: RouteHandler[];
+  pathExpressions: Expresssion[];
   searchParams: string[];
 }
 
-function parseRoutes<HandlerPart>(
-  routeDefs: Array<RouteDef<HandlerPart>>
-): Array<RawRouteDef<HandlerPart>> {
-  const rawRoutes = [];
+function parseRoutes<RouteHandler>(
+  routeDefs: Array<RouteDef<RouteHandler>>
+): Array<RawRouteDef<RouteHandler>> {
+  const rawRoutes = [] as Array<RawRouteDef<RouteHandler>>;
 
   for (let i = 0, l = routeDefs.length; i < l; i += 1) {
     const routeDef = routeDefs[i];
 
-    const urlParts = (routeDef.url || '').match(/^([^?]*)(?:\?(.*))?$/);
+    const urlParts = (routeDef.url || '').match(/^([^?]*)(?:\?(.*))?$/) as [
+      string,
+      string,
+      string
+    ];
 
     const pathExpression = compile(urlParts[1]);
     const searchParams = urlParts[2] ? urlParts[2].split('&') : [];
@@ -69,21 +73,21 @@ function parseRoutes<HandlerPart>(
   return rawRoutes;
 }
 
-function getRouteName<HandlerPart>(routeDef: RawRouteDef<HandlerPart>) {
+function getRouteName<RouteHandler>(routeDef: RawRouteDef<RouteHandler>) {
   return routeDef.names.filter(v => v).join('.');
 }
 
-export interface CompiledRouteDef<HandlerPart> {
+export interface Route<RouteHandler> {
   name: string;
-  handlers: HandlerPart[];
+  handlers: RouteHandler[];
   matchPath: (path: string) => RouteParams | null;
   generatePath: (params: RouteParams) => string;
   searchParams: string[];
 }
 
-export function compileRoutes<HandlerPart>(
-  routeDefs: Array<RouteDef<HandlerPart>>
-): Array<CompiledRouteDef<HandlerPart>> {
+export function compileRoutes<RouteHandler>(
+  routeDefs: Array<RouteDef<RouteHandler>>
+): Array<Route<RouteHandler>> {
   const rawRoutes = parseRoutes(routeDefs);
   /* istanbul ignore else */
   if (process.env.NODE_ENV !== 'production') {

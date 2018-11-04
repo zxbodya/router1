@@ -1,4 +1,4 @@
-import { CompiledExpression } from './compile';
+import { Expresssion } from './compile';
 
 /**
  * Concatenates compiled expressions
@@ -6,7 +6,7 @@ import { CompiledExpression } from './compile';
  * @param expressions
  * @return {*[]}
  */
-export function concat(expressions: CompiledExpression[]): CompiledExpression {
+export function concat(expressions: Expresssion[]): Expresssion {
   let exp = '';
   let params: string[] = [];
   let parts: Array<string | null> = [];

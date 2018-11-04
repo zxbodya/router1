@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.13.0 (2018-11-04)
+
+- TypeScript
+- **breaking:** change router.onBeforeUnload to possible to use dirrectly as handler for window.onbeforeunload
+
 ## 0.12.1 (2018-09-04)
 
 - Babel 7

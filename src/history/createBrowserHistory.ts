@@ -29,10 +29,10 @@ export function createBrowserHistory(): History {
       refCount()
     );
 
-    push = (url: string, state: object = null, title = '') => {
+    push = (url: string, state: object | null = null, title = '') => {
       window.history.pushState(state, title, url);
     };
-    replace = (url: string, state: object = null, title = '') => {
+    replace = (url: string, state: object | null = null, title = '') => {
       window.history.replaceState(state, title, url);
     };
   } else {

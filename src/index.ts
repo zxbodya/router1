@@ -4,3 +4,4 @@ export { createBrowserHistory } from './history/createBrowserHistory';
 export { createHashHistory } from './history/createHashHistory';
 export { createTestHistory } from './history/createTestHistory';
 export { RouteCollection } from './RouteCollection';
+export { RouteParams, RouteTransition } from './Router';

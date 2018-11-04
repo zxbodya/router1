@@ -8,7 +8,7 @@ import { first, take } from 'rxjs/operators';
 import { RouteCollection } from './RouteCollection';
 import { Router } from './Router';
 
-import { CompiledRouteDef } from './compileRoutes';
+import { Route } from './compileRoutes';
 import { createTestHistory } from './history/createTestHistory';
 import { RouteParams, Transition } from './Router';
 
@@ -31,7 +31,7 @@ const createTestConfig = (
   renderState(
     state: any,
     transition: Transition<any, any, any> & {
-      route: CompiledRouteDef<any>;
+      route: Route<any>;
       params: RouteParams;
     }
   ): Observable<object> {
@@ -665,7 +665,7 @@ describe('Router', () => {
       routeCollection: new RouteCollection([
         {
           name: 'main',
-          handler: () => 'main',
+          handler: () => 'main' as any,
           url: '/',
         },
       ]),
@@ -701,7 +701,7 @@ describe('Router', () => {
       routeCollection: new RouteCollection([
         {
           name: 'main',
-          handler: () => 'main',
+          handler: () => 'main' as any,
           url: '/',
         },
       ]),

@@ -94,7 +94,7 @@ describe('Router, compiling route collection', () => {
 
   describe('warnings', () => {
     const { warn } = console;
-    let lastWarnMessage: any[];
+    let lastWarnMessage: any;
     beforeAll(() => {
       // tslint:disable-next-line no-console
       console.warn = (...args: any[]) => {

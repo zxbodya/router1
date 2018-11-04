@@ -1,6 +1,6 @@
-export type CompiledExpression = [string, Array<string | null>, string[]];
+export type Expresssion = [string, Array<string | null>, string[]];
 
-export function compile(expression: string): CompiledExpression {
+export function compile(expression: string): Expresssion {
   // http://stackoverflow.com/questions/8844256/split-string-including-regular-expression-match
   const textParts = expression.split(/<([^>:]+?)(?::([^>]+))?>/);
   const matcher = [];

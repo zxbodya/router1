@@ -1,14 +1,10 @@
-import { RouteParams } from '../Router';
-import { CompiledExpression } from './compile';
+import { Expresssion } from './compile';
 
-export function createGenerator(
-  info: CompiledExpression
-): (params: object) => string {
-  const generateParts = info[1];
-  const paramNames = info[2];
+export function createGenerator(info: Expresssion): (params: object) => string {
+  const [, generateParts, paramNames] = info;
   const partsCount = generateParts.length;
 
-  return (params: RouteParams): string => {
+  return (params: { [k: string]: any }): string => {
     /* istanbul ignore else */
     if (process.env.NODE_ENV !== 'production') {
       const missingParams = paramNames.filter(
@@ -20,13 +16,13 @@ export function createGenerator(
       }
     }
 
-    const res = [];
+    const res = [] as string[];
     for (let i = 0, pn = 0; i < partsCount; i += 1) {
       const g = generateParts[i];
       if (g !== null) {
         res.push(g);
       } else {
-        res.push(params[paramNames[pn]]);
+        res.push(`${params[paramNames[pn]]}`);
         pn += 1;
       }
     }

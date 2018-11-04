@@ -10,8 +10,8 @@ type TestCallback = (
   action: 'push' | 'replace',
   historyState: {
     url: string;
-    state?: object;
-    title?: string;
+    state?: object | null;
+    title?: string | null;
   }
 ) => void;
 
@@ -27,21 +27,29 @@ export function createTestHistory(
     parseUrl(url: string) {
       return locationFromUrl(url);
     },
-    push(url: string, state: object = null, title: string = null) {
+    push(
+      url: string,
+      state: object | null = null,
+      title: string | null = null
+    ) {
       if (cb) {
         cb('push', { url, state, title });
       }
     },
-    replace(url: string, state: object = null, title: string = null) {
+    replace(
+      url: string,
+      state: object | null = null,
+      title: string | null = null
+    ) {
       if (cb) {
         cb('replace', { url, state, title });
       }
     },
-    navigate(url: string, state?: object) {
+    navigate(url: string, state?: object | null) {
       location$.next({ ...locationFromUrl(url, state), source: 'pop' });
     },
     location: location$.pipe(
-      startWith({ ...locationFromUrl(initialUrl), source: 'init' }),
+      startWith({ ...locationFromUrl(initialUrl), source: 'init' } as Location),
       publishReplay(1),
       refCount()
     ) as Observable<Location>,

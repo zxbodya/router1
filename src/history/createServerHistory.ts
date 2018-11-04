@@ -4,7 +4,7 @@ import { publishReplay, refCount } from 'rxjs/operators';
 
 import { locationFromUrl } from '../utils/locationFromUrl';
 
-import { History } from './history';
+import { History, Location } from './history';
 
 export function createServerHistory(initialUrl: string): History {
   return {
@@ -20,7 +20,10 @@ export function createServerHistory(initialUrl: string): History {
     replace() {
       throw new Error('navigation not supported');
     },
-    location: of({ ...locationFromUrl(initialUrl), source: 'init' }).pipe(
+    location: of({
+      ...locationFromUrl(initialUrl),
+      source: 'init',
+    } as Location).pipe(
       publishReplay(1),
       refCount()
     ) as Observable<Location>,

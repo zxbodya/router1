@@ -1,21 +1,23 @@
 import { compileRoutes } from './compileRoutes';
 import { pickValues as pickQueryValues } from './utils/queryString';
 
-import { CompiledRouteDef, RouteDef } from './compileRoutes';
+import { Route, RouteDef } from './compileRoutes';
 import { RouteParams } from './Router';
 
-export class RouteCollection<HandlerPart> {
-  public routes: Array<CompiledRouteDef<HandlerPart>>;
+export class RouteCollection<RouteHandler> {
+  private readonly routes: Array<Route<RouteHandler>>;
 
-  public routesByName: { [name: string]: CompiledRouteDef<HandlerPart> };
+  private readonly routesByName: {
+    [name: string]: Route<RouteHandler>;
+  };
 
-  constructor(routes: Array<RouteDef<HandlerPart>>) {
+  constructor(routes: Array<RouteDef<RouteHandler>>) {
     this.routes = [];
     this.routesByName = {};
     this.addRoutes(routes);
   }
 
-  public addRoutes(routeDefs: Array<RouteDef<HandlerPart>>): void {
+  public addRoutes(routeDefs: Array<RouteDef<RouteHandler>>): void {
     compileRoutes(routeDefs).forEach(route => {
       this.routes.push(route);
       this.routesByName[route.name] = route;
@@ -25,8 +27,8 @@ export class RouteCollection<HandlerPart> {
   public match(
     pathname: string,
     queryData: RouteParams
-  ): Array<[CompiledRouteDef<HandlerPart>, RouteParams]> {
-    const matched = [] as Array<[CompiledRouteDef<HandlerPart>, RouteParams]>;
+  ): Array<[Route<RouteHandler>, RouteParams]> {
+    const matched = [] as Array<[Route<RouteHandler>, RouteParams]>;
 
     for (let i = 0, l = this.routes.length; i < l; i += 1) {
       const route = this.routes[i];
@@ -41,7 +43,7 @@ export class RouteCollection<HandlerPart> {
     return matched;
   }
 
-  public getByName(name: string): CompiledRouteDef<HandlerPart> {
+  public getByName(name: string): Route<RouteHandler> {
     return this.routesByName[name];
   }
 }

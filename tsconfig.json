@@ -5,7 +5,7 @@
     "declarationDir": "./dist",
     "moduleResolution": "node",
     "module": "es6",
-    "noImplicitAny": true,
+    "strict": true,
     "outDir": "./dist",
     "target": "es5",
     "typeRoots": ["node_modules/@types"],
@@ -18,7 +18,7 @@
       "es2015.iterable",
       "es2016.array.include",
       "es2017"
-    ],
+    ]
   },
   "include": [
     "src/**/*"
