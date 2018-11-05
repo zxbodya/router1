@@ -1,13 +1,10 @@
 {
   "name": "router1",
-  "version": "0.13.0",
+  "version": "0.13.1",
   "description": "Reactive routing library for universal(isomorphic) web applications",
   "main": "dist/index.js",
   "module": "dist/router1.esm.js",
   "typings": "dist/index.d.ts",
-  "files": [
-    "dist"
-  ],
   "sideEffects": false,
   "scripts": {
     "lint": "tslint --project .",

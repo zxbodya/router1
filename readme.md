@@ -211,13 +211,7 @@ router.renderResult()
 To handle `onbreforeload` browser event there is callback `onBeforeUnload` in router, it can be used as following:
 
 ```js
-window.onbeforeunload = (e) => {
-  const returnValue = router.onBeforeUnload();
-  if (returnValue) {
-    e.returnValue = returnValue;
-    return returnValue;
-  }
-};
+window.onbeforeunload = router.onBeforeUnload;
 ```
 
 Other router public methods are:
