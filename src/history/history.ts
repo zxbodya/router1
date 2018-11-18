@@ -7,7 +7,7 @@ export interface Location {
   pathname: string;
   search: string;
   hash: string;
-  state?: object | null;
+  state: object & { noscroll?: boolean };
   source?: LocationSource;
 }
 

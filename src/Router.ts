@@ -80,7 +80,7 @@ export class Router<RouteState, RenderResult, RouteHandler> {
     pathname: '',
     search: '',
     hash: '',
-    state: null,
+    state: {},
   };
 
   private resultsSubscription?: Subscription = undefined;
@@ -105,7 +105,7 @@ export class Router<RouteState, RenderResult, RouteHandler> {
 
   private readonly navigate$: Subject<{
     url: string;
-    state?: object;
+    state: object;
     source: NavigateSource;
   }> = new Subject();
 

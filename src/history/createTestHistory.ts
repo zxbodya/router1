@@ -5,7 +5,7 @@ import { locationFromUrl } from '../utils/locationFromUrl';
 
 import { History, Location } from './history';
 
-type Navigate = (url: string, state?: object | null) => void;
+type Navigate = (url: string, state?: object) => void;
 type TestCallback = (
   action: 'push' | 'replace',
   historyState: {
@@ -45,7 +45,7 @@ export function createTestHistory(
         cb('replace', { url, state, title });
       }
     },
-    navigate(url: string, state?: object | null) {
+    navigate(url: string, state: object = {}) {
       location$.next({ ...locationFromUrl(url, state), source: 'pop' });
     },
     location: location$.pipe(
