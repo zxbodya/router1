@@ -120,16 +120,15 @@ export class Router<RouteState, RenderResult, RouteHandler> {
   ): Observable<StateHandler<RouteState, RenderResult, RouteHandler> | null> {
     const state$ = this.loadState(transition);
     return state$.pipe(
-      map(
-        state =>
-          state
-            ? new StateHandler(
-                state,
-                transition,
-                this.renderState,
-                this.scrollBehavior
-              )
-            : null
+      map(state =>
+        state
+          ? new StateHandler(
+              state,
+              transition,
+              this.renderState,
+              this.scrollBehavior
+            )
+          : null
       )
     );
   }
@@ -341,21 +340,16 @@ export class Router<RouteState, RenderResult, RouteHandler> {
           ...transition,
         } as Transition<RouteState, RenderResult, RouteHandler> & { route: any; params: any });
         return handler.pipe(
-          switchMap(
-            loadResult =>
-              loadResult
-                ? (of([route[0].name, route[1], loadResult]) as Observable<
-                    [
-                      string,
-                      RouteParams,
-                      StateHandler<
-                        RouteState,
-                        RenderResult,
-                        RouteHandler
-                      > | null
-                    ]
-                  >)
-                : loadRoute(routes, index + 1)
+          switchMap(loadResult =>
+            loadResult
+              ? (of([route[0].name, route[1], loadResult]) as Observable<
+                  [
+                    string,
+                    RouteParams,
+                    StateHandler<RouteState, RenderResult, RouteHandler> | null
+                  ]
+                >)
+              : loadRoute(routes, index + 1)
           )
         );
       };

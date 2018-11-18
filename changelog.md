@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.14.0 (2018-11-18)
+
+- **breaking:** Moved common after render logic to the router, replaced onHashChange and after Render with scrollBehavior property.
+- Added scroll helper class, and typical scroll behavior implementation to router package.
+- Make location state strictly an object
+
 ## 0.13.0 (2018-11-04)
 
 - TypeScript

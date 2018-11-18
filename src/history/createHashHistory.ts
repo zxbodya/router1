@@ -25,6 +25,9 @@ export function createHashHistory(): History {
   let push;
   let replace;
 
+  function fullUrl(url: string): string {
+    return `${window.location.pathname}${window.location.search}${url}`;
+  }
   if ('onpopstate' in window) {
     location = fromEvent(window, 'popstate').pipe(
       map(() => currentLocation('pop')),
@@ -33,15 +36,11 @@ export function createHashHistory(): History {
       refCount()
     );
 
-    push = (url: string, state: object | null = null, title: string = '') => {
-      window.history.pushState(state, title, url);
+    push = (url: string, state?: object, title: string = '') => {
+      window.history.pushState(state, title, fullUrl(url));
     };
-    replace = (
-      url: string,
-      state: object | null = null,
-      title: string = ''
-    ) => {
-      window.history.replaceState(state, title, url);
+    replace = (url: string, state?: object, title: string = '') => {
+      window.history.replaceState(state, title, fullUrl(url));
     };
   } else {
     replace = (url: string) => {

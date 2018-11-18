@@ -12,8 +12,8 @@ export interface Location {
 }
 
 export interface History {
-  push: (url: string, state?: object | null, title?: string) => void;
-  replace: (url: string, state?: object | null, title?: string) => void;
+  push: (url: string, state?: object, title?: string) => void;
+  replace: (url: string, state?: object, title?: string) => void;
   createUrl: (path: string, search: string, hash: string) => string;
   parseUrl: (url: string) => Location;
   location: Observable<Location>;

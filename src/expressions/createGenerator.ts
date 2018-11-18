@@ -26,9 +26,8 @@ export function createGenerator(info: Expresssion): (params: object) => string {
         pn += 1;
       }
     }
-    return encodeURI(res.join('')).replace(
-      /[?#]/g,
-      c => (c === '?' ? '%3F' : '%23')
+    return encodeURI(res.join('')).replace(/[?#]/g, c =>
+      c === '?' ? '%3F' : '%23'
     );
   };
 }
