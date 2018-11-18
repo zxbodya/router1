@@ -1,4 +1,4 @@
-import { EMPTY, merge, noop, Observable, of, Subject } from 'rxjs';
+import { EMPTY, merge, Observable, of, Subject } from 'rxjs';
 
 import { map, mergeMap, switchMap } from 'rxjs/operators';
 
@@ -14,7 +14,8 @@ import {
 } from './utils/queryString';
 
 import { normalizeParams } from './routes/normalizeParams';
-import { OnLocationChange, StateHandler } from './StateHandler';
+import { IScrollBehavior } from './scroll/types';
+import { StateHandler } from './StateHandler';
 
 export interface Transition<RouteState, RenderResult, RouteHandler> {
   location: Location;
@@ -40,31 +41,18 @@ type StateLoader<RouteState, RenderResult, RouteHandler> = ((
   routeTransition: RouteTransition<RouteState, RenderResult, RouteHandler>
 ) => Observable<RouteState>);
 
-export type AfterRender<RouteState, RenderResult, RouteHandler> = (
-  stateHandler: StateHandler<RouteState, RenderResult, RouteHandler>,
-  pageState: {
-    state: RouteState;
-    transition: Transition<RouteState, RenderResult, RouteHandler>;
-    renderResult: RenderResult;
-  }
-) => void;
+export type RenderState<RouteState, RenderResult, RouteHandler> = (
+  state: RouteState,
+  routeTransition: RouteTransition<RouteState, RenderResult, RouteHandler>
+) => Observable<RenderResult>;
 
 export interface RouterConfig<RouteState, RenderResult, RouteHandler> {
   history: History;
   routeCollection: RouteCollection<RouteHandler>;
   loadState: StateLoader<RouteState, RenderResult, RouteHandler>;
-  onHashChange?: OnLocationChange;
-  renderState: (
-    state: RouteState,
-    transition: RouteTransition<RouteState, RenderResult, RouteHandler>
-  ) => Observable<RenderResult>;
-  onLocationChange?: OnLocationChange;
+  scrollBehavior?: IScrollBehavior;
+  renderState: RenderState<RouteState, RenderResult, RouteHandler>;
 }
-
-export type RenderState<RouteState, RenderResult, RouteHandler> = (
-  state: RouteState,
-  routeTransition: RouteTransition<RouteState, RenderResult, RouteHandler>
-) => Observable<RenderResult>;
 
 export class Router<RouteState, RenderResult, RouteHandler> {
   private readonly history: History;
@@ -93,15 +81,13 @@ export class Router<RouteState, RenderResult, RouteHandler> {
     RouteHandler
   >;
 
-  private readonly onHashChange: OnLocationChange;
+  private readonly scrollBehavior?: IScrollBehavior;
 
   private readonly renderState: RenderState<
     RouteState,
     RenderResult,
     RouteHandler
   >;
-
-  private readonly onLocationChange: OnLocationChange;
 
   private readonly navigate$: Subject<{
     url: string;
@@ -110,9 +96,8 @@ export class Router<RouteState, RenderResult, RouteHandler> {
   }> = new Subject();
 
   public onBeforeUnload = (e?: BeforeUnloadEvent): string | void => {
-    const returnValue = this.activeRoute[2]
-      ? this.activeRoute[2].onBeforeUnload()
-      : '';
+    const stateHandler = this.activeRoute[2];
+    const returnValue = stateHandler ? stateHandler.onBeforeUnload() : '';
     if (e && returnValue) {
       e.returnValue = returnValue;
     }
@@ -123,9 +108,8 @@ export class Router<RouteState, RenderResult, RouteHandler> {
     this.history = config.history;
     this.routeCollection = config.routeCollection;
     this.loadState = config.loadState;
-    this.onHashChange = config.onHashChange || noop;
+    this.scrollBehavior = config.scrollBehavior;
     this.renderState = config.renderState;
-    this.onLocationChange = config.onLocationChange || noop;
   }
 
   private createHandler(
@@ -142,9 +126,8 @@ export class Router<RouteState, RenderResult, RouteHandler> {
             ? new StateHandler(
                 state,
                 transition,
-                this.onHashChange,
                 this.renderState,
-                this.onLocationChange
+                this.scrollBehavior
               )
             : null
       )
@@ -171,9 +154,8 @@ export class Router<RouteState, RenderResult, RouteHandler> {
           new StateHandler(
             state,
             notFoundTransition,
-            this.onHashChange,
             this.renderState,
-            this.onLocationChange
+            this.scrollBehavior
           )
       )
     );

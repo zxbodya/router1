@@ -3,6 +3,7 @@ import { tap } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 import { Location } from './history/history';
 import { Router, RouteTransition } from './Router';
+import { IScrollBehavior } from './scroll/types';
 
 export type OnLocationChange = (location: Location) => void;
 
@@ -18,32 +19,40 @@ export class StateHandler<
   public state: RouteState;
   public transition: RouteTransition<RouteState, RenderResult, RouteHandler>;
   public router: Router<RouteState, RenderResult, RouteHandler>;
-  public onHashChange: OnLocationChange;
+  private onHashChangeOverride?: OnLocationChange;
   public renderState: (
     state: RouteState,
     transition: RouteTransition<RouteState, RenderResult, RouteHandler>
   ) => Observable<RenderResult>;
-  public onLocationChange: OnLocationChange;
   public onBeforeUnload: () => string;
+  private readonly scrollBehavior?: IScrollBehavior;
 
   constructor(
     state: RouteState,
     routeTransition: RouteTransition<RouteState, RenderResult, RouteHandler>,
-    onHashChange: OnLocationChange,
     renderState: (
       state: RouteState,
       transition: RouteTransition<RouteState, RenderResult, RouteHandler>
     ) => Observable<RenderResult>,
-    onLocationChange: OnLocationChange
+    scrollBehavior?: IScrollBehavior
   ) {
     this.state = state;
     this.transition = routeTransition;
     this.router = routeTransition.router;
-    this.onHashChange = onHashChange;
+    this.scrollBehavior = scrollBehavior;
     this.renderState = renderState;
-    this.onLocationChange = onLocationChange;
     // by default do not prevent transition
     this.onBeforeUnload = () => '';
+  }
+
+  public onHashChange(location: Location): void {
+    if (this.onHashChangeOverride) {
+      this.onHashChangeOverride(location);
+    } else {
+      if (this.scrollBehavior) {
+        this.scrollBehavior.onHashChange(location);
+      }
+    }
   }
 
   public render(): Observable<RenderResult> {
@@ -58,9 +67,11 @@ export class StateHandler<
         if (this.state.onHashChange) {
           // if state provides hash change handler - replace default with it
           // eslint-disable-next-line no-param-reassign
-          this.onHashChange = this.state.onHashChange;
+          this.onHashChangeOverride = this.state.onHashChange;
         }
-        this.onLocationChange(this.transition.location);
+        if (this.scrollBehavior) {
+          this.scrollBehavior.onLocationChange(this.transition.location);
+        }
       })
     );
   }

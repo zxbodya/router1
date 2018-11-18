@@ -5,3 +5,5 @@ export { createHashHistory } from './history/createHashHistory';
 export { createTestHistory } from './history/createTestHistory';
 export { RouteCollection } from './routes/RouteCollection';
 export { RouteParams, RouteTransition } from './Router';
+export { ScrollBehavior } from './scroll/ScrollBehavior';
+export { ScrollManager } from './scroll/ScrollManager';

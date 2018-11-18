@@ -5,11 +5,10 @@ module.exports = {
   input: 'src/index.ts',
   external: ['rxjs', 'tslib'],
   output: [
-    { file: pkg.main, format: 'cjs' },
-    { file: pkg.module, format: 'es' },
+    { file: pkg.main, sourcemap: true, format: 'cjs' },
+    { file: pkg.module, sourcemap: true,  format: 'es' },
   ],
   plugins: [
     typescript({ cacheRoot: `${require('temp-dir')}/.rpt2_cache` }),
   ],
-  sourcemap: true,
 };
