@@ -5,12 +5,12 @@ import { Observable } from 'rxjs';
 import { noop, of } from 'rxjs';
 import { first, take } from 'rxjs/operators';
 
-import { RouteCollection } from './RouteCollection';
 import { Router } from './Router';
+import { RouteCollection } from './routes/RouteCollection';
 
-import { Route } from './compileRoutes';
 import { createTestHistory } from './history/createTestHistory';
 import { RouteParams, Transition } from './Router';
+import { Route } from './routes/compileRoutes';
 
 const createTestConfig = (
   config: any,
@@ -445,14 +445,6 @@ describe('Router', () => {
             },
           ]),
           history,
-          afterRender(stateHandler: any, { state }: any) {
-            // after state was rendered
-            if (state.onBeforeUnload) {
-              // if state provides before unload hook - replace default with it
-              // eslint-disable-next-line no-param-reassign
-              stateHandler.onBeforeUnload = state.onBeforeUnload;
-            }
-          },
         },
         testHandlerOptions
       )

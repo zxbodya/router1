@@ -1,12 +1,12 @@
-import { compile } from './expressions/compile';
-import { createGenerator } from './expressions/createGenerator';
-import { createMatcher } from './expressions/createMatcher';
+import { compile } from '../expressions/compile';
+import { createGenerator } from '../expressions/createGenerator';
+import { createMatcher } from '../expressions/createMatcher';
 
-import { concat } from './expressions/concat';
+import { concat } from '../expressions/concat';
 import { normalizeParams } from './normalizeParams';
 
-import { Expresssion } from './expressions/compile';
-import { RouteParams } from './Router';
+import { Expresssion } from '../expressions/compile';
+import { RouteParams } from '../Router';
 
 export interface RouteDef<RouteHandler> {
   name?: string;

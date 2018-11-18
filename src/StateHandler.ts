@@ -2,11 +2,19 @@ import { tap } from 'rxjs/operators';
 
 import { Observable } from 'rxjs';
 import { Location } from './history/history';
-import { AfterRender, Router, RouteTransition } from './Router';
+import { Router, RouteTransition } from './Router';
 
 export type OnLocationChange = (location: Location) => void;
 
-export class StateHandler<RouteState, RenderResult, RouteHandler> {
+interface BaseRouteState {
+  onHashChange?: OnLocationChange;
+  onBeforeUnload?: () => string;
+}
+export class StateHandler<
+  RouteState extends BaseRouteState,
+  RenderResult,
+  RouteHandler
+> {
   public state: RouteState;
   public transition: RouteTransition<RouteState, RenderResult, RouteHandler>;
   public router: Router<RouteState, RenderResult, RouteHandler>;
@@ -15,7 +23,7 @@ export class StateHandler<RouteState, RenderResult, RouteHandler> {
     state: RouteState,
     transition: RouteTransition<RouteState, RenderResult, RouteHandler>
   ) => Observable<RenderResult>;
-  public afterRender: AfterRender<RouteState, RenderResult, RouteHandler>;
+  public onLocationChange: OnLocationChange;
   public onBeforeUnload: () => string;
 
   constructor(
@@ -26,27 +34,34 @@ export class StateHandler<RouteState, RenderResult, RouteHandler> {
       state: RouteState,
       transition: RouteTransition<RouteState, RenderResult, RouteHandler>
     ) => Observable<RenderResult>,
-    afterRender: AfterRender<RouteState, RenderResult, RouteHandler>
+    onLocationChange: OnLocationChange
   ) {
     this.state = state;
     this.transition = routeTransition;
     this.router = routeTransition.router;
     this.onHashChange = onHashChange;
     this.renderState = renderState;
-    this.afterRender = afterRender;
+    this.onLocationChange = onLocationChange;
     // by default do not prevent transition
     this.onBeforeUnload = () => '';
   }
 
   public render(): Observable<RenderResult> {
     return this.renderState(this.state, this.transition).pipe(
-      tap(renderResult =>
-        this.afterRender(this, {
-          state: this.state,
-          transition: this.transition,
-          renderResult,
-        })
-      )
+      tap(renderResult => {
+        // after state was rendered
+        if (this.state.onBeforeUnload) {
+          // if state provides before unload hook - replace default with it
+          // eslint-disable-next-line no-param-reassign
+          this.onBeforeUnload = this.state.onBeforeUnload;
+        }
+        if (this.state.onHashChange) {
+          // if state provides hash change handler - replace default with it
+          // eslint-disable-next-line no-param-reassign
+          this.onHashChange = this.state.onHashChange;
+        }
+        this.onLocationChange(this.transition.location);
+      })
     );
   }
 }

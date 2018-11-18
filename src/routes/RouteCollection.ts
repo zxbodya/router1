@@ -1,26 +1,23 @@
-import { compileRoutes } from './compileRoutes';
-import { pickValues as pickQueryValues } from './utils/queryString';
+import { pickValues as pickQueryValues } from '../utils/queryString';
+import { compileRoutes, Route, RouteDef } from './compileRoutes';
 
-import { Route, RouteDef } from './compileRoutes';
-import { RouteParams } from './Router';
+import { RouteParams } from '../Router';
 
 export class RouteCollection<RouteHandler> {
   private readonly routes: Array<Route<RouteHandler>>;
 
-  private readonly routesByName: {
-    [name: string]: Route<RouteHandler>;
-  };
+  private readonly routesByName: Map<string, Route<RouteHandler>>;
 
   constructor(routes: Array<RouteDef<RouteHandler>>) {
     this.routes = [];
-    this.routesByName = {};
+    this.routesByName = new Map();
     this.addRoutes(routes);
   }
 
   public addRoutes(routeDefs: Array<RouteDef<RouteHandler>>): void {
     compileRoutes(routeDefs).forEach(route => {
       this.routes.push(route);
-      this.routesByName[route.name] = route;
+      this.routesByName.set(route.name, route);
     });
   }
 
@@ -43,7 +40,7 @@ export class RouteCollection<RouteHandler> {
     return matched;
   }
 
-  public getByName(name: string): Route<RouteHandler> {
-    return this.routesByName[name];
+  public getByName(name: string): Route<RouteHandler> | undefined {
+    return this.routesByName.get(name);
   }
 }

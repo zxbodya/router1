@@ -1,4 +1,4 @@
-import { RouteParams } from './Router';
+import { RouteParams } from '../Router';
 
 const has = Object.prototype.hasOwnProperty;
 
