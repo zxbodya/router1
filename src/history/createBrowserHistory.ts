@@ -6,7 +6,11 @@ import { splitUrl } from '../utils/splitUrl';
 
 import { History, Location, LocationSource } from './history';
 
-export function createBrowserHistory(): History {
+export function createBrowserHistory({
+  forceReload,
+}: {
+  forceReload?: boolean;
+} = {}): History {
   function currentLocation(source?: LocationSource): Location {
     return {
       pathname: window.location.pathname,
@@ -21,7 +25,7 @@ export function createBrowserHistory(): History {
   let push;
   let replace;
 
-  if ('onpopstate' in window) {
+  if ('onpopstate' in window && !forceReload) {
     location = fromEvent(window, 'popstate').pipe(
       map(() => currentLocation('pop')),
       startWith(currentLocation('init')),
@@ -39,7 +43,7 @@ export function createBrowserHistory(): History {
     const justUpdateHash = (url: string) => {
       const [path, query, hash] = splitUrl(url);
       const cl = currentLocation();
-      if (cl.pathname === path || cl.search === query) {
+      if (cl.pathname === path && cl.search === query) {
         window.location.hash = `#${hash}`;
         return true;
       }

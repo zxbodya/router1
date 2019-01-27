@@ -37,9 +37,9 @@ export type RouteTransition<
   params: RouteParams;
 };
 
-type StateLoader<RouteState, RenderResult, RouteHandler> = ((
+type StateLoader<RouteState, RenderResult, RouteHandler> = (
   routeTransition: RouteTransition<RouteState, RenderResult, RouteHandler>
-) => Observable<RouteState>);
+) => Observable<RouteState>;
 
 export type RenderState<RouteState, RenderResult, RouteHandler> = (
   state: RouteState,

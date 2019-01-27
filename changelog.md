@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.14.1 (2019-01-27)
+
+- added option `forceRefresh`, to `createBrowserHistory`, allowing to force page not using push state in modern browsers
+- fix bug in `createBrowserHistory` casing navigation to not happen in most cases for old browsers
+
 ## 0.14.0 (2018-11-18)
 
 - **breaking:** Moved common after render logic to the router, replaced onHashChange and after Render with scrollBehavior property.
