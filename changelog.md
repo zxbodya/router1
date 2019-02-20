@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.14.2 (2019-02-20)
+
+- allow to control change in router state when navigating, to prevent state change when `forceRefresh` is set to true
+
 ## 0.14.1 (2019-01-27)
 
 - added option `forceRefresh`, to `createBrowserHistory`, allowing to force page not using push state in modern browsers

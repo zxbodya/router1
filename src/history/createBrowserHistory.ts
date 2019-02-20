@@ -35,9 +35,11 @@ export function createBrowserHistory({
 
     push = (url: string, state?: object, title = '') => {
       window.history.pushState(state, title, url);
+      return true;
     };
     replace = (url: string, state?: object, title = '') => {
       window.history.replaceState(state, title, url);
+      return true;
     };
   } else {
     const justUpdateHash = (url: string) => {
@@ -52,12 +54,16 @@ export function createBrowserHistory({
     replace = (url: string) => {
       if (!justUpdateHash(url)) {
         window.location.replace(url);
+        return false;
       }
+      return true;
     };
     push = (url: string) => {
       if (!justUpdateHash(url)) {
         window.location.assign(url);
+        return false;
       }
+      return true;
     };
     location = fromEvent(window, 'hashchange').pipe(
       map(() => currentLocation('pop')),

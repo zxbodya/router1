@@ -283,10 +283,11 @@ export class Router<RouteState, RenderResult, RouteHandler> {
           return EMPTY;
         }
 
-        this.currentLocation = location;
-        this.history.push(url, state);
-
-        return [location];
+        if (this.history.push(url, state)) {
+          this.currentLocation = location;
+          return [location];
+        }
+        return EMPTY;
       })
     );
     const matchRoutes = (

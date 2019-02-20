@@ -38,16 +38,20 @@ export function createHashHistory(): History {
 
     push = (url: string, state?: object, title: string = '') => {
       window.history.pushState(state, title, fullUrl(url));
+      return true;
     };
     replace = (url: string, state?: object, title: string = '') => {
       window.history.replaceState(state, title, fullUrl(url));
+      return true;
     };
   } else {
     replace = (url: string) => {
       window.location.replace(url);
+      return true;
     };
     push = (url: string) => {
       window.location.assign(url);
+      return true;
     };
 
     location = fromEvent(window, 'hashchange').pipe(

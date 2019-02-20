@@ -35,6 +35,7 @@ export function createTestHistory(
       if (cb) {
         cb('push', { url, state, title });
       }
+      return true;
     },
     replace(
       url: string,
@@ -44,6 +45,7 @@ export function createTestHistory(
       if (cb) {
         cb('replace', { url, state, title });
       }
+      return true;
     },
     navigate(url: string, state: object = {}) {
       location$.next({ ...locationFromUrl(url, state), source: 'pop' });
