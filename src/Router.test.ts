@@ -1,5 +1,4 @@
-/* tslint:disable no-console */
-/* tslint:disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Observable } from 'rxjs';
 
 import { noop, of } from 'rxjs';
@@ -502,7 +501,7 @@ describe('Router', () => {
       routeCollection: new RouteCollection<any>([
         {
           name: 'main',
-          handler: (t: any) => 'main',
+          handler: () => 'main',
           url: '/',
         },
         {
@@ -512,7 +511,7 @@ describe('Router', () => {
         },
         {
           name: 'main3',
-          handler: (t: any) => 'main3',
+          handler: () => 'main3',
           url: '/3',
         },
         {
@@ -560,7 +559,7 @@ describe('Router', () => {
       routeCollection: new RouteCollection<any>([
         {
           name: 'main',
-          handler: (t: any) => 'main',
+          handler: () => 'main',
           url: '/',
         },
         {
@@ -606,7 +605,7 @@ describe('Router', () => {
       routeCollection: new RouteCollection<any>([
         {
           name: 'main',
-          handler: (t: any) => 'main',
+          handler: () => 'main',
           url: '/',
         },
         {
@@ -709,13 +708,11 @@ describe('Router', () => {
       },
     });
 
-    const bak = console.error;
-    console.error = (v: any) => {
+    jest.spyOn(console, 'error').mockImplementationOnce(v => {
       expect(v).toMatchSnapshot();
-      console.error = bak;
       router.stop();
       done();
-    };
+    });
     router.start();
   });
 

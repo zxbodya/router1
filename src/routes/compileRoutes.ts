@@ -99,7 +99,6 @@ export function compileRoutes<RouteHandler>(
 
       // few routes with same name
       if (usedNames.has(routeName)) {
-        // tslint:disable-next-line no-console
         console.warn(
           `"${routeName}" is dublicated, route names should be uniq`
         );
@@ -108,7 +107,6 @@ export function compileRoutes<RouteHandler>(
 
       // no handlers defined
       if (rawRoute.handlers.length === 0) {
-        // tslint:disable-next-line no-console
         console.warn(`route "${routeName}" have no handlers`);
       }
 
@@ -120,7 +118,6 @@ export function compileRoutes<RouteHandler>(
       for (let j = 0, sl = pathParams.length; j < sl; j += 1) {
         const paramName = pathParams[j];
         if (pathParamsSet.has(paramName)) {
-          // tslint:disable-next-line no-console
           console.warn(
             `path param "${paramName}" in route "${routeName}" is duplicated`
           );
@@ -132,7 +129,6 @@ export function compileRoutes<RouteHandler>(
       for (let j = 0, sl = searchParams.length; j < sl; j += 1) {
         const paramName = searchParams[j];
         if (pathParamsSet.has(paramName)) {
-          // tslint:disable-next-line no-console
           console.warn(
             `path param "${paramName}" in route "${routeName}" is overridden by search params`
           );
@@ -155,7 +151,6 @@ export function compileRoutes<RouteHandler>(
         const path = generatePathOriginal(params);
         const match = matchPath(path);
         if (!match) {
-          // tslint:disable-next-line no-console
           console.warn(
             `path "${path}" generated for route "${routeName}" with params ${JSON.stringify(
               params
@@ -167,7 +162,6 @@ export function compileRoutes<RouteHandler>(
             false
           )
         ) {
-          // tslint:disable-next-line no-console
           console.warn(
             `path "${path}" generated for route "${routeName}" with params ${JSON.stringify(
               params

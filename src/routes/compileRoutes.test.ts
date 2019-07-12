@@ -96,13 +96,11 @@ describe('Router, compiling route collection', () => {
     const { warn } = console;
     let lastWarnMessage: any;
     beforeAll(() => {
-      // tslint:disable-next-line no-console
       console.warn = (...args: any[]) => {
         lastWarnMessage = args;
       };
     });
     afterAll(() => {
-      // tslint:disable-next-line no-console
       console.warn = warn;
     });
     beforeEach(() => {

@@ -11,9 +11,9 @@ export function createMatcher(
     const matches = decodeURI(path)
       .replace(/(?:%3F|%23)/g, c => (c === '%3F' ? '?' : '#'))
       .match(matcherExp);
-    let res = null;
+    let res: { [k: string]: string } | null = null;
     if (matches) {
-      res = {} as { [k: string]: string };
+      res = {};
       for (let i = 0, l = paramNames.length; i < l; i += 1) {
         res[paramNames[i]] = matches[i + 1];
       }

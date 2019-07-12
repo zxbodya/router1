@@ -2,7 +2,6 @@ import { first, take } from 'rxjs/operators';
 
 import { createHashHistory } from './createHashHistory';
 
-// tslint:disable-next-line no-namespace
 declare namespace global {
   let window: any;
 }

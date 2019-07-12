@@ -2,7 +2,7 @@ import { first, take } from 'rxjs/operators';
 
 import { createBrowserHistory } from './createBrowserHistory';
 
-// tslint:disable-next-line no-namespace
+// eslint-disable-next-line @typescript-eslint/no-namespace
 declare namespace global {
   let window: any;
 }

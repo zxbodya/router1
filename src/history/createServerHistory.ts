@@ -1,4 +1,4 @@
-import { Observable, of } from 'rxjs';
+import { of } from 'rxjs';
 
 import { publishReplay, refCount } from 'rxjs/operators';
 
@@ -20,12 +20,12 @@ export function createServerHistory(initialUrl: string): History {
     replace() {
       throw new Error('navigation not supported');
     },
-    location: of({
+    location: of<Location>({
       ...locationFromUrl(initialUrl),
       source: 'init',
-    } as Location).pipe(
+    }).pipe(
       publishReplay(1),
       refCount()
-    ) as Observable<Location>,
+    ),
   };
 }

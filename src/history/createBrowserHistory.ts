@@ -33,11 +33,11 @@ export function createBrowserHistory({
       refCount()
     );
 
-    push = (url: string, state?: object, title = '') => {
+    push = (url: string, state?: object, title: string = '') => {
       window.history.pushState(state, title, url);
       return true;
     };
-    replace = (url: string, state?: object, title = '') => {
+    replace = (url: string, state?: object, title: string = '') => {
       window.history.replaceState(state, title, url);
       return true;
     };

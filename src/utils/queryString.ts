@@ -1,7 +1,7 @@
 import { RouteParams } from '../Router';
 
 export function pickValues(data: RouteParams, keys: string[]): RouteParams {
-  const res = {} as RouteParams;
+  const res: RouteParams = {};
   keys.forEach(name => {
     res[name] = data[name] === undefined ? false : data[name];
   });
@@ -12,7 +12,7 @@ export function parse(
   query: string,
   keys: null | string[] = null
 ): RouteParams {
-  const data = {} as RouteParams;
+  const data: RouteParams = {};
   query.split('&').forEach(part => {
     if (part === '') {
       return;

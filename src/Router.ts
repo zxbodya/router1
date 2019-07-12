@@ -33,7 +33,7 @@ export type RouteTransition<
   RenderResult,
   RouteHandler
 > = Transition<RouteState, RenderResult, RouteHandler> & {
-  route: Route<RouteHandler>;
+  route: Pick<Route<RouteHandler>, 'name' | 'handlers'>;
   params: RouteParams;
 };
 
@@ -104,7 +104,9 @@ export class Router<RouteState, RenderResult, RouteHandler> {
     return returnValue || undefined;
   };
 
-  constructor(config: RouterConfig<RouteState, RenderResult, RouteHandler>) {
+  public constructor(
+    config: RouterConfig<RouteState, RenderResult, RouteHandler>
+  ) {
     this.history = config.history;
     this.routeCollection = config.routeCollection;
     this.loadState = config.loadState;
@@ -136,12 +138,15 @@ export class Router<RouteState, RenderResult, RouteHandler> {
   private createNotFoundHandler(
     transition: Transition<RouteState, RenderResult, RouteHandler>
   ): Observable<StateHandler<RouteState, RenderResult, RouteHandler>> {
-    const notFoundTransition = {
-      // @ts-ignore
+    const notFoundTransition: RouteTransition<
+      RouteState,
+      RenderResult,
+      RouteHandler
+    > = {
       route: {
         name: '',
         handlers: [],
-      } as Route<RouteHandler>,
+      },
       params: {},
       ...transition,
       router: this,
@@ -164,16 +169,17 @@ export class Router<RouteState, RenderResult, RouteHandler> {
     const transitionFromLocation = (
       toLocation: Location
     ): Observable<Transition<RouteState, RenderResult, RouteHandler>> =>
-      Observable.create(
+      new Observable(
         (
           observer: Subscriber<
             Transition<RouteState, RenderResult, RouteHandler>
           >
         ) => {
           let redirectCount = 0;
+          // eslint-disable-next-line prefer-const
           let forwardInt: (url: string) => void;
           // defer redirect to new state to prevent subscription new render() result before old in edge cases
-          const forward = (redirectUrl: string) => {
+          const forward = (redirectUrl: string): void => {
             setTimeout(forwardInt, 0, redirectUrl);
           };
           forwardInt = (redirectUrl: string): void => {
@@ -325,7 +331,7 @@ export class Router<RouteState, RenderResult, RouteHandler> {
       > => {
         if (index >= routes.length) {
           // not found
-          return of(['', {}, null]) as Observable<
+          return of(['', {}, null] as unknown) as Observable<
             [
               string,
               RouteParams,
@@ -339,7 +345,7 @@ export class Router<RouteState, RenderResult, RouteHandler> {
           route: route[0],
           params: route[1],
           ...transition,
-        } as Transition<RouteState, RenderResult, RouteHandler> & { route: any; params: any });
+        });
         return handler.pipe(
           switchMap(loadResult =>
             loadResult
@@ -379,8 +385,7 @@ export class Router<RouteState, RenderResult, RouteHandler> {
       StateHandler<RouteState, RenderResult, RouteHandler>
     ]): Observable<RenderResult> => {
       this.activeRoute = [route, params, handler];
-      // @ts-ignore
-      return this.activeRoute[2].render();
+      return this.activeRoute[2]!.render();
     };
 
     this.resultsSubscription = merge(historyTransition$, navigateTransition$)
@@ -399,7 +404,6 @@ export class Router<RouteState, RenderResult, RouteHandler> {
           if (this.renderResult$.observers.length) {
             this.renderResult$.error(e);
           } else {
-            // tslint:disable-next-line no-console
             console.error(e);
           }
         }
@@ -456,7 +460,6 @@ export class Router<RouteState, RenderResult, RouteHandler> {
     }
     /* istanbul ignore else */
     if (process.env.NODE_ENV !== 'production') {
-      // tslint:disable-next-line no-console
       console.error(`Route "${name}" not found`);
       return `#route-${name}-not-found`;
     }

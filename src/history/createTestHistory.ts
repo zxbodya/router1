@@ -1,4 +1,4 @@
-import { Observable, Subject } from 'rxjs';
+import { Subject } from 'rxjs';
 import { publishReplay, refCount, startWith } from 'rxjs/operators';
 
 import { locationFromUrl } from '../utils/locationFromUrl';
@@ -51,9 +51,9 @@ export function createTestHistory(
       location$.next({ ...locationFromUrl(url, state), source: 'pop' });
     },
     location: location$.pipe(
-      startWith({ ...locationFromUrl(initialUrl), source: 'init' } as Location),
+      startWith<Location>({ ...locationFromUrl(initialUrl), source: 'init' }),
       publishReplay(1),
       refCount()
-    ) as Observable<Location>,
+    ),
   };
 }

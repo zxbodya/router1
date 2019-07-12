@@ -57,7 +57,7 @@ export class StateHandler<
 
   public render(): Observable<RenderResult> {
     return this.renderState(this.state, this.transition).pipe(
-      tap(renderResult => {
+      tap(() => {
         // after state was rendered
         if (this.state.onBeforeUnload) {
           // if state provides before unload hook - replace default with it

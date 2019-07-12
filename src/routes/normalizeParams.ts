@@ -7,7 +7,7 @@ export function normalizeParams(
   searchParams: string[],
   params: { [key: string]: any }
 ): RouteParams {
-  const res = {} as RouteParams;
+  const res: RouteParams = {};
   for (const key in params) {
     /* istanbul ignore else */
     if (has.call(params, key)) {

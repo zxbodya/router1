@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "resolveJsonModule": true,
     "declaration": true,
     "declarationDir": "./dist",
     "moduleResolution": "node",

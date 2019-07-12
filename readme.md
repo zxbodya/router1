@@ -3,9 +3,7 @@
 [![Build Status](https://travis-ci.org/zxbodya/router1.svg)](https://travis-ci.org/zxbodya/router1)
 [![codecov.io](https://codecov.io/github/zxbodya/router1/coverage.svg?branch=master)](https://codecov.io/github/zxbodya/router1?branch=master)
 
-Reactive routing library for universal(isomorphic) web applications. Built with RxJS.
-
-It is meant to be foundation for implementing routing in your application in a way you want it to be.
+Reactive routing library for web applications(both server and client side). Built with RxJS. 
 
 What makes it different? Why it was created?
 
@@ -17,7 +15,7 @@ What makes it different? Why it was created?
 
 It provides:
 
- - url matching, 
+ - url matching
  - url generation (by route name and parameters)
  - history abstractions for various use cases (server-side, html5 browser, via location.hash, or for tests)
  - transition handling (waiting for data, redirect, before enter checks, automatic cancellation of previous transition)
